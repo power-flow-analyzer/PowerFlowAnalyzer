@@ -12,6 +12,12 @@ public interface IConnectionConstants {
 	
 	public final static String NETWORK_DATA_FIELD = "network-data";
 	
+	public final static String IMPORT_TYPE_DATA_FIELD = "import-type";
+	
+	public final static String IMPORT_TYPE_REPLACE_CASE_DATA_VALUE = "replace-case";
+	
+	public final static String IMPORT_TYPE_NEW_CASE_DATA_VALUE = "new-case";
+	
 	public final static String SERVER_STATUS_CONNECTION = "server-status";
 	
 	public final static String SET_WORKING_DIR_CONNECTION = "set-working-directory";

@@ -4,21 +4,19 @@ import net.ee.pfanalyzer.model.Branch;
 
 public class BranchPanel extends ModelElementPanel {
 
-	private Group flagGroup;
-
 	public BranchPanel(ElementPanelController controller) {
 		super(controller);
-		
-		flagGroup = addElementGroup("Flags");
 	}
 
 	public void setBranch(Branch data) {
 		// remove old elements
-		flagGroup.removeAll();
+		removeAllElements();
 		// set title
 		setTitle(data.getDisplayName());
+		// show properties
+		addParameters(data);
 		// show flags
-		addFlags(data, flagGroup);
+		addFlags(data);
 		finishLayout();
 	}
 }

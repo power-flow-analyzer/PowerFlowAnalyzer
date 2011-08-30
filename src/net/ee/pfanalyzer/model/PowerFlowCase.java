@@ -5,6 +5,7 @@ import java.io.File;
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
+import net.ee.pfanalyzer.ui.PowerFlowViewer;
 
 public class PowerFlowCase {
 
@@ -12,6 +13,7 @@ public class PowerFlowCase {
 	private CaseData pfCase;
 	private Network network;
 	private ModelDB modelDB;
+	private PowerFlowViewer viewer;
 	
 	public PowerFlowCase() {
 		pfCase = new CaseData();
@@ -50,6 +52,14 @@ public class PowerFlowCase {
 		return network;
 	}
 	
+	public PowerFlowViewer getViewer() {
+		return viewer;
+	}
+
+	public void setViewer(PowerFlowViewer viewer) {
+		this.viewer = viewer;
+	}
+
 	public void setNetworkData(NetworkData networkData) {
 		getNetwork().setData(networkData);
 		pfCase.setNetwork(networkData);
@@ -57,7 +67,7 @@ public class PowerFlowCase {
 	}
 	
 	private void updateNetworkData() {
-		System.out.println("case: setting network data with " + getNetwork().getElements().size() + " elements");
+//		System.out.println("case: setting network data with " + getNetwork().getElements().size() + " elements");
 		for (AbstractNetworkElement element : getNetwork().getElements()) {
 			ModelData model = getModelDB().getModel(element.getModelID());
 //			System.out.println("    model id: " + element.getModelID());

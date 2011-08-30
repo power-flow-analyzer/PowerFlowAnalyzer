@@ -1,6 +1,5 @@
 package net.ee.pfanalyzer.ui.table;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import javax.swing.table.TableColumnModel;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.model.data.NetworkParameterType;
 
 public class DataTableModel extends AbstractTableModel {
 
@@ -79,24 +77,7 @@ public class DataTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String parameterID = parameters.get(columnIndex);
 		AbstractNetworkElement element = data.get(rowIndex);
-		NetworkParameter param = element.getParameterDefinition(parameterID);
-		if(param != null) {
-			NetworkParameterType type = param.getType();
-			if(type != null) {
-				if(type.equals(NetworkParameterType.INTEGER))
-					return element.getIntParameter(parameterID);
-				if(type.equals(NetworkParameterType.DOUBLE)) {
-					Double value = element.getDoubleParameter(parameterID);
-					if(value != null && param.getDisplay() != null) {
-						String pattern = param.getDisplay().getDecimalFormatPattern();
-						DecimalFormat format = new DecimalFormat(pattern);
-						return format.format(value);
-					}
-					return value;
-				}
-			}
-		}
-		return element.getTextParameter(parameterID);
+		return element.getParameterDisplayValue(parameterID);
 	}
 	
 	protected boolean isValueCorrect(int row, int column) {

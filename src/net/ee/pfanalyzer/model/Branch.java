@@ -22,7 +22,7 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	}
 	
 	public int getInitialBranchStatus() {
-		return getIntParameter(PROPERTY_INITIAL_BRANCH_STATUS);
+		return getIntParameter(PROPERTY_INITIAL_BRANCH_STATUS, -1);
 //		return (int) Math.round(getData()[INITIAL_BRANCH_STATUS]);
 	}
 	
@@ -78,12 +78,18 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	public String getDisplayName() {
 		Bus fromBus = getFromBus();
 		String fromBusName = "??";
-		if(fromBus != null)
+		if(fromBus != null) {
 			fromBusName = fromBus.getName();
+			if(fromBusName == null)
+				fromBusName = fromBus.getDisplayName();
+		}
 		Bus toBus = getToBus();
 		String toBusName = "??";
-		if(toBus != null)
+		if(toBus != null) {
 			toBusName = toBus.getName();
+			if(toBusName == null)
+				toBusName = toBus.getDisplayName();
+		}
 		return "Branch " + (getIndex() + 1) + " (" + fromBusName + " - " + toBusName + ")";
 	}
 }

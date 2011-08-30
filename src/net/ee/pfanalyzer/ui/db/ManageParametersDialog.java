@@ -651,43 +651,59 @@ public class ManageParametersDialog extends BaseDialog {
 			}
 		}
 		
-		private int parseInt(String text) {
+		private Integer parseInt(String text, boolean nullOnError) {
 			try {
 				return Integer.parseInt(text.replace(',', '.'));
 			} catch(NumberFormatException e) {
+				if(nullOnError)
+					return null;
 				return 0;
 			}
 		}
 		
-		private double parseDouble(String text) {
+		private int parseInt(String text) {
+			return parseInt(text, false);
+		}
+		
+		private Double parseDouble(String text, boolean nullOnError) {
 			try {
 				return Double.parseDouble(text.replace(',', '.'));
 			} catch(NumberFormatException e) {
-				return 0;
+				if(nullOnError)
+					return null;
+				return 0.0;
 			}
+		}
+		
+		private double parseDouble(String text) {
+			return parseDouble(text, false);
 		}
 		
 		class IntegerMinField extends StringField {
 			@Override
 			protected String getValue() {
+				if(displayOptions.getMin() == null)
+					return "";
 				return Integer.toString((int) Math.round(displayOptions.getMin()));
 			}
 
 			@Override
 			protected void setValue(String value) {
-				displayOptions.setMin((double) parseInt(value));
+				displayOptions.setMin((double) parseInt(value, true));
 			}
 		}
 		
 		class IntegerMaxField extends StringField {
 			@Override
 			protected String getValue() {
+				if(displayOptions.getMax() == null)
+					return "";
 				return Integer.toString((int) Math.round(displayOptions.getMax()));
 			}
 
 			@Override
 			protected void setValue(String value) {
-				displayOptions.setMax((double) parseInt(value));
+				displayOptions.setMax((double) parseInt(value, true));
 			}
 		}
 		
@@ -706,24 +722,28 @@ public class ManageParametersDialog extends BaseDialog {
 		class DoubleMinField extends StringField {
 			@Override
 			protected String getValue() {
+				if(displayOptions.getMin() == null)
+					return "";
 				return Double.toString(displayOptions.getMin());
 			}
 
 			@Override
 			protected void setValue(String value) {
-				displayOptions.setMin(parseDouble(value));
+				displayOptions.setMin(parseDouble(value, true));
 			}
 		}
 		
 		class DoubleMaxField extends StringField {
 			@Override
 			protected String getValue() {
+				if(displayOptions.getMax() == null)
+					return "";
 				return Double.toString(displayOptions.getMax());
 			}
 
 			@Override
 			protected void setValue(String value) {
-				displayOptions.setMax(parseDouble(value));
+				displayOptions.setMax(parseDouble(value, true));
 			}
 		}
 		

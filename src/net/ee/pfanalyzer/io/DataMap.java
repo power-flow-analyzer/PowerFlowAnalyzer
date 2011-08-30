@@ -12,6 +12,7 @@ public class DataMap implements IConnectionConstants {
 	public DataMap(String connectionType) {
 		this.connectionType = connectionType;
 		if(connectionType.equals(NETWORK_DATA_CONNECTION)) {
+			dataMap.put(IMPORT_TYPE_DATA_FIELD, new EmptyObject(DATA_TYPE_STRING, true));
 			dataMap.put(NETWORK_DATA_FIELD, new EmptyObject(DATA_TYPE_STRING, true));
 		} else if(connectionType.equals(POWER_FLOW_DATA_CONNECTION)) {
 			// Matpower matrices

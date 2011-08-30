@@ -71,7 +71,7 @@ public class ModelDBUtils {
 //		return p;
 //	}
 	
-	public static void removeOwnProperty(AbstractModelElementData element, String id) {
+	public static void removeOwnParameter(AbstractModelElementData element, String id) {
 //		for (int i = 0; i < element.getProperty().size(); i++) {
 //			if(element.getProperty().get(i).getID().equals(id)) {
 //				element.getProperty().remove(i);
@@ -87,6 +87,8 @@ public class ModelDBUtils {
 		NetworkParameter p = ModelDBUtils.getOwnParameter(element, id);
 		if(p != null)
 			return p;
+		if(create == false)
+			return null;
 		p = ModelDBUtils.getParameterValue(element, id);
 //		if(p != null) {
 //			ModelProperty copy = copyProperty(p);

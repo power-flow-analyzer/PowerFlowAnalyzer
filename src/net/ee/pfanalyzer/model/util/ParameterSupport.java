@@ -8,7 +8,7 @@ public abstract class ParameterSupport {
 
 	public abstract List<NetworkParameter> getParameterList();
 	
-	protected NetworkParameter getOwnParameter(String id) {
+	public NetworkParameter getOwnParameter(String id) {
 		for (NetworkParameter p : getParameterList()) {
 			if(p.getID() != null && p.getID().equals(id))
 				return p;
@@ -16,11 +16,41 @@ public abstract class ParameterSupport {
 		return null;
 	}
 	
+	public NetworkParameter getParameter(String id, boolean create) {
+		NetworkParameter p = getOwnParameter(id);
+		if(p != null)
+			return p;
+		if(create == false)
+			return null;
+		p = getParameterValue(id);
+		if(p != null) {
+			NetworkParameter reference = new NetworkParameter();
+			reference.setID(id);
+//			reference.setTextValue(new String(p.getTextValue()));
+			getParameterList().add(reference);
+			return reference;
+		}
+		return null;
+	}
+	
+	public void removeOwnParameter(String id) {
+		NetworkParameter parameter = getOwnParameter(id);
+		if(parameter != null)
+			getParameterList().remove(parameter);
+	}
+	
 	protected NetworkParameter getParameterValue(String id) {
 		NetworkParameter parameter = getOwnParameter(id);
 		if(parameter != null && parameter.getValue() != null)
 			return parameter;
 		return null;
+	}
+	
+	public int getIntParameter(String name, int defaultValue) {
+		Integer value = getIntParameter(name);
+		if(value == null)
+			return defaultValue;
+		return value;
 	}
 	
 	public Integer getIntParameter(String name) {

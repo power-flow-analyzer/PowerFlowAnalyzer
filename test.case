@@ -30,7 +30,7 @@
             <parameter ID="R" type="double" label="Resistance" empty="true">
                 <display increment="1.0E-4"/>
             </parameter>
-            <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" empty="false">
+            <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" value="0" empty="false">
                 <option value="1" label="in-service" ID="1"/>
                 <option value="0" label="out-of-service" ID="0"/>
                 <display/>
@@ -1575,7 +1575,6 @@
             <parameter ID="RATE_C" value="1036.0"/>
             <parameter ID="TAP" value="0.0"/>
             <parameter ID="SHIFT" value="0.0"/>
-            <parameter ID="BR_STATUS" value="1.0"/>
             <parameter ID="ANGMIN" value="0.0"/>
             <parameter ID="ANGMAX" value="0.0"/>
             <parameter ID="PF" value="-122.54226787630718"/>

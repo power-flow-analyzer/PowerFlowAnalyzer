@@ -72,9 +72,18 @@ public class MatpowerGUIClient implements IConnectionConstants {
 		sendData(dataMap.getConnectionType(), dataMap);
 	}
 	
-	public void sendData(Network network) {
+	public void createNetwork(Network network) {
+		sendNetwork(network, IMPORT_TYPE_NEW_CASE_DATA_VALUE);
+	}
+	
+	public void updateNetwork(Network network) {
+		sendNetwork(network, IMPORT_TYPE_REPLACE_CASE_DATA_VALUE);
+	}
+	
+	private void sendNetwork(Network network, String importType) {
 		// create data map
 		DataMap dataMap = new DataMap(NETWORK_DATA_CONNECTION);
+		dataMap.put(IMPORT_TYPE_DATA_FIELD, importType);
 		dataMap.put(NETWORK_DATA_FIELD, network.toXML());
 		// check data
 		dataMap.checkValues();

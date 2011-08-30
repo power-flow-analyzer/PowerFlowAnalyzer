@@ -1,5 +1,6 @@
 package net.ee.pfanalyzer.model;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	}
 	
 	@Override
-	protected NetworkParameter getParameterValue(String id) {
+	public NetworkParameter getParameterValue(String id) {
 		NetworkParameter parameter = super.getParameterValue(id);
 		if(parameter != null)
 			return parameter;
@@ -69,13 +70,41 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 		return null;
 	}
 	
-	public NetworkParameterType getParameterType(String id) {
-		NetworkParameter parameter = super.getOwnParameter(id);
-		if(parameter != null && parameter.getType() != null)
-			return parameter.getType();
-		if(getModel() != null)
-			return ModelDBUtils.getParameterType(getModel(), id);
-		return null;
+//	public NetworkParameterType getParameterType(String id) {
+//		NetworkParameter parameter = super.getOwnParameter(id);
+//		if(parameter != null && parameter.getType() != null)
+//			return parameter.getType();
+//		if(getModel() != null)
+//			return ModelDBUtils.getParameterType(getModel(), id);
+//		return null;
+//	}
+	
+	public String getParameterDisplayValue(String parameterID) {
+		NetworkParameter param = getParameterDefinition(parameterID);
+		if(param != null) {
+			NetworkParameterType type = param.getType();
+//			NetworkParameterValueRestriction restriction = param.getRestriction();
+//			param.getOption().
+			if(type != null) {
+				if(type.equals(NetworkParameterType.INTEGER)) {
+					Integer result = getIntParameter(parameterID);
+					if(result != null)
+						return result.toString();
+					return "";
+				} else if(type.equals(NetworkParameterType.DOUBLE)) {
+					Double value = getDoubleParameter(parameterID);
+					if(value != null && param.getDisplay() != null) {
+						String pattern = param.getDisplay().getDecimalFormatPattern();
+						DecimalFormat format = new DecimalFormat(pattern);
+						return format.format(value);
+					}
+					if(value != null)
+						return value.toString();
+					return "";
+				}
+			}
+		}
+		return getTextParameter(parameterID);
 	}
 	
 	public String getModelID() {

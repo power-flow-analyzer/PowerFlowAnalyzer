@@ -10,6 +10,7 @@ import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.Transformer;
+import net.ee.pfanalyzer.ui.util.Group;
 
 public class CombinedBusPanel extends ModelElementPanel {
 

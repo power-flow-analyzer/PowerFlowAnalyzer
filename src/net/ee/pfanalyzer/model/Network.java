@@ -162,7 +162,7 @@ public class Network extends ParameterSupport {
 		for (CombinedBus cbus : combinedBusList) {
 			busCount += cbus.getNetworkElementCount();
 		}
-		System.out.println(combinedBusList.size() + " combined bus nodes found with " + busCount + " elements");
+//		System.out.println(combinedBusList.size() + " combined bus nodes found with " + busCount + " elements");
 		// combine generators
 		for (int i = 0; i < getGeneratorsCount(); i++) {
 			Generator generator = generators.get(i);
@@ -206,7 +206,7 @@ public class Network extends ParameterSupport {
 //				System.out.println("  created new combined branch " + cbranch.getIndex());
 			}
 		}
-		System.out.println(combinedBranchList.size() + " combined branches found");
+//		System.out.println(combinedBranchList.size() + " combined branches found");
 	}
 	
 	public int getCombinedBusCount() {

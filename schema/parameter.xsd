@@ -44,8 +44,8 @@
     </simpleType>
     
     <complexType name="NetworkParameterValueDisplay">
-        <attribute name="min" type="double" default="0"/>
-        <attribute name="max" type="double" default="100"/>
+        <attribute name="min" type="double"/>
+        <attribute name="max" type="double"/>
         <attribute name="increment" type="double" default="1"/>
         <attribute name="precision" type="double"/>
         <attribute name="decimalFormatPattern" type="string" default="#.########"/>

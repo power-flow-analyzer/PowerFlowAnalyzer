@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.model;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -53,6 +54,14 @@ public class CaseSerializer {
 	}
 	
 	public CaseData readCase(File caseFile) throws Exception {
+		Unmarshaller unmarschaller = context.createUnmarshaller();
+		Object data = ((JAXBElement<?>) unmarschaller.unmarshal(caseFile)).getValue();
+		CaseData c = (CaseData) data;
+		updateParents(c);
+		return c;
+	}
+	
+	public CaseData readCase(InputStream caseFile) throws Exception {
 		Unmarshaller unmarschaller = context.createUnmarshaller();
 		Object data = ((JAXBElement<?>) unmarschaller.unmarshal(caseFile)).getValue();
 		CaseData c = (CaseData) data;
@@ -120,8 +129,8 @@ public class CaseSerializer {
 	public static ModelDBData readInternalModelDB() throws IllegalDataException {
 		try {
 			CaseSerializer serializer = new CaseSerializer();
-			CaseData pfCase = serializer.readCase(new File(ModelDBDialog.class.getResource(
-					INTERNAL_MODEL_DB_INPUT_FILE).toURI()));
+			CaseData pfCase = serializer.readCase(ModelDBDialog.class.getResourceAsStream(
+					INTERNAL_MODEL_DB_INPUT_FILE));
 			updateParents(pfCase);
 			return pfCase.getModelDb();
 		} catch (Exception e) {

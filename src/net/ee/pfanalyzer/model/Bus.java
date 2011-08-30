@@ -52,7 +52,7 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 	}
 	
 	public int getBusNumber() {
-		return getIntParameter(PROPERTY_BUS_NUMBER);
+		return getIntParameter(PROPERTY_BUS_NUMBER, -1);
 	}
 	
 	public void setBusNumber(int value) {
@@ -60,7 +60,7 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 	}
 	
 	public int getBusType() {
-		return getIntParameter(PROPERTY_BUS_TYPE);
+		return getIntParameter(PROPERTY_BUS_TYPE, -1);
 	}
 	
 	public void setBusType(int value) {

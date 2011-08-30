@@ -1,4 +1,4 @@
-function [ generator ] = create_generator( network, genData, index )
+function [ generator ] = create_generator( network, genData, genCostData, index )
 %CREATE_generator Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -39,11 +39,13 @@ if length(genData) > MU_PMAX
 end
 
 % add generator cost parameters to object
-% generator.setParameter('MODEL', genCostData(MODEL));
-% generator.setParameter('STARTUP', genCostData(STARTUP));
-% generator.setParameter('SHUTDOWN', genCostData(SHUTDOWN));
-% generator.setParameter('NCOST', genCostData(NCOST));
-% generator.setParameter('COST', genCostData(COST));
+generator.setParameter('MODEL', genCostData(MODEL));
+generator.setParameter('STARTUP', genCostData(STARTUP));
+generator.setParameter('SHUTDOWN', genCostData(SHUTDOWN));
+generator.setParameter('NCOST', genCostData(NCOST));
+generator.setParameter('COST', genCostData(COST));
+generator.setParameter('GENCOST6', genCostData(6));
+generator.setParameter('GENCOST7', genCostData(7));
 
 end
 

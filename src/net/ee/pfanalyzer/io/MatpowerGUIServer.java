@@ -84,9 +84,14 @@ public class MatpowerGUIServer implements Runnable, IConnectionConstants {
 					} else if(action.equals(NETWORK_DATA_CONNECTION)) {
 						ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
 						out.writeObject(SERVER_MESSAGE_OK);
-						NetworkData network = receiveNetworkData(in, out);
-						if(network != null)
-							application.setNetworkData(network);
+						NetworkImport netImport = receiveNetworkData(in, out);
+						NetworkData network = netImport.network;
+						if(network != null) {
+							if(IMPORT_TYPE_NEW_CASE_DATA_VALUE.equals(netImport.importType))
+								application.createNewCase(network);
+							else if(IMPORT_TYPE_REPLACE_CASE_DATA_VALUE.equals(netImport.importType))
+								application.updateNetwork(network);
+						}
 						out.close();
 					} else if(action.equals(SET_WORKING_DIR_CONNECTION)) {
 						ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -124,14 +129,18 @@ public class MatpowerGUIServer implements Runnable, IConnectionConstants {
 			out.close();
 		}
 		
-		private NetworkData receiveNetworkData(ObjectInputStream in, ObjectOutputStream out) throws IOException {
+		private NetworkImport receiveNetworkData(ObjectInputStream in, ObjectOutputStream out) throws IOException {
 			try {
 				DataMap dataMap = new DataMap(NETWORK_DATA_CONNECTION);
 				receiveData(in, out, dataMap);
 				String data = (String) dataMap.get(NETWORK_DATA_FIELD);
+				String importType = (String) dataMap.get(IMPORT_TYPE_DATA_FIELD);
 				NetworkData network = CaseSerializer.readNetwork(data);
 				out.writeObject(SERVER_MESSAGE_OK);
-				return network;
+				NetworkImport netImport = new NetworkImport();
+				netImport.network = network;
+				netImport.importType = importType;
+				return netImport;
 			} catch (IllegalDataException e) {
 				out.writeObject(e.getMessage() + "(server)");
 			} catch (ClassCastException e) {
@@ -140,6 +149,11 @@ public class MatpowerGUIServer implements Runnable, IConnectionConstants {
 				e.printStackTrace();
 			}
 			return null;
+		}
+		
+		class NetworkImport {
+			NetworkData network;
+			String importType;
 		}
 		
 		private String receiveWorkingDirectory(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {

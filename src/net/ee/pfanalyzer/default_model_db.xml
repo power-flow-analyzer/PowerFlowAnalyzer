@@ -12,11 +12,49 @@
                 <option value="4" label="Isolated" ID="ISOLATED"/>
                 <display/>
             </parameter>
-            <parameter ID="BASE_KV" type="double" label="&lt;html&gt;Base&lt;sub&gt;kV&lt;/sub&gt;&lt;/html&gt;" description="Base voltage (kV)" empty="true"/>
             <parameter ID="LATTITUDE" type="double" label="Lattitude" description="" empty="true"/>
             <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
+            <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QD" type="double" label="Reactive Power Demand (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="GS" type="double" label="Shunt Conductance" description="MV demanded at V = 1.0 p.u." empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="BS" type="double" label="Shunt Susceptance" description="MVAr injected at V = 1.0 p.u." empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="BUS_AREA" type="integer" label="Area" description="Bus Area" empty="true">
+                <display/>
+            </parameter>
             <parameter ID="VM" type="double" label="Voltage Magnitude" empty="true">
                 <display decimalFormatPattern="#.###"/>
+            </parameter>
+            <parameter ID="VA" type="double" label="Voltage Angle (degrees)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="BASE_KV" type="double" label="Base-kV" description="Base voltage (kV)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="VMAX" type="double" label="Max. voltage (p.u.)" description="Maximum voltage magnitude" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="VMIN" type="double" label="Min. voltage (p.u.)" description="Minimum voltage magnitude" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="LAM_P" type="double" label="LaM P (u/MW)" description="Lagrange multiplier on real power mismatch" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="LAM_Q" type="double" label="LaM Q (u/MVAr)" description="Lagrange multiplier on reactive power mismatch" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_VMAX" type="double" label="Mult Vmax (u/p.u.)" description="Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_VMIN" type="double" label="Mult Vmin (u/p.u.)" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" empty="true">
+                <display/>
             </parameter>
             <model ID="unknown" label="Unknown Bus"/>
         </modelClass>

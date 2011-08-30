@@ -63,7 +63,8 @@ public class ClosableTabbedPane {
 	}
 	
 	public void setSelectedIndex(int index) {
-		getTabbedPane().setSelectedIndex(index);
+		if(index < getTabCount())
+			getTabbedPane().setSelectedIndex(index);
 	}
 	
 	public void selectLastTab() {

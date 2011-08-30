@@ -93,6 +93,14 @@ public class PowerFlowViewer implements NetworkElementSelectionListener {
 		});
 	}
 	
+	public void setNetwork(Network network) {
+		this.network = network;
+		for (INetworkDataViewer viewer : viewers) {
+			viewer.setData(network);
+			viewer.refresh();
+		}
+	}
+	
 	private void addTable(String label, String elementID) {
 		INetworkDataViewer table = new DataTable(elementID);
 		table.setData(network);

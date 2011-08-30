@@ -22,10 +22,13 @@ branch.setParameter('SHIFT', branchData(SHIFT));
 branch.setParameter('BR_STATUS', branchData(BR_STATUS));
 branch.setParameter('ANGMIN', branchData(ANGMIN));
 branch.setParameter('ANGMAX', branchData(ANGMAX));
-branch.setParameter('PF', branchData(PF));
-branch.setParameter('QF', branchData(QF));
-branch.setParameter('PT', branchData(PT));
-branch.setParameter('QT', branchData(QT));
+% the following parameters are only included in (O)PF output
+if length(branchData) > QT 
+    branch.setParameter('PF', branchData(PF));
+    branch.setParameter('QF', branchData(QF));
+    branch.setParameter('PT', branchData(PT));
+    branch.setParameter('QT', branchData(QT));
+end
 % the following parameters are only included in OPF output
 if length(branchData) > MU_SF 
     branch.setParameter('MU_SF', branchData(MU_SF));
