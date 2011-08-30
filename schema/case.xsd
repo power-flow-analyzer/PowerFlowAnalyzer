@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mpui="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        targetNamespace="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+    <include schemaLocation="model_db.xsd"/>
+    <include schemaLocation="network.xsd"/>
+    
+    <element name="power_flow_case" type="mpui:CaseData"/>
+    
+    <complexType name="CaseData">
+        <sequence>
+            <element name="model-db" type="mpui:ModelDBData" minOccurs="1" maxOccurs="1"/>
+            <element name="network" type="mpui:NetworkData" minOccurs="1" maxOccurs="1"/>
+        </sequence>
+        <attribute name="version" type="string" default="1.0.0"/>
+    </complexType>
+    
+</schema>

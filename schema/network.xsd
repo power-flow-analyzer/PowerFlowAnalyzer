@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mpui="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        targetNamespace="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+    <include schemaLocation="case.xsd"/>
+    <include schemaLocation="parameter.xsd"/>
+    
+    <complexType name="NetworkData">
+        <sequence>
+            <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="element" type="mpui:AbstractNetworkElementData" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="AbstractNetworkElementData">
+        <sequence>
+            <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="flag" type="mpui:NetworkFlagData" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="modelID" type="string"/>
+    </complexType>
+    
+    <complexType name="NetworkFlagData">
+        <sequence>
+            <element name="parameter" type="string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="label" type="string"/>
+        <attribute name="percentage" type="double" default="0"/>
+        <attribute name="warning" type="boolean" default="false"/>
+        <attribute name="failure" type="boolean" default="false"/>
+    </complexType>
+    
+</schema>

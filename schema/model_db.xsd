@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mpui="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        targetNamespace="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+    
+    <include schemaLocation="parameter.xsd"/>
+
+    <complexType name="ModelDBData">
+        <sequence>
+            <element name="modelClass" type="mpui:ModelClassData" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="AbstractModelElementData" abstract="true">
+        <sequence>
+            <element name="parent" type="mpui:AbstractModelElementData"/>
+            <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+		<attribute name="description" type="string"/>
+        <attribute name="label" type="string"/>
+		<attribute name="ID" type="string"/>
+    </complexType>
+    
+    <complexType name="ModelClassData">
+        <complexContent>
+            <extension base="mpui:AbstractModelElementData">
+		        <sequence>
+		            <element name="modelClass" type="mpui:ModelClassData" minOccurs="0" maxOccurs="unbounded"/>
+		            <element name="model" type="mpui:ModelData" minOccurs="0" maxOccurs="unbounded"/>
+		        </sequence>
+		        <attribute name="baseType" type="mpui:BaseElementType"/>
+            </extension>
+        </complexContent>
+    </complexType>
+    
+    <complexType name="ModelData">
+        <complexContent>
+            <extension base="mpui:AbstractModelElementData">
+            </extension>
+        </complexContent>
+    </complexType>
+    
+    <simpleType name="BaseElementType">
+        <restriction base="string">
+            <enumeration value="bus"/>
+            <enumeration value="branch"/>
+            <enumeration value="generator"/>
+            <enumeration value="custom"/>
+        </restriction>
+    </simpleType>
+    
+</schema>
