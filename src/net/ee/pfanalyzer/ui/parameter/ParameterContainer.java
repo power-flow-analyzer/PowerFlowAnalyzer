@@ -2,19 +2,25 @@ package net.ee.pfanalyzer.ui.parameter;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
@@ -110,6 +116,24 @@ public class ParameterContainer extends JPanel {
 		currentGroupContainer.addElementLink(element);
 	}
 	
+	protected void addModelLink(final AbstractNetworkElement element) {
+		String modelName = element.getModelID();
+		if(element.getModel() != null)
+			modelName = element.getModel().getLabel() + " (\"" + modelName + "\")";
+		JButton changeModelButton = PowerFlowAnalyzer.createButton("Select a model from the database", "database_go.png", "Change Model", false);
+		changeModelButton.setMargin(new Insets(2, 2, 1, 1));
+		changeModelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showModelDB(element.getModel());
+			}
+		});
+		JPanel linkPanel = new JPanel(new BorderLayout());
+		linkPanel.add(new JLabel(modelName), BorderLayout.CENTER);
+		linkPanel.add(changeModelButton, BorderLayout.EAST);
+		currentGroupContainer.add(linkPanel);
+	}
+	
 	protected void removeAllElements() {
 		elementContainer.removeAll();
 		properties.clear();
@@ -136,4 +160,7 @@ public class ParameterContainer extends JPanel {
 //		elementContainer.add(Box.createVerticalGlue());
 	}
 	
+	private void showModelDB(ModelData model) {
+		PowerFlowAnalyzer.getInstance().showModelDBDialog();
+	}
 }

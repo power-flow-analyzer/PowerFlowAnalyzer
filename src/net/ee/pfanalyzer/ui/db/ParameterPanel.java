@@ -54,11 +54,11 @@ public class ParameterPanel extends ParameterContainer {
 		protected String getParameterValue() {
 			if(master.getID() == null)
 				return "";
-			return master.getID().toString();
+			return master.getID();
 		}
 		
 		protected void setParameterValue(String text) {
-			if(text == null || text.trim().length() == 0)
+			if(text == null || text.trim().isEmpty())
 				master.setID(null);
 			else
 				master.setID(text);

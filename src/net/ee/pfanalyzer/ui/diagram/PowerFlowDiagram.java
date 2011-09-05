@@ -16,6 +16,7 @@ import javax.swing.event.MouseInputListener;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
@@ -287,5 +288,28 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	public void selectionChanged(Object data) {
 		selection = data;
 		repaint();
+	}
+
+	@Override
+	public void networkChanged(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkChanged");
+		refresh();
+	}
+
+	@Override
+	public void networkElementAdded(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkElementAdded");
+		refresh();
+	}
+
+	@Override
+	public void networkElementChanged(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkElementChanged");
+		refresh();
+	}
+
+	@Override
+	public void networkElementRemoved(NetworkChangeEvent event) {
+		refresh();
 	}
 }

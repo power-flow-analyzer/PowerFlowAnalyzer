@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 
-public class NetworkElementSelectionManager implements NetworkElementSelectionListener {
+public class NetworkElementSelectionManager implements INetworkElementSelectionListener {
 
 	private static NetworkElementSelectionManager INSTANCE = new NetworkElementSelectionManager();
 	
@@ -13,7 +13,7 @@ public class NetworkElementSelectionManager implements NetworkElementSelectionLi
 		return INSTANCE;
 	}
 	
-	private List<NetworkElementSelectionListener> networkElementListeners = new ArrayList<NetworkElementSelectionListener>();
+	private List<INetworkElementSelectionListener> networkElementListeners = new ArrayList<INetworkElementSelectionListener>();
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private ArrayList<Object> viewHistory = new ArrayList<Object>();
 	private int currentView = 0;
@@ -41,7 +41,7 @@ public class NetworkElementSelectionManager implements NetworkElementSelectionLi
 			currentView++;
 //			System.out.println("added to history, now is at index " + currentView);
 		}
-		for (NetworkElementSelectionListener listener : networkElementListeners) {
+		for (INetworkElementSelectionListener listener : networkElementListeners) {
 			listener.selectionChanged(selection);
 		}
 		fireActionUpdate();
@@ -61,11 +61,11 @@ public class NetworkElementSelectionManager implements NetworkElementSelectionLi
 		}
 	}
 
-	public void addNetworkElementSelectionListener(NetworkElementSelectionListener listener) {
+	public void addNetworkElementSelectionListener(INetworkElementSelectionListener listener) {
 		networkElementListeners.add(listener);
 	}
 	
-	public void removeNetworkElementSelectionListener(NetworkElementSelectionListener listener) {
+	public void removeNetworkElementSelectionListener(INetworkElementSelectionListener listener) {
 		networkElementListeners.remove(listener);
 	}
 	

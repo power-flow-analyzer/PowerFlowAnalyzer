@@ -17,12 +17,17 @@ public class ParameterTextField extends JTextField implements ActionListener, Ke
 	public ParameterTextField(String parameterID) {
 		super();
 		this.parameterID = parameterID;
+		initField();
 	}
 	
 	public ParameterTextField(NetworkParameter parameter) {
 		super();
 		this.parameter = parameter;
 		this.parameterID = parameter.getID();
+		initField();
+	}
+	
+	private void initField() {
 		if(getParameterValue() != null)
 			setText(getParameterValue());
 		addActionListener(this);

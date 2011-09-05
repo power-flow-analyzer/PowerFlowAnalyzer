@@ -23,6 +23,14 @@ public class DataTableModel extends AbstractTableModel {
 	
 	void setData(List<AbstractNetworkElement> data) {
 		this.data = data;
+		reloadTableData();
+	}
+	
+	void updateTableData() {
+		fireTableDataChanged();
+	}
+	
+	void reloadTableData() {
 		parameters.clear();
 		columnNames.clear();
 		columnDescriptions.clear();
@@ -49,6 +57,7 @@ public class DataTableModel extends AbstractTableModel {
 				}
 			}
 		}
+		fireTableStructureChanged();
 	}
 	
 	protected AbstractNetworkElement getDataObject(int row) {
@@ -94,6 +103,10 @@ public class DataTableModel extends AbstractTableModel {
 			}
 		}
 		return correct;
+	}
+	
+	public boolean containsParameter(String id) {
+		return parameters.contains(id);
 	}
 	
 	@Override

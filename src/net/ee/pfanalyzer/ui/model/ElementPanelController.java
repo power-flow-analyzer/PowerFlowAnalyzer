@@ -11,12 +11,14 @@ import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.preferences.Preferences;
-import net.ee.pfanalyzer.ui.NetworkElementSelectionListener;
+import net.ee.pfanalyzer.ui.INetworkElementSelectionListener;
 import net.ee.pfanalyzer.ui.dialog.ModelPropertiesDialog;
 
-public class ElementPanelController extends JPanel implements NetworkElementSelectionListener {
+public class ElementPanelController extends JPanel implements INetworkElementSelectionListener, INetworkChangeListener {
 
 	private final static String NETWORK_CARD = "network";
 	private final static String COMBINED_BUS_CARD = "combined-bus";
@@ -70,9 +72,10 @@ public class ElementPanelController extends JPanel implements NetworkElementSele
 
 	@Override
 	public void selectionChanged(Object selection) {
-		if(selection == null)
+		if(selection == null) {
+			networkPanel.updateNetwork();
 			cardLayout.show(this, NETWORK_CARD);
-		else if(selection instanceof CombinedBus) {
+		} else if(selection instanceof CombinedBus) {
 			cBusPanel.setCombinedBus((CombinedBus) selection);
 			cardLayout.show(this, COMBINED_BUS_CARD);
 		} else if(selection instanceof CombinedBranch) {
@@ -89,10 +92,33 @@ public class ElementPanelController extends JPanel implements NetworkElementSele
 			cardLayout.show(this, GENERATOR_CARD);
 		}
 		doLayout();
+		revalidate();
 		repaint();
 		oldSelection = selection;
 	}
 	
+	@Override
+	public void networkChanged(NetworkChangeEvent event) {
+		selectionChanged(null);
+	}
+
+	@Override
+	public void networkElementAdded(NetworkChangeEvent event) {
+		// do nothing
+	}
+
+	@Override
+	public void networkElementChanged(NetworkChangeEvent event) {
+		if(event.getNetworkElement() != null && event.getNetworkElement() == oldSelection)
+			selectionChanged(event.getNetworkElement());
+	}
+
+	@Override
+	public void networkElementRemoved(NetworkChangeEvent event) {
+		if(event.getNetworkElement() != null && event.getNetworkElement() == oldSelection)
+			selectionChanged(null);
+	}
+
 	public void showPanelPropertiesDialog(Frame frame) {
 		if(panelPropertiesDialog != null) {
 			panelPropertiesDialog.setVisible(true);

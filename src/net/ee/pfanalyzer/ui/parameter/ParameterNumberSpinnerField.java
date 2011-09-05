@@ -58,7 +58,10 @@ public abstract class ParameterNumberSpinnerField extends ParameterValuePanel im
 		if(ignoreAction())
 			return;
 		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);
-		property.setValue(getTextValue(spinner.getValue()));
+		String newValue = getTextValue(spinner.getValue());
+		String oldValue = property.getValue();
+		property.setValue(newValue);
+		fireValueChanged(oldValue, newValue);
 		refresh();
 	}
 }

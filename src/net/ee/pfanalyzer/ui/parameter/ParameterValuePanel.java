@@ -110,6 +110,10 @@ public abstract class ParameterValuePanel extends JPanel {
 		}
 	}
 	
+	protected void fireValueChanged(String oldValue, String newValue) {
+		getMasterElement().fireValueChanged(propertyDefinition.getID(), oldValue, newValue);
+	}
+	
 	private void inheritValue() {
 		userAction = false;
 		getMasterElement().removeOwnParameter(getPropertyID());

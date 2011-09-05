@@ -75,6 +75,8 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 		String locationName = getFirstBus().getName();
 		if(locationName != null)
 			return locationName;// + " (Area " + (getIndex() + 1) + ")";
+		else if(getNetworkElementCount() == 1)
+			return "Bus " + (getIndex() + 1);
 		else
 			return "Area " + (getIndex() + 1);
 	}

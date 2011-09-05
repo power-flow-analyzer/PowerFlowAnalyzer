@@ -25,7 +25,6 @@ public class ModelElementPanel extends ParameterContainer {
 
 	private ElementPanelController controller;
 	private AbstractNetworkElement element;
-	private Object data;
 	private JLabel titleLabel;
 	private Font titleFont = new Font(null, Font.BOLD, 16);
 //	private Font groupFont = new Font(null, Font.BOLD, 12);
@@ -45,14 +44,6 @@ public class ModelElementPanel extends ParameterContainer {
 		return controller;
 	}
 
-	public Object getData() {
-		return data;
-	}
-
-	public void setData(Object data) {
-		this.data = data;
-	}
-	
 	protected void setTitle(String title) {
 		titleLabel.setText(title);
 	}
@@ -67,10 +58,7 @@ public class ModelElementPanel extends ParameterContainer {
 		setCurrentElement(element);
 		Group modelGroup = addElementGroup("");
 		modelGroup.add(new JLabel("Model: "));
-		String modelName = element.getModelID();
-		if(element.getModel() != null)
-			modelName = element.getModel().getLabel() + " (\"" + modelName + "\")";
-		modelGroup.add(new JLabel(modelName));
+		addModelLink(element);
 		// add parameters from model
 		if(element.getModel() != null)
 			addParameters(element.getModel(), element.getModel(), getElementContainer());

@@ -45,4 +45,9 @@ public class ParameterMasterModel implements IParameterMasterElement {
 	public void removeOwnParameter(String parameterID) {
 		ModelDBUtils.removeOwnParameter(getMasterElement(), parameterID);
 	}
+	
+	@Override
+	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
+		// empty implementation
+	}
 }

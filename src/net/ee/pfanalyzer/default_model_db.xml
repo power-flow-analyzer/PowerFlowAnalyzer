@@ -56,6 +56,9 @@
             <parameter ID="MU_VMIN" type="double" label="Mult Vmin (u/p.u.)" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" empty="true">
                 <display/>
             </parameter>
+            <parameter ID="ZONE" type="integer" label="Zone" empty="true">
+                <display/>
+            </parameter>
             <model ID="unknown" label="Unknown Bus"/>
         </modelClass>
         <modelClass baseType="branch" ID="branch" label="Branch">
@@ -65,15 +68,63 @@
             <parameter ID="T_BUS" type="integer" label="To Bus" description="To Bus" restriction="bus-number" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="R" type="double" label="Resistance" empty="true">
+            <parameter ID="BR_R" type="double" label="Resistance" empty="true">
                 <display increment="1.0E-4"/>
+            </parameter>
+            <parameter ID="BR_X" type="double" label="Reactance" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="BR_B" type="double" label="Total line charging susceptance (p.u.)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RATE_A" type="double" label="MVA Rating A" description="long term rating" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RATE_B" type="double" label="MVA Rating B" description="short term rating" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RATE_C" type="double" label="MVA Rating C" description="emergency rating" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at \&quot;from\&quot; bus, &lt;br&gt;impedance at \&quot;to\&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="SHIFT" type="double" label="Transformer phase shift angle" description="angle in degrees, positive =&gt; delay" empty="true">
+                <display/>
             </parameter>
             <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" empty="false">
                 <option value="1" label="in-service" ID="1"/>
                 <option value="0" label="out-of-service" ID="0"/>
                 <display/>
             </parameter>
-            <parameter ID="susceptance" label="Susceptance" value="1.5e-8">
+            <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="\u0398&lt;sub&gt;f&lt;/sub&gt; - \u0398&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="ANGMAX" label="Maximum angle difference" description="\u0398&lt;sub&gt;f&lt;/sub&gt; - \u0398&lt;sub&gt;t&lt;/sub&gt; (degrees)">
+                <display/>
+            </parameter>
+            <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QF" type="double" label="Reactive power injected at &quot;from&quot; bus end (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="PT" type="double" label="Real power injected at &quot;to&quot; bus end (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QT" type="double" label="Reactive power injected at &quot;to&quot; bus end (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_SF" type="double" label="Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_ST" type="double" label="Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_ANGMIN" type="double" label="Kuhn-Tucker multiplier lower angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_ANGMAX" type="double" label="Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)" empty="true">
                 <display/>
             </parameter>
             <modelClass label="Cable"/>
@@ -104,6 +155,74 @@
             <parameter ID="GEN_STATUS" type="integer" label="Machine Status" restriction="list">
                 <option value="1" label="in-service" ID="1"/>
                 <option value="0" label="out-of-service" ID="0"/>
+                <display/>
+            </parameter>
+            <parameter ID="PMAX" type="double" label="Maximum real power output (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="PMIN" type="double" label="Minimum real power output (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="PC1" type="double" label="Lower real power output of PQ capability curve (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="PC2" type="double" label="Upper real power output of PQ capability curve (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QC1MIN" type="double" label="Minimum reactive power output at PC1 (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QC1MAX" type="double" label="Maximum reactive power output at PC1 (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QC2MIN" type="double" label="Minimum reactive power output at PC2 (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="QC2MAX" type="double" label="Maximum reactive power output at PC2 (MVAr)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RAMP_AGC" type="double" label="Ramp rate for loading following/AGC (MW/min)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RAMP_10" type="double" label="Ramp rate for 10 minute reserves (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RAMP_30" type="double" label="Ramp rate for 30 minute reserves (MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="RAMP_Q" type="double" label="Ramp rate for reactive power (2 sec timescale) (MVAr/min)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="APF" type="double" label="Area participation factor" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_PMAX" type="double" label="Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_PMIN" type="double" label="Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_QMAX" type="double" label="Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MU_QMIN" type="double" label="Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="MODEL" type="integer" label="Cost model" restriction="list" empty="true">
+                <option value="1" label="Piecewise linear" ID="1"/>
+                <option value="2" label="polynomial" ID="2"/>
+                <display/>
+            </parameter>
+            <parameter ID="STARTUP" type="double" label="Startup cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="SHUTDOWN" type="double" label="Shutdown cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="NCOST" type="integer" label="Number cost" description="Number of cost coefficients for polynomial cost function, or number of data points for piecewise linear" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="COST" type="double" label="Parameters definining total cost function" description="Parameters definining total cost function f(p) begin in this column, units of f and p are $/hr and MW (or MVAr), respectively" empty="true">
                 <display/>
             </parameter>
             <model ID="unknown" label="Unknown Generator"/>

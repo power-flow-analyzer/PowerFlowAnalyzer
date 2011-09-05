@@ -13,8 +13,10 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -36,15 +38,19 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CaseSerializer;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.ModelDBData;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
+import net.ee.pfanalyzer.ui.INetworkElementSelectionListener;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
 
-public class ModelDBDialog extends BaseDialog implements PropertyChangeListener {
+public class ModelDBDialog extends BaseDialog implements PropertyChangeListener, INetworkElementSelectionListener {
 	
 	private final static String INTERNAL_MODEL_DB_DEV_FILE = 
 		"C:/Uni/Diplomarbeit/workspace_matlab/PowerFlowAnalyzer/src"
@@ -60,8 +66,9 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener 
 	private DefaultTreeModel treeModel;
 //	private ManageParametersDialog manageParametersDialog;
 	private DefaultMutableTreeNode currentNode;
+	private AbstractNetworkElement selectedElement;
 	private final boolean devMode;
-	private JButton addClassButton, addModelButton, removeButton, managePropsButton;
+	private JButton addClassButton, addModelButton, removeButton, managePropsButton, setModelButton;
 	
 	public ModelDBDialog(Frame frame, ModelDBData modelDB) {
 		this(frame, modelDB, false);
@@ -77,6 +84,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener 
 		treeModel = new DefaultTreeModel(createTreeData());
 		modelTree = new JTree(treeModel);
 		modelTree.setRootVisible(false);
+		modelTree.setExpandsSelectedPaths(true);
 //		modelTree.setToggleClickCount(1);
 		for (int i = treeModel.getChildCount(treeModel.getRoot()) - 1; i >= 0 ; i--) {
 			modelTree.expandRow(i);
@@ -128,6 +136,24 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener 
 		JPanel propPanelResizer = new JPanel(new BorderLayout());
 		propPanelResizer.add(titlePanel, BorderLayout.NORTH);
 		propPanelResizer.add(new JScrollPane(propPanel), BorderLayout.CENTER);
+		
+		setModelButton = new JButton("Set Model");
+		setModelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AbstractModelElementData selected = getSelectedElement();
+				if(selected instanceof ModelData && selectedElement != null) {
+					String oldModelID = selectedElement.getModelID();
+					ModelData model = (ModelData) selected;
+					selectedElement.setModel(model);
+					String newModelID = ModelDBUtils.getParameterID(model);
+					selectedElement.setModelID(newModelID);
+					selectedElement.getNetwork().fireNetworkElementChanged(new NetworkChangeEvent(
+							selectedElement, oldModelID, newModelID));
+				}
+			}
+		});
+		addBottomComponent(setModelButton);
 		addButton("Close", true, true);
 
 		managePropsButton = new JButton("Manage Parameters...");
@@ -213,22 +239,26 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener 
 			addModelButton.setEnabled(false);
 			removeButton.setEnabled(false);
 			managePropsButton.setEnabled(false);
+			setModelButton.setEnabled(false);
 		} else {
 			if(treeNode.getUserObject() instanceof ModelClassData) {
 				addClassButton.setEnabled(true);
 				addModelButton.setEnabled(true);
 				removeButton.setEnabled(true);
 				managePropsButton.setEnabled(true);
+				setModelButton.setEnabled(false);
 			} else if(treeNode.getUserObject() instanceof ModelData) {
 				addClassButton.setEnabled(false);
 				addModelButton.setEnabled(false);
 				removeButton.setEnabled(true);
 				managePropsButton.setEnabled(true);
+				setModelButton.setEnabled(selectedElement != null);
 			} else {
 				addClassButton.setEnabled(false);
 				addModelButton.setEnabled(false);
 				removeButton.setEnabled(false);
 				managePropsButton.setEnabled(false);
+				setModelButton.setEnabled(false);
 			}
 		}
 	}
@@ -259,6 +289,56 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener 
 		if(ParameterPanel.PROPERTY_NAME_RELOAD_ELEMENT.equals(evt.getPropertyName())) {
 			treeModel.reload((TreeNode) evt.getNewValue());
 		}
+	}
+
+	@Override
+	public void selectionChanged(Object data) {
+		if(data instanceof AbstractNetworkElement)
+			setSelectedElement((AbstractNetworkElement) data);
+		else
+			setSelectedElement(null);
+	}
+	
+	public void setSelectedElement(AbstractNetworkElement element) {
+		selectedElement = element;
+		if(selectedElement != null) {
+			ModelData model = selectedElement.getModel();
+			if(model != null) {
+				DefaultMutableTreeNode node = findNode(model);
+				if(node != null)
+					modelTree.setSelectionPath(new TreePath(node.getPath()));
+				updateButtons(node);
+				modelTree.repaint();
+			} else
+				updateButtons(null);
+		} else
+			updateButtons(null);
+	}
+	
+	private DefaultMutableTreeNode findNode(AbstractModelElementData data) {
+		List<AbstractModelElementData> list = new ArrayList<AbstractModelElementData>();
+		addElementsRecursive(data, list);
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) modelTree.getModel().getRoot();
+		for (int i = 0; i < list.size(); i++) {
+			boolean found = false;
+			for (int j = 0; j < node.getChildCount(); j++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(j);
+				if(list.get(i) == child.getUserObject()) {
+					node = child;
+					found = true;
+					break;
+				}
+			}
+			if(found == false)
+				return null;
+		}
+		return node;
+	}
+	
+	private void addElementsRecursive(AbstractModelElementData data, List<AbstractModelElementData> list) {
+		if(data.getParent() != null)
+			addElementsRecursive(data.getParent(), list);
+		list.add(data);
 	}
 	
 	private void manageParameters(AbstractModelElementData element) {

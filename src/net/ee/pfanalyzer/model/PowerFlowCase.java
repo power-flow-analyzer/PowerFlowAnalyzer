@@ -61,9 +61,10 @@ public class PowerFlowCase {
 	}
 
 	public void setNetworkData(NetworkData networkData) {
-		getNetwork().setData(networkData);
 		pfCase.setNetwork(networkData);
+		getNetwork().setData(networkData);
 		updateNetworkData();
+//		getNetwork().fireNetworkChanged();
 	}
 	
 	private void updateNetworkData() {

@@ -36,7 +36,6 @@ import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
-import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
@@ -79,7 +78,6 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private Map<String, Boolean> success = new HashMap<String, Boolean>();
 	private ClosableTabbedPane casesParent;
 	private CaseSelectionDialog caseDialog;
-	private ModelDBDialog modelDBDialog;
 	String nextCase;
 	private List<PowerFlowCase> cases = new ArrayList<PowerFlowCase>();
 	private Map<String, JButton> toolbarButtons = new HashMap<String, JButton>();
@@ -356,12 +354,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		openProgressDialog(pfcase);
 	}
 	
-	private void showModelDBDialog() {
-		if(modelDBDialog != null) {
-			modelDBDialog.setVisible(true);
-			modelDBDialog.toFront();
-		} else
-			modelDBDialog = new ModelDBDialog(this, getCurrentCase().getModelDB().getData());
+	public void showModelDBDialog() {
+		getCurrentViewer().showModelDBDialog();
 	}
 	
 	private void openProgressDialog(final String pfcase) {
@@ -472,7 +466,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			return;
 		}
 		caze.setNetworkData(networkData);
-		caze.getViewer().setNetwork(caze.getNetwork());
+		caze.getNetwork().fireNetworkChanged();
 		success.put(nextCase, true);
 		updateToolbarButtons();
 	}
@@ -482,7 +476,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		try {
 			success.put(nextCase, true);
 			data.put(nextCase, caze);
-			PowerFlowViewer viewer = new PowerFlowViewer(network);
+			PowerFlowViewer viewer = new PowerFlowViewer(caze);
 			caze.setViewer(viewer);
 			cases.add(caze);
 			casesParent.addTab(nextCase, viewer.getContentPane());

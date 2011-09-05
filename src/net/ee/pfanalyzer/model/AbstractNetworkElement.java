@@ -33,7 +33,10 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 //		this.data = matpowerData;
 		this.indexInParent = index;
 		this.elementData = elementData;
-		setModelID(getDefaultModelID());
+		
+		if(elementData.getModelID() == null)
+			setModelID(getDefaultModelID());
+		
 		updateElementData();
 	}
 

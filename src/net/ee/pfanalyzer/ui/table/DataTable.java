@@ -18,6 +18,7 @@ import javax.swing.table.TableCellRenderer;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.IDerivedElement;
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
 
@@ -77,17 +78,21 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	@Override
 	public void setData(Network network) {
 		this.network = network;
-		model.setData(network.getElements(elementID));
+		model.setData(getNetwork().getElements(elementID));
 	}
 
 	@Override
 	public void refresh() {
-		model.fireTableStructureChanged();
+		selfSelection = true;
+		model.reloadTableData();
 		revalidate();
+		selfSelection = false;
 	}
 
 	@Override
 	public void selectionChanged(Object data) {
+		if(selfSelection)// selection may be done by method fireSelectionChanged
+			return;
 		selfSelection = true;
 		if(data == null) {
 			getSelectionModel().clearSelection();
@@ -109,11 +114,42 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		selfSelection = false;
 	}
 
+	@Override
+	public void networkChanged(NetworkChangeEvent event) {
+//		System.out.println("table: networkChanged");
+		model.setData(getNetwork().getElements(elementID));
+		refresh();
+	}
+
+	@Override
+	public void networkElementAdded(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkElementAdded");
+		refresh();
+	}
+
+	@Override
+	public void networkElementChanged(NetworkChangeEvent event) {
+		selfSelection = true; // TODO
+		if(event.getParameterID() != null && model.containsParameter(event.getParameterID()))
+			model.updateTableData();
+		else
+			model.reloadTableData();
+		revalidate();
+		selfSelection = false;
+	}
+
+	@Override
+	public void networkElementRemoved(NetworkChangeEvent event) {
+		refresh();
+	}
+
 	private void fireSelectionChanged() {
 		if(selfSelection)// selection may be done by method selectionChanged
 			return;
+		selfSelection = true;
 		Object selection = (getSelectedRow() >= 0) ? model.getDataObject(getSelectedRow()) : null;
 		NetworkElementSelectionManager.getInstance().selectionChanged(selection);
+		selfSelection = false;
 	}
 	
 	class CellRenderer extends JLabel 
@@ -147,7 +183,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		    	}
 		    	String text = value.toString();
 		    	if(value instanceof Double)
-		    		text = format.format(((Double) value).doubleValue());
+		    		text = format.format(((Double) value).doubleValue()); // TODO
 		    	// getValueAt(row, column)
 		    	setText(text);
 		    	setToolTipText(model.getColumnDescription(realColumn));

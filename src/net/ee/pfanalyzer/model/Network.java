@@ -1,9 +1,7 @@
 package net.ee.pfanalyzer.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.ee.pfanalyzer.io.IllegalDataException;
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
@@ -14,19 +12,15 @@ import net.ee.pfanalyzer.model.util.ParameterSupport;
 
 public class Network extends ParameterSupport {
 
-	private double[][] busData, generatorData, branchData, coordinateData;
-	
 	private List<Bus> busses = new ArrayList<Bus>();
 	private List<Branch> branches = new ArrayList<Branch>();
 	private List<Generator> generators = new ArrayList<Generator>();
-//	private Coordinates[] coordinates;
-//	private String[] locationNames;
-	private List<CombinedBus> combinedBusList;
-	private List<CombinedBranch> combinedBranchList;
-	private Map<String, double[]> customData = new HashMap<String, double[]>();
+	private List<CombinedBus> combinedBusList = new ArrayList<CombinedBus>();
+	private List<CombinedBranch> combinedBranchList = new ArrayList<CombinedBranch>();
 	
 	private NetworkData networkData;
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
+	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
 	
 	private double time;
 	
@@ -41,6 +35,7 @@ public class Network extends ParameterSupport {
 	public Network(NetworkData networkData) {
 		this.networkData = networkData;
 		updateNetworkData();
+		findCombinedElements();
 	}
 	
 	public NetworkData getData() {
@@ -50,23 +45,26 @@ public class Network extends ParameterSupport {
 	void setData(NetworkData data) {
 		networkData = data;
 		updateNetworkData();
+		findCombinedElements();
 	}
 
 	private void updateNetworkData() {
 		// update elements
 		getElements().clear();
 		getBusses().clear();
+		getBranches().clear();
+		getGenerators().clear();
 //		System.out.println("network: update data");
 		for (int i = 0; i < networkData.getElement().size(); i++) {
 			AbstractNetworkElementData element = networkData.getElement().get(i);
 			if(element.getModelID().startsWith("bus.")) {
-				addElementInternal(new Bus(this, element, i));
+				addElementInternal(new Bus(this, element, getBusses().size()));
 //				System.out.println("    adding bus: " + element.getModelID());
 			} else if(element.getModelID().startsWith("branch.")) {
-					addElementInternal(new Branch(this, element, i));
+				addElementInternal(new Branch(this, element, getBranches().size()));
 //					System.out.println("    adding branch: " + element.getModelID());
 			} else if(element.getModelID().startsWith("generator.")) {
-				addElementInternal(new Generator(this, element, i));
+				addElementInternal(new Generator(this, element, getGenerators().size()));
 //				System.out.println("    adding generator: " + element.getModelID());
 			}
 		}
@@ -79,6 +77,37 @@ public class Network extends ParameterSupport {
 		// set bus references in generators
 		for (Generator generator : getGenerators()) {
 			generator.setBus(getBus(generator.getBusNumber()));
+		}
+	}
+	
+	public void addNetworkChangeListener(INetworkChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeNetworkChangeListener(INetworkChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void fireNetworkChanged() {
+//		updateNetworkData();
+//		findCombinedElements();
+		NetworkChangeEvent event = new NetworkChangeEvent(this);
+		for (INetworkChangeListener listener : listeners) {
+			listener.networkChanged(event);
+		}
+	}
+	
+	public void fireNetworkElementChanged(NetworkChangeEvent event) {
+		// don't fire the event if old value is equal to new value
+		if(event.getNewValue() == null && event.getOldValue() == null
+				|| event.getNewValue() != null && event.getNewValue().equals(event.getOldValue()))
+			return;
+		// check if combined busses and branches must be updated
+		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
+				|| IInternalParameters.LATTITUDE.equals(event.getParameterID()))
+			findCombinedElements();
+		for (INetworkChangeListener listener : listeners) {
+			listener.networkElementChanged(event);
 		}
 	}
 	
@@ -96,10 +125,10 @@ public class Network extends ParameterSupport {
 		getElements().add(element);
 		if(element instanceof Bus)
 			getBusses().add((Bus) element);
-		if(element instanceof Branch)
-			branches.add((Branch) element);
-		if(element instanceof Generator)
-			generators.add((Generator) element);
+		else if(element instanceof Branch)
+			getBranches().add((Branch) element);
+		else if(element instanceof Generator)
+			getGenerators().add((Generator) element);
 	}
 	
 	public List<AbstractNetworkElement> getElements() {
@@ -109,18 +138,20 @@ public class Network extends ParameterSupport {
 	public List<AbstractNetworkElement> getElements(String idPrefix) {
 		List<AbstractNetworkElement> list = new ArrayList<AbstractNetworkElement>();
 		for (AbstractNetworkElement element : getElements()) {
-			if(element.getModel() == null)
+			if(element.getModel() == null) {
+//				System.err.println("model is null");
 				continue;
+			}
 			if(ModelDBUtils.getParameterID(element.getModel()).startsWith(idPrefix))
 				list.add(element);
 		}
 		return list;
 	}
 	
-	public void initializeData() {
-		if(combinedBusList != null)
-			return;
-		combinedBusList = new ArrayList<CombinedBus>();
+	private void findCombinedElements() {
+		// clear old entries
+		combinedBusList.clear();
+		combinedBranchList.clear();
 		// combine bus nodes
 		for (int i = 0; i < busses.size(); i++) {
 			Bus bus = busses.get(i);
@@ -171,7 +202,6 @@ public class Network extends ParameterSupport {
 			if(cbus != null)
 				cbus.addGenerator(generator);
 		}
-		combinedBranchList = new ArrayList<CombinedBranch>();
 		// combine branches
 		for (int i = 0; i < getBranchesCount(); i++) {
 			Branch branch = branches.get(i);
@@ -210,7 +240,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public int getCombinedBusCount() {
-		return combinedBusList == null ? 0 : combinedBusList.size();
+		return combinedBusList.size();
 	}
 	
 	public CombinedBus getCombinedBus(int index) {
@@ -226,7 +256,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public int getCombinedBranchCount() {
-		return combinedBranchList == null ? 0 : combinedBranchList.size();
+		return combinedBranchList.size();
 	}
 	
 	public CombinedBranch getCombinedBranch(int index) {
@@ -241,29 +271,10 @@ public class Network extends ParameterSupport {
 		return null;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public double[][] getBusData() {
-		return busData;
-	}
-	
 	public List<Bus> getBusses() {
 		return busses;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public void setBusData(double[][] busData) {
-		throw new RuntimeException("Must not be called");
-//		this.busData = busData;
-//		busses.clear();
-//		for (int i = 0; i < busData.length; i++) {
-//			busses.add(new Bus(this, i));
-//		}
-	}
-	
 	public Bus getBus(int busNumber) {
 		for (int i = 0; i < busses.size(); i++) {
 			Bus bus = busses.get(i);
@@ -273,87 +284,12 @@ public class Network extends ParameterSupport {
 		return null;
 	}
 	
-//	public Bus getBus(int index) {
-//		if(index < busses.size())
-//			return busses.get(index);
-//		// bus must be searched manually
-//		for (int i = 0; i < busses.size(); i++) {
-//			Bus bus = busses.get(i);
-//			if(bus.getBusNumber() == index)
-//				return bus;
-//		}
-//		return null;
-//	}
-	
-//	public void addBus(int index, Bus bus) {
-//		busses.add(index, bus);
-//		for (int i = index; i < busses.size(); i++) {
-//			getBus(i).setIndex(i);
-//		}
-//	}
-//	
-//	public void removeBus(Bus bus) {
-//		busses.remove(bus);
-//		for (int i = bus.getIndex(); i < busses.size(); i++) {
-//			getBus(i).setIndex(i);
-//		}
-//	}
-//	
-//	void updateBusData() {
-//		busData = new double[busses.size()][];
-//		for (int i = 0; i < busData.length; i++) {
-//			busData[i] = busses.get(i).getData();
-//		}
-//	}
-
-	/**
-	 * @deprecated
-	 */
-	public double[][] getGeneratorData() {
-		return generatorData;
-	}
-	
 	public List<Generator> getGenerators() {
 		return generators;
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public void setGeneratorData(double[][] generatorData) {
-		throw new RuntimeException("Must not be called");
-//		this.generatorData = generatorData;
-//		generators = new Generator[generatorData.length];
-//		for (int i = 0; i < generatorData.length; i++) {
-//			generators[i] = new Generator(this, i);
-//		}
-	}
-	
 	public int getGeneratorsCount() {
 		return generators.size();
-	}
-	
-//	public Generator getGenerator(int index) {
-//		return generators.get(index);
-//	}
-
-	/**
-	 * @deprecated
-	 */
-	public double[][] getBranchData() {
-		return branchData;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setBranchData(double[][] branchData) {
-		throw new RuntimeException("Must not be called");
-//		this.branchData = branchData;
-//		branches = new Branch[branchData.length];
-//		for (int i = 0; i < branchData.length; i++) {
-//			branches[i] = new Branch(this, i);
-//		}
 	}
 	
 	public List<Branch> getBranches() {
@@ -364,65 +300,6 @@ public class Network extends ParameterSupport {
 		return branches.size();
 	}
 	
-//	public Branch getBranch(int index) {
-//		return branches.get(index);
-////		return branches[index];
-//	}
-	
-	/**
-	 * @deprecated
-	 */
-	public double[][] getCoordinateData() {
-		return coordinateData;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setCoordinateData(double[][] coordinateData) {
-		throw new RuntimeException("Must not be called");
-//		this.coordinateData = coordinateData;
-//		coordinates = new Coordinates[coordinateData.length];
-//		for (int i = 0; i < coordinateData.length; i++) {
-//			coordinates[i] = new Coordinates(this, i);
-//		}
-//		for (int i = 0; i < busses.size(); i++) {
-//			Bus bus = getBus(i);
-//			if(i < coordinateData.length) {
-//				bus.setCoordinates(coordinateData[i]);
-//			} else
-//				bus.setCoordinates(getBus(bus.getRealBusIndex()).getCoordinates());
-//		}
-	}
-	
-//	/**
-//	 * @deprecated
-//	 */
-//	public void setLocationNames(String[] names) {
-//		for (int i = 0; i < busses.size(); i++) {
-//			Bus bus = getBus(i);
-//			if(i < names.length)
-//				bus.setName(names[i]);
-//			else
-//				bus.setName(getBus(bus.getRealBusIndex()).getName());
-//		}
-//		this.locationNames = names;
-//	}
-	
-//	public String getLocationName(int index) {
-//		if(locationNames != null)
-//			return locationNames[index];
-//		return null;
-//	}
-//	
-//	/**
-//	 * @deprecated
-//	 */
-//	public String[] getLocationNames() {
-////		String locationNames = new String[]
-//		return locationNames;
-//	}
-
 	public double getTime() {
 		return time;
 	}
@@ -445,14 +322,6 @@ public class Network extends ParameterSupport {
 
 	public void setSuccessful(boolean successful) {
 		this.successful = successful;
-	}
-	
-	public void setData(String name, double[] data) {
-		customData.put(name, data);
-	}
-	
-	public double[] getData(String name) {
-		return customData.get(name);
 	}
 	
 	public String toXML() throws IllegalDataException {

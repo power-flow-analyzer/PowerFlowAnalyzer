@@ -56,6 +56,7 @@
             <parameter ID="MU_VMIN" type="double" label="Mult Vmin (u/p.u.)" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" empty="true">
                 <display/>
             </parameter>
+            <model ID="test" label="Test"/>
             <model ID="unknown" label="Unknown Bus"/>
         </modelClass>
         <modelClass baseType="branch" ID="branch" label="Branch">
@@ -111,7 +112,7 @@
     </model-db>
     <network>
         <parameter ID="BASE_MVA" value="100.0"/>
-        <element modelID="bus.unknown">
+        <element modelID="bus.test">
             <parameter ID="BUS_I" value="1.0"/>
             <parameter ID="BUS_TYPE" value="3.0"/>
             <parameter ID="PD" value="0.0"/>
@@ -125,6 +126,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="1"/>
+            <parameter ID="LONGITUDE" value="1"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -143,11 +146,13 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="2"/>
+            <parameter ID="LONGITUDE" value="1"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
         </element>
-        <element modelID="bus.unknown">
+        <element modelID="bus.test">
             <parameter ID="BUS_I" value="3.0"/>
             <parameter ID="BUS_TYPE" value="2.0"/>
             <parameter ID="PD" value="0.0"/>
@@ -161,6 +166,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="2"/>
+            <parameter ID="LONGITUDE" value="2"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -179,6 +186,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="2"/>
+            <parameter ID="LONGITUDE" value="3"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -197,6 +206,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="1"/>
+            <parameter ID="LONGITUDE" value="3"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -215,6 +226,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="1"/>
+            <parameter ID="LONGITUDE" value="2"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -233,6 +246,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="0"/>
+            <parameter ID="LONGITUDE" value="2"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -251,6 +266,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="1"/>
+            <parameter ID="LONGITUDE" value="0"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -269,6 +286,8 @@
             <parameter ID="ZONE" value="1.0"/>
             <parameter ID="VMAX" value="1.1"/>
             <parameter ID="VMIN" value="0.9"/>
+            <parameter ID="LATTITUDE" value="3"/>
+            <parameter ID="LONGITUDE" value="1"/>
             <flag failure="false" warning="false" percentage="0.0" label="Voltage magnitude (p.u.)">
                 <parameter>VM</parameter>
             </flag>
@@ -284,7 +303,7 @@
             <parameter ID="RATE_C" value="250.0"/>
             <parameter ID="TAP" value="0.0"/>
             <parameter ID="SHIFT" value="0.0"/>
-            <parameter ID="BR_STATUS" value="0"/>
+            <parameter ID="BR_STATUS" value="1.0"/>
             <parameter ID="ANGMIN" value="-360.0"/>
             <parameter ID="ANGMAX" value="360.0"/>
         </element>

@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.ui.parameter;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 
@@ -47,5 +48,11 @@ public class ParameterMasterNetworkElement implements IParameterMasterElement {
 	@Override
 	public void removeOwnParameter(String parameterID) {
 		getMasterElement().removeOwnParameter(parameterID);
+	}
+	
+	@Override
+	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
+		NetworkChangeEvent event = new NetworkChangeEvent(getMasterElement(), parameterID, oldValue, newValue);
+		getMasterElement().getNetwork().fireNetworkElementChanged(event);
 	}
 }

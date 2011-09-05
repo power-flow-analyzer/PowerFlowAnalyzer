@@ -28,13 +28,12 @@ import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.IInternalParameters;
+import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
-import net.ee.pfanalyzer.model.matpower.IBranchDataConstants;
-import net.ee.pfanalyzer.model.matpower.IBusDataConstants;
-import net.ee.pfanalyzer.model.matpower.ICoordinateDataConstants;
+import net.ee.pfanalyzer.model.NetworkChangeEvent;
 
-public class NetworkViewer extends JComponent implements NetworkElementSelectionListener,
-		IBusDataConstants, IBranchDataConstants, ICoordinateDataConstants{
+public class NetworkViewer extends JComponent implements INetworkElementSelectionListener, INetworkChangeListener {
 
 	private final static double OVAL_HALF_HEIGHT = 8;
 	private final static int RECTANGLE_HALF_HEIGHT = 10;
@@ -137,6 +136,8 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 		converter = new Mercator();
 		initializeInternalCoordinates();
 		MouseInputListener mouseListener = new MouseInputAdapter() {
+			int lastX = -1, lastY = -1;
+			
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				try {
@@ -160,7 +161,6 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 				}
 			}
 			
-			int lastX = -1, lastY = -1;
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if(allowDragging == false)
@@ -275,8 +275,6 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 	}
 	
 	private void initializeInternalCoordinates() {
-//		internalBusCoords = new int[data.getBusses().size()][2];
-//		internalBusNumbers = new int[data.getBusses().size()];
 		if(perfectFit == false) {
 			internalMinX = converter.getX(minLatitude);
 			internalMaxX = converter.getX(maxLatitude);
@@ -285,20 +283,16 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 		}
 		for (int i = 0; i < data.getBusses().size(); i++) {
 			Bus bus = data.getBusses().get(i);
-//			internalBusNumbers[i] = bus.getBusNumber();
 			double longitude = bus.getLongitude();
 			double lattitude = bus.getLattitude();
 			if(Double.isNaN(longitude)// no coords set
 					|| Double.isNaN(lattitude)) {
 				internalBusCoords.put(bus.getBusNumber(), new int[]{-1, -1});
-//				internalBusCoords[i][1] = -1;
 				continue;
 			}
 			int x = converter.getX(lattitude);
 			int y = converter.getY(longitude);
 			internalBusCoords.put(bus.getBusNumber(), new int[]{x, y});
-//			internalBusCoords[i][0] = x;
-//			internalBusCoords[i][1] = y;
 			if(perfectFit) {
 				if(i == 0) {// initialize min/max values
 					internalMinX = x;
@@ -378,8 +372,6 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 			while(busNumbers.hasNext()) {
 				int busNumber = busNumbers.next();
 				int[] coords = getBusXY(busNumber, horizontalScale, verticalScale);
-//				int busX = getBusX(busNumber, horizontalScale);
-//				int busY = getBusY(busNumber, verticalScale);
 				if(x == -1 || y == -1)
 					continue;
 				if(Math.abs(coords[0] - x) <= OVAL_HALF_HEIGHT
@@ -419,13 +411,16 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 					continue;
 				double minX = Math.min(x1, x2);
 				double maxX = Math.max(x1, x2);
-				if(x < minX || x > maxX)
+				if(x < minX - 2 || x > maxX + 2)
 					continue;
 				double minY = Math.min(y1, y2);
 				double maxY = Math.max(y1, y2);
-				if(y < minY || y > maxY)
+				if(y < minY - 2 || y > maxY + 2)
 					continue;
 				double m = (y2 - y1) / (x2 - x1);
+				// check if m is infinity -> x2 = x1 -> both bus points on a vertical line
+				if(Double.isInfinite(m) && Math.abs(x1 - x) <= 5)
+					return branch;
 				double n = y1 - m * x1;
 				if(Math.abs((m * x + n - y)/(Math.sqrt(m * m + 1))) <= 5)
 					return branch;
@@ -522,9 +517,12 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 						double x2l = x2 - xOffset + xFactor * bd;
 						double y2l = y2 - yOffset + yFactor * bd;
 						Branch branch = cbranch.getBranch(b);
-						if(branch.isCorrect())
-							g.setColor(Color.BLUE);
-						else
+						if(branch.isCorrect()) {
+							if(branch.isActive())
+								g.setColor(Color.BLUE);
+							else
+								g.setColor(Color.GRAY);
+						} else
 							g.setColor(Color.RED);
 						g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
 						g2d.draw(new Line2D.Double(x1l, y1l, x2l, y2l));
@@ -685,6 +683,8 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 		int[] coords = internalBusCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
+		if(coords[0] == -1 || coords[1] == -1)
+			return new double[] { -1, -1 };
 		double x = ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
 		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
 		return new double[] { x, y };
@@ -797,6 +797,35 @@ public class NetworkViewer extends JComponent implements NetworkElementSelection
 	
 	public void selectionChanged(Object data) {
 		selection = data;
+		repaint();
+	}
+
+	@Override
+	public void networkChanged(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkChanged");
+		initializeInternalCoordinates();
+		repaint();
+	}
+
+	@Override
+	public void networkElementAdded(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkElementAdded");
+		initializeInternalCoordinates();
+		repaint();
+	}
+
+	@Override
+	public void networkElementChanged(NetworkChangeEvent event) {
+//		System.out.println("viewer: networkElementChanged");
+		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
+				|| IInternalParameters.LATTITUDE.equals(event.getParameterID()))
+			initializeInternalCoordinates();
+		repaint();
+	}
+
+	@Override
+	public void networkElementRemoved(NetworkChangeEvent event) {
+		initializeInternalCoordinates();
 		repaint();
 	}
 

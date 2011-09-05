@@ -15,4 +15,6 @@ public interface IParameterMasterElement {
 	void removeOwnParameter(String parameterID);
 	
 	boolean isRequired(String parameterID);
+	
+	void fireValueChanged(String parameterID, String oldValue, String newValue);
 }

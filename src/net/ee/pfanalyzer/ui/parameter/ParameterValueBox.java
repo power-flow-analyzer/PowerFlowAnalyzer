@@ -12,6 +12,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 public class ParameterValueBox extends ParameterValuePanel implements ActionListener {
 	
 	private JComboBox box;
+	private String oldValue;
 	
 	public ParameterValueBox(IParameterMasterElement element, NetworkParameter property, NetworkParameter propertyValue) {
 		super(element, property, propertyValue);
@@ -31,6 +32,7 @@ public class ParameterValueBox extends ParameterValuePanel implements ActionList
 		for (int i = 0; i < getOptions().size(); i++) {
 			if(getOptions().get(i).getValue().equals(value)) {
 				box.setSelectedIndex(i);
+				oldValue = value;
 				break;
 			}
 		}
@@ -43,6 +45,8 @@ public class ParameterValueBox extends ParameterValuePanel implements ActionList
 		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);
 		String value = getOptions().get(box.getSelectedIndex()).getValue();
 		property.setValue(value);
+		fireValueChanged(oldValue, value);
+		oldValue = value;
 		refresh();
 	}
 }
