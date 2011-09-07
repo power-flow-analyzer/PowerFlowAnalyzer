@@ -19,6 +19,9 @@ define_constants;
 % collect data for visualisation
 jnetwork = create_network();
 jnetwork.setParameter('BASE_MVA', mpc.baseMVA);
+if exist('mpc.success', 'var')
+    jnetwork.setParameter('SUCCESS', mpc.success);
+end
 
 % create busses
 for i=1:length(mpc.bus(:,1))
