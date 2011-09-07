@@ -86,7 +86,7 @@
             <parameter ID="RATE_C" type="double" label="MVA Rating C" description="emergency rating" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at \&quot;from\&quot; bus, &lt;br&gt;impedance at \&quot;to\&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
+            <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at &quot;from&quot; bus, &lt;br&gt;impedance at &quot;to&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
                 <display/>
             </parameter>
             <parameter ID="SHIFT" type="double" label="Transformer phase shift angle" description="angle in degrees, positive =&gt; delay" empty="true">
@@ -97,10 +97,10 @@
                 <option value="0" label="out-of-service" ID="0"/>
                 <display/>
             </parameter>
-            <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="\u0398&lt;sub&gt;f&lt;/sub&gt; - \u0398&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
+            <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="ANGMAX" label="Maximum angle difference" description="\u0398&lt;sub&gt;f&lt;/sub&gt; - \u0398&lt;sub&gt;t&lt;/sub&gt; (degrees)">
+            <parameter ID="ANGMAX" label="Maximum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)">
                 <display/>
             </parameter>
             <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true">
@@ -115,16 +115,16 @@
             <parameter ID="QT" type="double" label="Reactive power injected at &quot;to&quot; bus end (MVAr)" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_SF" type="double" label="Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)" empty="true">
+            <parameter ID="MU_SF" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_ST" type="double" label="Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)" empty="true">
+            <parameter ID="MU_ST" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_ANGMIN" type="double" label="Kuhn-Tucker multiplier lower angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)" empty="true">
+            <parameter ID="MU_ANGMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier lower angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_ANGMAX" type="double" label="Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)" empty="true">
+            <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
             <modelClass label="Cable"/>
@@ -196,16 +196,16 @@
             <parameter ID="APF" type="double" label="Area participation factor" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_PMAX" type="double" label="Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+            <parameter ID="MU_PMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_PMIN" type="double" label="Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+            <parameter ID="MU_PMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_QMAX" type="double" label="Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+            <parameter ID="MU_QMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="MU_QMIN" type="double" label="Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)" empty="true">
+            <parameter ID="MU_QMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
                 <display/>
             </parameter>
             <parameter ID="MODEL" type="integer" label="Cost model" restriction="list" empty="true">
