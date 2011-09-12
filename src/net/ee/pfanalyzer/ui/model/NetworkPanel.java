@@ -1,9 +1,12 @@
 package net.ee.pfanalyzer.ui.model;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetwork;
 import net.ee.pfanalyzer.ui.util.Group;
 
 public class NetworkPanel extends ModelElementPanel {
@@ -13,17 +16,24 @@ public class NetworkPanel extends ModelElementPanel {
 	public NetworkPanel(ElementPanelController controller, Network data) {
 		super(controller);
 		this.data = data;
+		setParameterMaster(new ParameterMasterNetwork(data));
 		setTitle("Network Overview");
 		updateNetwork();
 	}
 	
 	public void updateNetwork() {
 		removeAllElements();
+		if(data.getParameterList().size() > 0) {
+			Group globalParameters = addElementGroup("Global Network Parameters");
+			for (NetworkParameter parameter : data.getParameterList()) {
+				addParameter(parameter, parameter, globalParameters);
+			}
+		}
 		if(data.getCombinedBusCount() > 0) { // show combined elements
 			addElementGroup("Areas");
 			for (int i = 0; i < data.getCombinedBusCount(); i++) {
 				if(data.getCombinedBus(i).getBusNodes().size() == 1)
-					addElementLink(data.getCombinedBus(i).getFirstBus());
+					addElementLink(data.getCombinedBus(i).getFirstBus(), AbstractNetworkElement.DISPLAY_DEFAULT);
 				else
 					addElementLink(data.getCombinedBus(i));
 			}
@@ -31,7 +41,7 @@ public class NetworkPanel extends ModelElementPanel {
 			addElementGroup("Power Lines");
 			for (int i = 0; i < data.getCombinedBranchCount(); i++) {
 				if(data.getCombinedBranch(i).getBranches().size() == 1)
-					addElementLink(data.getCombinedBranch(i).getFirstBranch());
+					addElementLink(data.getCombinedBranch(i).getFirstBranch(), AbstractNetworkElement.DISPLAY_NAME);
 				else
 					addElementLink(data.getCombinedBranch(i));
 			}
@@ -47,7 +57,7 @@ public class NetworkPanel extends ModelElementPanel {
 					}
 				}
 				if(added == false)
-					group.addElementLink(bus);
+					group.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
 			}
 			if(group.getComponentCount() > 0)
 				addElementGroup(group);
@@ -62,14 +72,14 @@ public class NetworkPanel extends ModelElementPanel {
 					}
 				}
 				if(added == false)
-					group.addElementLink(branch);
+					group.addElementLink(branch, AbstractNetworkElement.DISPLAY_NAME);
 			}
 			if(group.getComponentCount() > 0)
 				addElementGroup(group);
 			
 			addElementGroup("Generators");
 			for (Generator generator: data.getGenerators()) {
-				addElementLink(generator);
+				addElementLink(generator, AbstractNetworkElement.DISPLAY_DEFAULT);
 			}
 //		}
 		finishLayout();

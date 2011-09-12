@@ -96,7 +96,9 @@ public abstract class ParameterValuePanel extends JPanel {
 	
 	private void setValue(NetworkParameter p) {
 		String value = null;
-		if(p.getValue() != null)
+		if(p == null)
+			value = "";
+		else if(p.getValue() != null)
 			value = p.getValue();
 		else if(p.getDefaultValue() != null)
 			value = p.getDefaultValue();

@@ -35,6 +35,7 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 	private PowerFlowCase powerFlowCase;
 	
 	private NetworkViewer viewer;
+//	private NetworkElementSelectionManager selectionManager;
 	private JPanel contentPane = new JPanel(new BorderLayout());
 	private ClosableTabbedPane dataTabs;
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -51,6 +52,7 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 	
 	public PowerFlowViewer(PowerFlowCase caze) {
 		this.powerFlowCase = caze;
+//		selectionManager = new NetworkElementSelectionManager();
 		viewer = new NetworkViewer(getNetwork());
 		viewerController = new NetworkViewerController(viewer);
 		viewer.setController(viewerController);

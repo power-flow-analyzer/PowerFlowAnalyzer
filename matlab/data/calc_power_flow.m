@@ -9,10 +9,10 @@ mpopt = mpoption('VERBOSE', 0, 'OUT_ALL', 0);
 mpc = network2matpower(jnetwork);
 
 % calculate power flow
-mpc = runuopf(mpc, mpopt);
+mpc2 = runpf(mpc, mpopt);
 
 % collect data for visualisation
-jnetwork = matpower2network(mpc);
+update_network(mpc2, jnetwork);
 
 % transfer data to visualisation
 transfer_update_network(jnetwork);

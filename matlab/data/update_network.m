@@ -1,4 +1,4 @@
-function [ jnetwork ] = matpower2network( caze )
+function [ ] = update_network( caze, jnetwork )
 %LOADPFDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,34 +10,38 @@ if ischar(caze) % (exist('file','var') > 0)
     mpc = loadcase(name);
     cd(oldDir); % change back to old working directory
 elseif isstruct(caze)
-    mpc = caze; % for testing purposes
+    mpc = caze;
 end
 
 % define Matpower constants
 define_constants;
     
 % collect data for visualisation
-jnetwork = create_network();
-jnetwork.setParameter('BASE_MVA', mpc.baseMVA);
-if exist('mpc.success', 'var')
+%if exist('mpc.success', 'var')
     jnetwork.setParameter('SUCCESS', mpc.success);
+    disp('Set success');
+%end
+
+% update busses
+for i=1:length(mpc.bus(:,1))
+    % get bus object from network via bus number
+    jbus = jnetwork.getBus(mpc.bus(i,BUS_I));
+    % update it
+    update_bus(jbus, mpc.bus(i,:));
 end
 
-% create busses
-for i=1:length(mpc.bus(:,1))
-    % erstelle neuen Bus
-    jbus = create_bus(jnetwork, mpc.bus(i,:), i - 1);
-    % füge neuen Bus dem Netzwerk hinzu
-    jnetwork.addElement(jbus);
-end
-% create branches
+% update branches
 for i=1:length(mpc.branch(:,1))
-    jnetwork.addElement(create_branch(jnetwork, mpc.branch(i,:), i - 1));
+    jbranch = jnetwork.getBranches.get(i - 1);
+    % update it
+    update_branch(jbranch, mpc.branch(i,:));
 end
-% create generators
+
+% update generators
 for i=1:length(mpc.gen(:,1))
-    jnetwork.addElement(create_generator(...
-            jnetwork, mpc.gen(i,:), mpc.gencost(i,:), i - 1));
+    jgenerator = jnetwork.getGenerators.get(i - 1);
+    % update it
+    update_generator(jgenerator, mpc.gen(i,:), mpc.gencost(i,:));
 end
 
 end

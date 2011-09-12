@@ -732,7 +732,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				tooltipText += cbranch.getLabel();
 				tooltipText += "<ul>";
 				for (Branch branch : cbranch.getBranches()) {
-					tooltipText += "<li>" + branch.getDisplayName();
+					tooltipText += "<li>" + branch.getDisplayName(AbstractNetworkElement.DISPLAY_NAME);
 					int baseVoltage = getBaseVoltage(branch);
 					if(baseVoltage != VOLTAGE_LEVEL_UNKNOWN)
 						tooltipText += " (" + baseVoltage + " kV)";
@@ -747,18 +747,18 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				tooltipText += cbus.getLabel();
 				tooltipText += "<ul>";
 				for (Bus bus : cbus.getBusNodes()) {
-					tooltipText += "<li>" + bus.getDisplayName() + "</li>";
+					tooltipText += "<li>" + bus.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT) + "</li>";
 				}
 				if(cbus.getGenerators().size() > 0) {
 					tooltipText += "</ul>Generators:<ul>";
 					for (Generator gen : cbus.getGenerators()) {
-						tooltipText += "<li>" + gen.getDisplayName() + "</li>";
+						tooltipText += "<li>" + gen.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT) + "</li>";
 					}
 				}
 				return tooltipText;
 			} 
 		}
-		return dataElement.getDisplayName();
+		return dataElement.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT);
 	}
 	
     public Point getToolTipLocation(MouseEvent event) {

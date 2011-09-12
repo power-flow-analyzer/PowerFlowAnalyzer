@@ -155,7 +155,8 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	}
 	
 	private String getTooltipText(AbstractNetworkElement element) {
-		return element.getDisplayName() + " (" + element.getTextParameter(parameterID) + ")";
+		return element.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT) 
+				+ " (" + element.getTextParameter(parameterID) + ")";
 	}
 	
     public Dimension getPreferredSize() {

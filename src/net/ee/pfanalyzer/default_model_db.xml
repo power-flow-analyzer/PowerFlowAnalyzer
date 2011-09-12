@@ -2,6 +2,9 @@
 <power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
     <model-db>
         <modelClass baseType="bus" ID="bus" label="Bus">
+            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                <display/>
+            </parameter>
             <parameter ID="BUS_I" type="integer" label="Bus" description="Bus number" restriction="bus-number" empty="true">
                 <display/>
             </parameter>
@@ -62,6 +65,9 @@
             <model ID="unknown" label="Unknown Bus"/>
         </modelClass>
         <modelClass baseType="branch" ID="branch" label="Branch">
+            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                <display/>
+            </parameter>
             <parameter ID="F_BUS" type="integer" label="From Bus" description="From Bus" restriction="bus-number" empty="true">
                 <display/>
             </parameter>
@@ -131,6 +137,9 @@
             <model ID="unknown" label="Unknown Branch"/>
         </modelClass>
         <modelClass ID="generator" label="Generator">
+            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                <display/>
+            </parameter>
             <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="bus-number" empty="true">
                 <display/>
             </parameter>

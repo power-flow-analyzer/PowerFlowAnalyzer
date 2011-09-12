@@ -109,8 +109,9 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 
 	@Override
 	public void networkElementChanged(NetworkChangeEvent event) {
-		if(event.getNetworkElement() != null && event.getNetworkElement() == oldSelection)
-			selectionChanged(event.getNetworkElement());
+		// the following lets the current selection jump between components
+//		if(event.getNetworkElement() != null && event.getNetworkElement() == oldSelection)
+//			selectionChanged(event.getNetworkElement());
 	}
 
 	@Override

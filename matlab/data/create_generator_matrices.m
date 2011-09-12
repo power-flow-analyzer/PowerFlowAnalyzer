@@ -15,36 +15,36 @@ for i=1:generator_list.size()
     jgenerator = generator_list.get(i - 1);
     
     % add parameters to current generator matrix row
-    generatorData(i, GEN_BUS) = jgenerator.getIntParameter('GEN_BUS');
-    generatorData(i, PG) = jgenerator.getDoubleParameter('PG');
-    generatorData(i, QG) = jgenerator.getDoubleParameter('QG');
-    generatorData(i, QMAX) = jgenerator.getDoubleParameter('QMAX');
-    generatorData(i, QMIN) = jgenerator.getDoubleParameter('QMIN');
-    generatorData(i, VG) = jgenerator.getDoubleParameter('VG');
-    generatorData(i, MBASE) = jgenerator.getDoubleParameter('MBASE');
-    generatorData(i, GEN_STATUS) = jgenerator.getIntParameter('GEN_STATUS');
-    generatorData(i, PMAX) = jgenerator.getDoubleParameter('PMAX');
-    generatorData(i, PMIN) = jgenerator.getDoubleParameter('PMIN');
-    generatorData(i, PC1) = jgenerator.getDoubleParameter('PC1');
-    generatorData(i, PC2) = jgenerator.getDoubleParameter('PC2');
-    generatorData(i, QC1MIN) = jgenerator.getDoubleParameter('QC1MIN');
-    generatorData(i, QC1MAX) = jgenerator.getDoubleParameter('QC1MAX');
-    generatorData(i, QC2MIN) = jgenerator.getDoubleParameter('QC2MIN');
-    generatorData(i, QC2MAX) = jgenerator.getDoubleParameter('QC2MAX');
-    generatorData(i, RAMP_AGC) = jgenerator.getDoubleParameter('RAMP_AGC');
-    generatorData(i, RAMP_10) = jgenerator.getDoubleParameter('RAMP_10');
-    generatorData(i, RAMP_30) = jgenerator.getDoubleParameter('RAMP_30');
-    generatorData(i, RAMP_Q) = jgenerator.getDoubleParameter('RAMP_Q');
-    generatorData(i, APF) = jgenerator.getDoubleParameter('APF');
+    generatorData(i, GEN_BUS) = parameter_int(jgenerator, 'GEN_BUS');
+    generatorData(i, PG) = parameter_double(jgenerator, 'PG');
+    generatorData(i, QG) = parameter_double(jgenerator, 'QG');
+    generatorData(i, QMAX) = parameter_double(jgenerator, 'QMAX');
+    generatorData(i, QMIN) = parameter_double(jgenerator, 'QMIN');
+    generatorData(i, VG) = parameter_double(jgenerator, 'VG');
+    generatorData(i, MBASE) = parameter_double(jgenerator, 'MBASE');
+    generatorData(i, GEN_STATUS) = parameter_int(jgenerator, 'GEN_STATUS');
+    generatorData(i, PMAX) = parameter_double(jgenerator, 'PMAX');
+    generatorData(i, PMIN) = parameter_double(jgenerator, 'PMIN');
+    generatorData(i, PC1) = parameter_double(jgenerator, 'PC1');
+    generatorData(i, PC2) = parameter_double(jgenerator, 'PC2');
+    generatorData(i, QC1MIN) = parameter_double(jgenerator, 'QC1MIN');
+    generatorData(i, QC1MAX) = parameter_double(jgenerator, 'QC1MAX');
+    generatorData(i, QC2MIN) = parameter_double(jgenerator, 'QC2MIN');
+    generatorData(i, QC2MAX) = parameter_double(jgenerator, 'QC2MAX');
+    generatorData(i, RAMP_AGC) = parameter_double(jgenerator, 'RAMP_AGC');
+    generatorData(i, RAMP_10) = parameter_double(jgenerator, 'RAMP_10');
+    generatorData(i, RAMP_30) = parameter_double(jgenerator, 'RAMP_30');
+    generatorData(i, RAMP_Q) = parameter_double(jgenerator, 'RAMP_Q');
+    generatorData(i, APF) = parameter_double(jgenerator, 'APF');
 
     % add parameters to current generator cost matrix row
-    genCostData(i, MODEL) = jgenerator.getIntParameter('MODEL');
-    genCostData(i, STARTUP) = jgenerator.getDoubleParameter('STARTUP');
-    genCostData(i, SHUTDOWN) = jgenerator.getDoubleParameter('SHUTDOWN');
-    genCostData(i, NCOST) = jgenerator.getDoubleParameter('NCOST');
-    genCostData(i, COST) = jgenerator.getDoubleParameter('COST');
-    genCostData(i, 6) = jgenerator.getDoubleParameter('GENCOST6');
-    genCostData(i, 7) = jgenerator.getDoubleParameter('GENCOST7');
+    genCostData(i, MODEL) = parameter_int(jgenerator, 'MODEL');
+    genCostData(i, STARTUP) = parameter_double(jgenerator, 'STARTUP');
+    genCostData(i, SHUTDOWN) = parameter_double(jgenerator, 'SHUTDOWN');
+    genCostData(i, NCOST) = parameter_int(jgenerator, 'NCOST');
+    genCostData(i, COST) = parameter_double(jgenerator, 'COST');
+    genCostData(i, 6) = parameter_double(jgenerator, 'GENCOST6');
+    genCostData(i, 7) = parameter_double(jgenerator, 'GENCOST7');
 end
 
 end

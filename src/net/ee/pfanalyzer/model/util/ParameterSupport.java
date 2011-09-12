@@ -39,7 +39,7 @@ public abstract class ParameterSupport {
 			getParameterList().remove(parameter);
 	}
 	
-	protected NetworkParameter getParameterValue(String id) {
+	public NetworkParameter getParameterValue(String id) {
 		NetworkParameter parameter = getOwnParameter(id);
 		if(parameter != null && parameter.getValue() != null)
 			return parameter;

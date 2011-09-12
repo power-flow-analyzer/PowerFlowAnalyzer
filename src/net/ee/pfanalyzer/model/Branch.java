@@ -75,20 +75,21 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 //		return getToBusNumber() - 1;
 //	}
 	
-	public String getDisplayName() {
+	@Override
+	public String getDisplayName(int displayFlags) {
 		Bus fromBus = getFromBus();
 		String fromBusName = "??";
 		if(fromBus != null) {
 			fromBusName = fromBus.getName();
 			if(fromBusName == null)
-				fromBusName = fromBus.getDisplayName();
+				fromBusName = fromBus.getDisplayName(displayFlags);
 		}
 		Bus toBus = getToBus();
 		String toBusName = "??";
 		if(toBus != null) {
 			toBusName = toBus.getName();
 			if(toBusName == null)
-				toBusName = toBus.getDisplayName();
+				toBusName = toBus.getDisplayName(displayFlags);
 		}
 		return "Branch " + (getIndex() + 1) + " (" + fromBusName + " - " + toBusName + ")";
 	}

@@ -1,17 +1,19 @@
 package net.ee.pfanalyzer.ui.db;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterModel;
-import net.ee.pfanalyzer.ui.parameter.ParameterTextField;
 
 public class ParameterPanel extends ParameterContainer {
 	
@@ -46,7 +48,7 @@ public class ParameterPanel extends ParameterContainer {
 		referenceLabel.setText(ModelDBUtils.getParameterID(master));
 	}
 	
-	class ParameterIDBox extends ParameterTextField implements ActionListener, KeyListener {
+	class ParameterIDBox extends ParameterTextBox implements ActionListener, KeyListener {
 		ParameterIDBox() {
 			super("ID");
 		}
@@ -70,7 +72,7 @@ public class ParameterPanel extends ParameterContainer {
 		}
 	}
 	
-	class ParameterLabelBox extends ParameterTextField implements ActionListener, KeyListener {
+	class ParameterLabelBox extends ParameterTextBox implements ActionListener, KeyListener {
 		ParameterLabelBox() {
 			super("LABEL");
 		}
@@ -91,7 +93,7 @@ public class ParameterPanel extends ParameterContainer {
 		}
 	}
 	
-	class ParameterDescriptionBox extends ParameterTextField implements ActionListener, KeyListener {
+	class ParameterDescriptionBox extends ParameterTextBox implements ActionListener, KeyListener {
 		ParameterDescriptionBox() {
 			super("DESCR");
 		}
@@ -114,4 +116,60 @@ public class ParameterPanel extends ParameterContainer {
 //		}
 //		return null;
 //	}
+	
+	abstract class ParameterTextBox extends JTextField implements ActionListener, KeyListener {
+		
+		private String parameterID;
+//		private NetworkParameter parameter;
+		
+		public ParameterTextBox(String parameterID) {
+			super();
+			this.parameterID = parameterID;
+			initField();
+		}
+		
+//		public ParameterTextField(NetworkParameter parameter) {
+//			super();
+//			this.parameter = parameter;
+//			this.parameterID = parameter.getID();
+//			initField();
+//		}
+		
+		private void initField() {
+			if(getParameterValue() != null)
+				setText(getParameterValue());
+			addActionListener(this);
+			addKeyListener(this);
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setParameterValue(getText());
+			updateView();
+		}
+		
+		protected void updateView() {
+			// empty implementation
+		}
+		
+		protected abstract void setParameterValue(String text);
+		
+		protected abstract String getParameterValue();
+		
+		public String getParameterID() {
+			return parameterID;
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			setParameterValue(getText());
+			updateView();
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {}
+		@Override
+		public void keyPressed(KeyEvent e) {}
+	}
+
 }

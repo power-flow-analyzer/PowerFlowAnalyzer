@@ -82,8 +82,10 @@ public class ParameterContainer extends JPanel {
 				ParameterIntField box = new ParameterIntField(parameterMaster, propertyDefinition, propertyValue);
 				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
 				panel.add(box);
-			} else {
-//				new ParameterTextField()
+			} else { //if(NetworkParameterType.TEXT.equals(propertyDefinition.getType())) {
+				ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
+				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
+				panel.add(box);
 			}
 		} else { // list
 			ParameterValueBox box = new ParameterValueBox(parameterMaster, propertyDefinition, propertyValue);
@@ -112,8 +114,8 @@ public class ParameterContainer extends JPanel {
 		currentGroupContainer.addElementLink(element);
 	}
 	
-	protected void addElementLink(AbstractNetworkElement element) {
-		currentGroupContainer.addElementLink(element);
+	protected void addElementLink(AbstractNetworkElement element, int displayFlags) {
+		currentGroupContainer.addElementLink(element, displayFlags);
 	}
 	
 	protected void addModelLink(final AbstractNetworkElement element) {

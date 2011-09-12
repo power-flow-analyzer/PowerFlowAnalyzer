@@ -13,8 +13,8 @@ mpc.baseMVA = jnetwork.getIntParameter('BASE_MVA', 0);
 
 mpc.bus    = create_bus_matrix(jnetwork.getBusses());
 mpc.branch = create_branch_matrix(jnetwork.getBranches());
-[gen, gencost] = create_generator_matrices(jnetwork.getGenerators());
 
+[gen, gencost] = create_generator_matrices(jnetwork.getGenerators());
 mpc.gen = gen;
 mpc.gencost = gencost;
 

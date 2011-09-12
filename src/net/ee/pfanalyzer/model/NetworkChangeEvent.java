@@ -15,6 +15,13 @@ public class NetworkChangeEvent {
 		
 	}
 	
+	public NetworkChangeEvent(Network network, String parameterID, String oldValue, String newValue) {
+		setNetwork(network);
+		setParameterID(parameterID);
+		setOldValue(oldValue);
+		setNewValue(newValue);
+	}
+	
 	public NetworkChangeEvent(AbstractNetworkElement networkElement, String oldValue, String newValue) {
 		setNetworkElement(networkElement);
 		setOldValue(oldValue);

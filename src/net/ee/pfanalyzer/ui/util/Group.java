@@ -30,13 +30,13 @@ public class Group extends JPanel {
 		add(new HyperLinkLabel(element.getLabel(), element, foreground));
 	}
 	
-	public void addElementLink(AbstractNetworkElement childData) {
+	public void addElementLink(AbstractNetworkElement childData, int displayFlags) {
 		Color foreground = Color.BLUE;
 		if(childData.isCorrect() == false)
 			foreground = Color.RED;
 		if(childData.isActive() == false)
 			foreground = Color.DARK_GRAY;
-		add(new HyperLinkLabel(childData.getDisplayName(), childData, foreground));
+		add(new HyperLinkLabel(childData.getDisplayName(displayFlags), childData, foreground));
 	}
 	
 	public void removeFlags() {

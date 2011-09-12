@@ -13,19 +13,19 @@ for i=1:bus_list.size()
     jbus = bus_list.get(i - 1);
     
     % add parameters to current matrix row
-    busData(i, BUS_I) = jbus.getIntParameter('BUS_I');
-    busData(i, BUS_TYPE) = jbus.getIntParameter('BUS_TYPE');
-    busData(i, PD) = jbus.getDoubleParameter('PD');
-    busData(i, QD) = jbus.getDoubleParameter('QD');
-    busData(i, GS) = jbus.getDoubleParameter('GS');
-    busData(i, BS) = jbus.getDoubleParameter('BS');
-    busData(i, BUS_AREA) = jbus.getIntParameter('BUS_AREA');
-    busData(i, VM) = jbus.getDoubleParameter('VM');
-    busData(i, VA) = jbus.getDoubleParameter('VA');
-    busData(i, BASE_KV) = jbus.getDoubleParameter('BASE_KV');
-    busData(i, ZONE) = jbus.getIntParameter('ZONE');
-    busData(i, VMAX) = jbus.getDoubleParameter('VMAX');
-    busData(i, VMIN) = jbus.getDoubleParameter('VMIN');
+    busData(i, BUS_I) = parameter_int(jbus, 'BUS_I');
+    busData(i, BUS_TYPE) = parameter_int(jbus, 'BUS_TYPE');
+    busData(i, PD) = parameter_double(jbus, 'PD');
+    busData(i, QD) = parameter_double(jbus, 'QD');
+    busData(i, GS) = parameter_double(jbus, 'GS');
+    busData(i, BS) = parameter_double(jbus, 'BS');
+    busData(i, BUS_AREA) = parameter_int(jbus, 'BUS_AREA');
+    busData(i, VM) = parameter_double(jbus, 'VM');
+    busData(i, VA) = parameter_double(jbus, 'VA');
+    busData(i, BASE_KV) = parameter_double(jbus, 'BASE_KV');
+    busData(i, ZONE) = parameter_int(jbus, 'ZONE');
+    busData(i, VMAX) = parameter_double(jbus, 'VMAX');
+    busData(i, VMIN) = parameter_double(jbus, 'VMIN');
 end
 
 end

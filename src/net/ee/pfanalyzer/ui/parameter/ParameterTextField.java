@@ -5,61 +5,56 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 
-public class ParameterTextField extends JTextField implements ActionListener, KeyListener {
+public class ParameterTextField extends ParameterValuePanel implements ActionListener, KeyListener {
 	
-	private String parameterID;
-	private NetworkParameter parameter;
+	private JTextField textfield;
 	
-	public ParameterTextField(String parameterID) {
-		super();
-		this.parameterID = parameterID;
-		initField();
+	public ParameterTextField(IParameterMasterElement element, NetworkParameter property, NetworkParameter propertyValue) {
+		super(element, property, propertyValue);
+		textfield.addActionListener(this);
+		textfield.addKeyListener(this);
 	}
 	
-	public ParameterTextField(NetworkParameter parameter) {
-		super();
-		this.parameter = parameter;
-		this.parameterID = parameter.getID();
-		initField();
+	protected void createValuePanel() {
+		textfield = new JTextField();
 	}
 	
-	private void initField() {
-		if(getParameterValue() != null)
-			setText(getParameterValue());
-		addActionListener(this);
-		addKeyListener(this);
+	protected JComponent getValuePanel() {
+		return textfield;
+	}
+	
+	protected void setValue(String value) {
+		textfield.setText(value);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		setParameterValue(getText());
-		updateView();
+		setNewValue();
+	}
+	
+	private void setNewValue() {
+		if(ignoreAction())
+			return;
+		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);
+		String value = textfield.getText();
+		String oldValue = property.getValue();
+		property.setValue(value);
+		fireValueChanged(oldValue, value);
+		refresh();
 	}
 	
 	protected void updateView() {
 		// empty implementation
 	}
-	
-	protected void setParameterValue(String text) {
-		parameter.setValue(text);
-	}
-	
-	protected String getParameterValue() {
-		return parameter.getValue();
-	}
-	
-	public String getParameterID() {
-		return parameterID;
-	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		setParameterValue(getText());
-		updateView();
+		setNewValue();
 	}
 
 	@Override

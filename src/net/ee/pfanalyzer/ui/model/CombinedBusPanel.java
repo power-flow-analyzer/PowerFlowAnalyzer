@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
@@ -56,7 +57,7 @@ public class CombinedBusPanel extends ModelElementPanel {
 		double reactivePowerSum = 0;
 		for (int i = 0; i < data.getNetworkElementCount(); i++) {
 			Bus bus = data.getNetworkElement(i);
-			busGroup.addElementLink(bus);
+			busGroup.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
 //			realPowerSum += bus.getData()[IBusDataConstants.REAL_POWER_DEMAND];
 //			reactivePowerSum += bus.getData()[IBusDataConstants.REACTIVE_POWER_DEMAND];
 		}
@@ -77,7 +78,7 @@ public class CombinedBusPanel extends ModelElementPanel {
 		realPowerSum = 0;
 		reactivePowerSum = 0;
 		for (Generator gen : data.getGenerators()) {
-			generatorGroup.addElementLink(gen);// TODO
+			generatorGroup.addElementLink(gen, AbstractNetworkElement.DISPLAY_DEFAULT);// TODO
 //			realPowerSum += gen.getData()[IGeneratorDataConstants.REAL_POWER_OUTPUT];
 //			reactivePowerSum += gen.getData()[IGeneratorDataConstants.REACTIVE_POWER_OUTPUT];
 		}
@@ -86,7 +87,7 @@ public class CombinedBusPanel extends ModelElementPanel {
 		
 		// add transformers
 		for (Transformer t : data.getTransformers()) {
-			transformerGroup.addElementLink(t);
+			transformerGroup.addElementLink(t, AbstractNetworkElement.DISPLAY_DEFAULT);
 		}
 		
 		finishLayout();

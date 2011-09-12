@@ -8,7 +8,7 @@ public class Coordinates extends AbstractNetworkElement implements ICoordinateDa
 		super(data, index);
 	}
 	
-	public String getDisplayName() {
+	public String getDisplayName(int displayFlags) {
 		throw new RuntimeException("Must not be called");
 	}
 }

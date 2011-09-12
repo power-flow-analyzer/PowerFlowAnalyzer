@@ -91,7 +91,7 @@ public class ModelElementPanel extends ParameterContainer {
 				bus = element.getNetwork().getBus(busNumber);
 			if(bus != null && bus != element) {
 				panel.add(new JLabel(getLabel(paramDef) + ": "));
-				panel.addElementLink(bus);
+				panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
 				parameterAdded(paramDef);
 				return;
 			}

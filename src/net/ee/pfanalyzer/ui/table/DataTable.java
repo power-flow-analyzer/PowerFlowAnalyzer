@@ -181,14 +181,14 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		    			setForeground(Color.RED);
 		    		setBackground(table.getBackground());
 		    	}
-		    	String text = value.toString();
+		    	String text = value != null ? value.toString() : "";
 		    	if(value instanceof Double)
 		    		text = format.format(((Double) value).doubleValue()); // TODO
 		    	// getValueAt(row, column)
 		    	setText(text);
 		    	setToolTipText(model.getColumnDescription(realColumn));
 	    	} catch(Exception e) {
-	    		System.err.println(e);
+	    		e.printStackTrace();
 	    		setText("Error");
 	    		setForeground(Color.RED);
 	    	}

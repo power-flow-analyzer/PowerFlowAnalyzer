@@ -1,5 +1,6 @@
 package net.ee.pfanalyzer.ui.model;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.Network;
 
@@ -18,7 +19,7 @@ public class CombinedBranchPanel extends ModelElementPanel {
 		// add branches
 		addElementGroup("Branches");
 		for (int i = 0; i < data.getNetworkElementCount(); i++) {
-			addElementLink(data.getNetworkElement(i));
+			addElementLink(data.getNetworkElement(i), AbstractNetworkElement.DISPLAY_NAME);
 		}
 		finishLayout();
 	}

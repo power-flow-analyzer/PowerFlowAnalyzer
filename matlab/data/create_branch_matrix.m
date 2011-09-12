@@ -14,19 +14,19 @@ for i=1:branch_list.size()
     jbranch = branch_list.get(i - 1);
     
     % add parameters to current matrix row
-    branchData(i, F_BUS) = jbranch.getIntParameter('F_BUS');
-    branchData(i, T_BUS) = jbranch.getIntParameter('T_BUS');
-    branchData(i, BR_R) = jbranch.getIntParameter('BR_R');
-    branchData(i, BR_X) = jbranch.getIntParameter('BR_X');
-    branchData(i, BR_B) = jbranch.getIntParameter('BR_B');
-    branchData(i, RATE_A) = jbranch.getIntParameter('RATE_A');
-    branchData(i, RATE_B) = jbranch.getIntParameter('RATE_B');
-    branchData(i, RATE_C) = jbranch.getIntParameter('RATE_C');
-    branchData(i, TAP) = jbranch.getIntParameter('TAP');
-    branchData(i, SHIFT) = jbranch.getIntParameter('SHIFT');
-    branchData(i, BR_STATUS) = jbranch.getIntParameter('BR_STATUS');
-    branchData(i, ANGMIN) = jbranch.getIntParameter('ANGMIN');
-    branchData(i, ANGMAX) = jbranch.getIntParameter('ANGMAX');
+    branchData(i, F_BUS) = parameter_int(jbranch, 'F_BUS');
+    branchData(i, T_BUS) = parameter_int(jbranch, 'T_BUS');
+    branchData(i, BR_R) = parameter_double(jbranch, 'BR_R');
+    branchData(i, BR_X) = parameter_double(jbranch, 'BR_X');
+    branchData(i, BR_B) = parameter_double(jbranch, 'BR_B');
+    branchData(i, RATE_A) = parameter_double(jbranch, 'RATE_A');
+    branchData(i, RATE_B) = parameter_double(jbranch, 'RATE_B');
+    branchData(i, RATE_C) = parameter_double(jbranch, 'RATE_C');
+    branchData(i, TAP) = parameter_double(jbranch, 'TAP');
+    branchData(i, SHIFT) = parameter_double(jbranch, 'SHIFT');
+    branchData(i, BR_STATUS) = parameter_int(jbranch, 'BR_STATUS');
+    branchData(i, ANGMIN) = parameter_double(jbranch, 'ANGMIN');
+    branchData(i, ANGMAX) = parameter_double(jbranch, 'ANGMAX');
 end
 
 end

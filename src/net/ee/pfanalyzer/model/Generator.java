@@ -59,7 +59,8 @@ public class Generator extends AbstractNetworkElement implements IGeneratorDataC
 //		return getData()[REACTIVE_POWER_OUTPUT];
 	}
 	
-	public String getDisplayName() {
+	@Override
+	public String getDisplayName(int displayFlags) {
 		int MW = (int) Math.round(getRealPowerOutput());
 		int MVAr = (int) Math.round(getReactivePowerOutput());
 		String text = "Generator " + (getIndex() + 1);

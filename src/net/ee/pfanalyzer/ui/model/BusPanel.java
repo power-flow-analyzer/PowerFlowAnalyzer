@@ -1,5 +1,6 @@
 package net.ee.pfanalyzer.ui.model;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Bus;
 
 public class BusPanel extends ModelElementPanel {
@@ -12,7 +13,7 @@ public class BusPanel extends ModelElementPanel {
 		// remove old elements
 		removeAllElements();
 		// set title
-		String title = data.getDisplayName();
+		String title = data.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT);
 		if(data.getName() != null)
 			title += " (" + data.getName() + ")";
 		setTitle(title);

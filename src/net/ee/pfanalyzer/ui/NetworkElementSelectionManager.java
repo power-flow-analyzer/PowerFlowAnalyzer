@@ -20,7 +20,7 @@ public class NetworkElementSelectionManager implements INetworkElementSelectionL
 	private Object oldSelection;
 	
 	private NetworkElementSelectionManager() {
-		viewHistory.add(null);
+		viewHistory.add(null);// add the whole network as first entry in history
 	}
 	
 	@Override

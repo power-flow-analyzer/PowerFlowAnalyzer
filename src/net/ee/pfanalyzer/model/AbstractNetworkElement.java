@@ -13,7 +13,12 @@ import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
 
 public abstract class AbstractNetworkElement extends ParameterSupport {
+	
+	public final static int DISPLAY_NAME = 2;
+	public final static int DISPLAY_ADDITIONAL_INFO = 4;
 
+	public final static int DISPLAY_DEFAULT = DISPLAY_NAME | DISPLAY_ADDITIONAL_INFO;
+	
 	private Network network;
 	private int indexInParent;
 //	private double[] data;
@@ -22,7 +27,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	private ModelData model;
 	private List<NetworkFlag> flags = new ArrayList<NetworkFlag>();
 	
-	public abstract String getDisplayName();
+	public abstract String getDisplayName(int displayFlags);
 	
 	AbstractNetworkElement(Network data, int index) {
 		this(data, new AbstractNetworkElementData(), index);
@@ -161,6 +166,11 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	
 	public List<NetworkFlag> getFlags() {
 		return flags;
+	}
+	
+	public void clearFlags() {
+		flags.clear();
+		elementData.getFlag().clear();
 	}
 	
 	public void addFlag(NetworkFlag flag) {
