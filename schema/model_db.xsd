@@ -18,6 +18,7 @@
             <element name="parent" type="mpui:AbstractModelElementData"/>
             <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
+		<attribute name="internal" type="boolean" default="false"/>
 		<attribute name="description" type="string"/>
         <attribute name="label" type="string"/>
 		<attribute name="ID" type="string"/>
@@ -30,7 +31,6 @@
 		            <element name="modelClass" type="mpui:ModelClassData" minOccurs="0" maxOccurs="unbounded"/>
 		            <element name="model" type="mpui:ModelData" minOccurs="0" maxOccurs="unbounded"/>
 		        </sequence>
-		        <attribute name="baseType" type="mpui:BaseElementType"/>
             </extension>
         </complexContent>
     </complexType>
@@ -41,14 +41,5 @@
             </extension>
         </complexContent>
     </complexType>
-    
-    <simpleType name="BaseElementType">
-        <restriction base="string">
-            <enumeration value="bus"/>
-            <enumeration value="branch"/>
-            <enumeration value="generator"/>
-            <enumeration value="custom"/>
-        </restriction>
-    </simpleType>
     
 </schema>

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -23,6 +24,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
@@ -228,17 +230,28 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 
 	public static JButton createButton(String tooltipText, String iconName, String altText, boolean largeIcons) {
-		String iconSizePath = largeIcons ? "32x32" : "16x16";
-		URL iconURL = PowerFlowAnalyzer.class.getResource("/" + iconSizePath + "/" + iconName);
 		JButton button = new JButton();
-		button.setFocusable(false);
-		button.setToolTipText(tooltipText);
-		if(iconURL != null) {
-			button.setIcon(new ImageIcon(iconURL, altText));
-		} else {
-			button.setText(altText);
-		}
+		decorateButton(button, tooltipText, iconName, altText, largeIcons);
 		return button;
+	}
+
+	public static JToggleButton createToggleButton(String tooltipText, String iconName, String altText, boolean largeIcons) {
+		JToggleButton button = new JToggleButton();
+		decorateButton(button, tooltipText, iconName, altText, largeIcons);
+		return button;
+	}
+	
+	public static void decorateButton(AbstractButton button, String tooltipText, String iconName, String altText, 
+			boolean largeIcons) {
+			String iconSizePath = largeIcons ? "32x32" : "16x16";
+			URL iconURL = PowerFlowAnalyzer.class.getResource("/" + iconSizePath + "/" + iconName);
+			button.setFocusable(false);
+			button.setToolTipText(tooltipText);
+			if(iconURL != null) {
+				button.setIcon(new ImageIcon(iconURL, altText));
+			} else {
+				button.setText(altText);
+			}
 	}
 
 	private JButton createToolbarButton(String actionCommand, String tooltipText, String iconName, String altText) {

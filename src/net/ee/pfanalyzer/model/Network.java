@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.ee.pfanalyzer.io.IllegalDataException;
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
+import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
@@ -19,6 +20,7 @@ public class Network extends ParameterSupport {
 	private List<CombinedBranch> combinedBranchList = new ArrayList<CombinedBranch>();
 	
 	private NetworkData networkData;
+	private ModelClassData globalParameterClass;
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
 	
@@ -46,6 +48,24 @@ public class Network extends ParameterSupport {
 		networkData = data;
 		updateNetworkData();
 		findCombinedElements();
+	}
+	
+	public ModelClassData getGlobalParameterClass() {
+		return globalParameterClass;
+	}
+
+	public void setGlobalParameterClass(ModelClassData globalParameterClass) {
+		this.globalParameterClass = globalParameterClass;
+	}
+
+	@Override
+	public NetworkParameter getParameterValue(String id) {
+		NetworkParameter parameter = super.getParameterValue(id);
+		if(parameter != null)
+			return parameter;
+		if(getGlobalParameterClass() != null)
+			return ModelDBUtils.getParameterValue(getGlobalParameterClass(), id);
+		return null;
 	}
 
 	private void updateNetworkData() {

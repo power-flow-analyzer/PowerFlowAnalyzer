@@ -9,6 +9,7 @@ import javax.swing.border.TitledBorder;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
+import net.ee.pfanalyzer.preferences.Preferences;
 
 public class Group extends JPanel {
 	
@@ -31,11 +32,13 @@ public class Group extends JPanel {
 	}
 	
 	public void addElementLink(AbstractNetworkElement childData, int displayFlags) {
-		Color foreground = Color.BLUE;
-		if(childData.isCorrect() == false)
-			foreground = Color.RED;
-		if(childData.isActive() == false)
-			foreground = Color.DARK_GRAY;
+		Color foreground = Preferences.getHyperlinkForeground();
+		if(childData.hasFailures())
+			foreground = Preferences.getFlagFailureColor();
+		else if(childData.hasWarnings())
+			foreground = Preferences.getFlagWarningColor();
+		else if(childData.isActive() == false)
+			foreground = Preferences.getDisabledForeground();
 		add(new HyperLinkLabel(childData.getDisplayName(displayFlags), childData, foreground));
 	}
 	

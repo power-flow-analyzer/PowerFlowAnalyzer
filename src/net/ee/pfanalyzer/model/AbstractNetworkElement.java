@@ -1,6 +1,5 @@
 package net.ee.pfanalyzer.model;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +7,6 @@ import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkFlagData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
 
@@ -21,8 +19,8 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	
 	private Network network;
 	private int indexInParent;
-//	private double[] data;
-	private Boolean isCorrect = null;
+	private Boolean hasFailures = null;
+	private Boolean hasWarnings = null;
 	private AbstractNetworkElementData elementData;
 	private ModelData model;
 	private List<NetworkFlag> flags = new ArrayList<NetworkFlag>();
@@ -35,7 +33,6 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	
 	AbstractNetworkElement(Network data, AbstractNetworkElementData elementData, int index) {
 		this.network = data;
-//		this.data = matpowerData;
 		this.indexInParent = index;
 		this.elementData = elementData;
 		
@@ -90,27 +87,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	public String getParameterDisplayValue(String parameterID) {
 		NetworkParameter param = getParameterDefinition(parameterID);
 		if(param != null) {
-			NetworkParameterType type = param.getType();
-//			NetworkParameterValueRestriction restriction = param.getRestriction();
-//			param.getOption().
-			if(type != null) {
-				if(type.equals(NetworkParameterType.INTEGER)) {
-					Integer result = getIntParameter(parameterID);
-					if(result != null)
-						return result.toString();
-					return "";
-				} else if(type.equals(NetworkParameterType.DOUBLE)) {
-					Double value = getDoubleParameter(parameterID);
-					if(value != null && param.getDisplay() != null) {
-						String pattern = param.getDisplay().getDecimalFormatPattern();
-						DecimalFormat format = new DecimalFormat(pattern);
-						return format.format(value);
-					}
-					if(value != null)
-						return value.toString();
-					return "";
-				}
-			}
+			return ModelDBUtils.getParameterDisplayValue(this, param);
 		}
 		return getTextParameter(parameterID);
 	}
@@ -145,10 +122,6 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 		return elementData.getParameter();
 	}
 	
-//	public double[] getData() {
-//		return data;
-//	}
-	
 	public int getIndex() {
 		return indexInParent;
 	}
@@ -179,16 +152,33 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	}
 	
 	public boolean isCorrect() {
-		if(isCorrect == null) {
-			isCorrect = true;
+		return hasFailures() == false;
+	}
+	
+	public boolean hasFailures() {
+		if(hasFailures == null) {
+			hasFailures = false;
 			for (NetworkFlag flag : getFlags()) {
 				if(flag.isFailure()) {
-					isCorrect = false;
+					hasFailures = true;
 					break;
 				}
 			}
 		}
-		return isCorrect;
+		return hasFailures;
+	}
+	
+	public boolean hasWarnings() {
+		if(hasWarnings == null) {
+			hasWarnings = false;
+			for (NetworkFlag flag : getFlags()) {
+				if(flag.isWarning()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+		}
+		return hasWarnings;
 	}
 	
 	public boolean isActive() {

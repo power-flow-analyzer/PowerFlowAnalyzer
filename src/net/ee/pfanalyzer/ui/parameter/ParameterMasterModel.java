@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.parameter;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
+import net.ee.pfanalyzer.model.util.ParameterSupport;
 
 public class ParameterMasterModel implements IParameterMasterElement {
 
@@ -49,5 +50,10 @@ public class ParameterMasterModel implements IParameterMasterElement {
 	@Override
 	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
 		// empty implementation
+	}
+
+	@Override
+	public ParameterSupport getParameterSupport() {
+		return null;
 	}
 }

@@ -22,6 +22,7 @@ import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
 import net.ee.pfanalyzer.ui.util.Group;
@@ -32,6 +33,7 @@ public class ParameterContainer extends JPanel {
 	private Map<String, NetworkParameter> properties = new HashMap<String, NetworkParameter>();
 	private Box elementContainer;
 	private Group currentGroupContainer;
+	private boolean editable = true;
 
 	public ParameterContainer(IParameterMasterElement parameterMaster, boolean scrollable) {
 		super(new BorderLayout());
@@ -55,42 +57,55 @@ public class ParameterContainer extends JPanel {
 	protected void addParameters(AbstractModelElementData element, AbstractModelElementData master, JComponent parent) {
 		if(element.getParent() != null)
 			addParameters(element.getParent(), master, parent);
-		Group resizer = new Group("Parameters of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
+		Group paramPanel = new Group("Parameters of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
+		Group resultPanel = new Group("Results of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
 		for (NetworkParameter property : element.getParameter()) {
+			if(element.getParent() == null)
+				continue;// do not show global parameters
 			NetworkParameter propertyValue = parameterMaster.getParameterValue(property.getID());//ModelDBUtils.getParameterValue(master, property.getID());
+			boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(property.getPurpose());
+			if(isResult && isEditable()) {
+				parameterAdded(property);
+				continue;// do not show results in editing mode
+			}
+			Group panel = isResult ? 
+					resultPanel : paramPanel;
 			if(propertyValue != null)
-				addParameter(property, propertyValue, resizer);
+				addParameter(property, propertyValue, panel);
 			else
-				addParameter(property, property, resizer);
+				addParameter(property, property, panel);
 		}
-		if(resizer.getComponentCount() > 0)
-			addElementGroup(resizer);
+		if(resultPanel.getComponentCount() > 0)
+			addElementGroup(resultPanel);
+		if(paramPanel.getComponentCount() > 0)
+			addElementGroup(paramPanel);
 	}
 	
 	protected void addParameter(NetworkParameter propertyDefinition, NetworkParameter propertyValue, Group panel) {
 		if(isParameterAdded(propertyDefinition))
 			return;
-		if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction()) == false) {
-			if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
-				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
-				panel.add(new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue));
-			} else if(NetworkParameterType.DOUBLE.equals(propertyDefinition.getType())) {
-				ParameterDoubleField box = new ParameterDoubleField(parameterMaster, propertyDefinition, propertyValue);
-				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
-				panel.add(box);
-			} else if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType())) {
-				ParameterIntField box = new ParameterIntField(parameterMaster, propertyDefinition, propertyValue);
-				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
-				panel.add(box);
-			} else { //if(NetworkParameterType.TEXT.equals(propertyDefinition.getType())) {
-				ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
-				panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
+		panel.add(createLabel(propertyDefinition));
+		if(isEditable() && NetworkParameterPurposeRestriction.PARAMETER.equals(propertyDefinition.getPurpose())) {
+			if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction()) == false) {
+				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
+					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
+					panel.add(box);
+				} else if(NetworkParameterType.DOUBLE.equals(propertyDefinition.getType())) {
+					ParameterDoubleField box = new ParameterDoubleField(parameterMaster, propertyDefinition, propertyValue);
+					panel.add(box);
+				} else if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType())) {
+					ParameterIntField box = new ParameterIntField(parameterMaster, propertyDefinition, propertyValue);
+					panel.add(box);
+				} else { //if(NetworkParameterType.TEXT.equals(propertyDefinition.getType())) {
+					ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
+					panel.add(box);
+				}
+			} else { // list
+				ParameterValueBox box = new ParameterValueBox(parameterMaster, propertyDefinition, propertyValue);
 				panel.add(box);
 			}
-		} else { // list
-			ParameterValueBox box = new ParameterValueBox(parameterMaster, propertyDefinition, propertyValue);
-			panel.add(new JLabel(getLabel(propertyDefinition) + ": "));
-			panel.add(box);
+		} else { //if(NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose())) {
+			panel.add(new ParameterTextLabel(parameterMaster, propertyDefinition, propertyValue));
 		}
 		parameterAdded(propertyDefinition);
 	}
@@ -101,6 +116,13 @@ public class ParameterContainer extends JPanel {
 	
 	protected boolean isParameterAdded(NetworkParameter parameter) {
 		return properties.get(parameter.getID()) != null;
+	}
+	
+	protected JLabel createLabel(NetworkParameter parameter) {
+		JLabel label = new JLabel(getLabel(parameter) + ": ");
+		if(parameter.getDescription() != null && parameter.getDescription().length() > 0)
+			label.setToolTipText(parameter.getDescription());
+		return label;
 	}
 	
 	protected String getLabel(NetworkParameter parameter) {
@@ -122,17 +144,19 @@ public class ParameterContainer extends JPanel {
 		String modelName = element.getModelID();
 		if(element.getModel() != null)
 			modelName = element.getModel().getLabel() + " (\"" + modelName + "\")";
-		JButton changeModelButton = PowerFlowAnalyzer.createButton("Select a model from the database", "database_go.png", "Change Model", false);
-		changeModelButton.setMargin(new Insets(2, 2, 1, 1));
-		changeModelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showModelDB(element.getModel());
-			}
-		});
 		JPanel linkPanel = new JPanel(new BorderLayout());
 		linkPanel.add(new JLabel(modelName), BorderLayout.CENTER);
-		linkPanel.add(changeModelButton, BorderLayout.EAST);
+		if(isEditable()) {
+			JButton changeModelButton = PowerFlowAnalyzer.createButton("Select a model from the database", "database_go.png", "Change Model", false);
+			changeModelButton.setMargin(new Insets(2, 2, 1, 1));
+			changeModelButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showModelDB(element.getModel());
+				}
+			});
+			linkPanel.add(changeModelButton, BorderLayout.EAST);
+		}
 		currentGroupContainer.add(linkPanel);
 	}
 	
@@ -141,6 +165,14 @@ public class ParameterContainer extends JPanel {
 		properties.clear();
 	}
 	
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+
 	protected void addElementGroup(Group group) {
 		elementContainer.add(Box.createVerticalStrut(10));
 		currentGroupContainer = group;

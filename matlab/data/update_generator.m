@@ -8,8 +8,13 @@ define_constants;
 %% add parameters to generator object
 jgenerator.setParameter('PG', genData(PG));
 jgenerator.setParameter('QG', genData(QG));
+jgenerator.setParameter('QMAX', genData(QMAX));
+jgenerator.setParameter('QMIN', genData(QMIN));
+jgenerator.setParameter('VG', genData(VG));
+jgenerator.setParameter('MBASE', genData(MBASE));
 jgenerator.setParameter('GEN_STATUS', genData(GEN_STATUS));
-
+jgenerator.setParameter('PMAX', genData(PMAX));
+jgenerator.setParameter('PMIN', genData(PMIN));
 jgenerator.setParameter('PC1', genData(PC1));
 jgenerator.setParameter('PC2', genData(PC2));
 jgenerator.setParameter('QC1MIN', genData(QC1MIN));
@@ -37,6 +42,16 @@ jgenerator.setParameter('NCOST', genCostData(NCOST));
 jgenerator.setParameter('COST', genCostData(COST));
 jgenerator.setParameter('GENCOST6', genCostData(6));
 jgenerator.setParameter('GENCOST7', genCostData(7));
+
+%% add flags
+
+% remove old flags
+jgenerator.clearFlags();
+
+% add flags
+if genData(GEN_STATUS) == 1 % check if generator is running
+    add_flags_generator(jgenerator, genData);
+end
 
 end
 

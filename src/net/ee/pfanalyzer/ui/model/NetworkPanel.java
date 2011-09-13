@@ -6,6 +6,7 @@ import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetwork;
 import net.ee.pfanalyzer.ui.util.Group;
 
@@ -26,7 +27,11 @@ public class NetworkPanel extends ModelElementPanel {
 		if(data.getParameterList().size() > 0) {
 			Group globalParameters = addElementGroup("Global Network Parameters");
 			for (NetworkParameter parameter : data.getParameterList()) {
-				addParameter(parameter, parameter, globalParameters);
+				NetworkParameter paramDef = ModelDBUtils.getOwnParameter(
+						data.getGlobalParameterClass(), parameter.getID());
+				if(paramDef == null)
+					paramDef = parameter; // fallback if parameter not defined in db
+				addParameter(paramDef, parameter, globalParameters);
 			}
 		}
 		if(data.getCombinedBusCount() > 0) { // show combined elements

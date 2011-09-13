@@ -82,13 +82,13 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 			cBranchPanel.setCombinedBranch((CombinedBranch) selection);
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
 		} else if(selection instanceof Bus) {
-			busPanel.setBus((Bus) selection);
+			busPanel.setNetworkElement((Bus) selection);
 			cardLayout.show(this, SINGLE_BUS_CARD);
 		} else if(selection instanceof Branch) {
-			branchPanel.setBranch((Branch) selection);
+			branchPanel.setNetworkElement((Branch) selection);
 			cardLayout.show(this, SINGLE_BRANCH_CARD);
 		} else if(selection instanceof Generator) {
-			generatorPanel.setGenerator((Generator) selection);
+			generatorPanel.setNetworkElement((Generator) selection);
 			cardLayout.show(this, GENERATOR_CARD);
 		}
 		doLayout();
@@ -130,6 +130,10 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 	
 	public void setViewerProperty(String property, boolean value) {
 		Preferences.setProperty(property, value);
+		reloadCard();
+	}
+	
+	public void reloadCard() {
 		selectionChanged(oldSelection);
 	}
 	

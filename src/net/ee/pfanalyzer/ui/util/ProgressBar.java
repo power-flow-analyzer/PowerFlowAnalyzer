@@ -6,14 +6,17 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 
+import net.ee.pfanalyzer.preferences.Preferences;
+
 public class ProgressBar extends JComponent {
 	final int BAR_HEIGHT = 20;
 	double value;
-	boolean isCorrect;
+	boolean isError, isWarning;
 	
-	public ProgressBar(double value, boolean isCorrect) {
+	public ProgressBar(double value, boolean isError, boolean isWarning) {
 		this.value = value;
-		this.isCorrect = isCorrect;
+		this.isError = isError;
+		this.isWarning = isWarning;
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -21,10 +24,12 @@ public class ProgressBar extends JComponent {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, y, getWidth() - 1, BAR_HEIGHT);
 		int barWidth = Math.min((int) (getWidth() * value / 100), getWidth());
-		if(isCorrect)
-			g.setColor(Color.GREEN.darker());
+		if(isError)
+			g.setColor(Preferences.getFlagFailureColor());
+		else if(isWarning)
+			g.setColor(Preferences.getFlagWarningColor());
 		else
-			g.setColor(Color.RED);
+			g.setColor(Preferences.getFlagCorrectColor());
 		g.fillRect(0, y, barWidth - 1, BAR_HEIGHT);
 		g.setColor(Color.BLACK);
 		g.drawRect(0, y, getWidth() - 1, BAR_HEIGHT);

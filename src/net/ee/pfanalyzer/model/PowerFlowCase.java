@@ -68,6 +68,9 @@ public class PowerFlowCase {
 	}
 	
 	private void updateNetworkData() {
+		// setting network class containing global parameters
+		getNetwork().setGlobalParameterClass(getModelDB().getNetworkClass());
+		// setting model references in network elements
 //		System.out.println("case: setting network data with " + getNetwork().getElements().size() + " elements");
 		for (AbstractNetworkElement element : getNetwork().getElements()) {
 			ModelData model = getModelDB().getModel(element.getModelID());

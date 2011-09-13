@@ -1,8 +1,12 @@
 package net.ee.pfanalyzer.model.util;
 
+import java.text.DecimalFormat;
+
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
+import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
+import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
 
 public class ModelDBUtils {
 
@@ -10,8 +14,12 @@ public class ModelDBUtils {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
 			id = "<empty>";
-		if(element.getParent() != null)
-			return getParameterID(element.getParent()) + "." + id;
+		if(element.getParent() != null) {
+			String parentID = getParameterID(element.getParent());
+			if("<empty>".equals(parentID))
+				return id;
+			return parentID + "." + id;
+		}
 		return id;
 	}
 	
@@ -110,5 +118,41 @@ public class ModelDBUtils {
 //			return p;
 //		}
 		return null;
+	}
+	
+	public static String getParameterDisplayValue(ParameterSupport support, NetworkParameter paramDef) {
+		String parameterID = paramDef.getID();
+		NetworkParameterType type = paramDef.getType();
+		if(NetworkParameterValueRestriction.LIST.equals(paramDef.getRestriction())) {
+			String value = support.getParameterValue(parameterID).getValue();
+			if(type != null && type.equals(NetworkParameterType.INTEGER)) {
+				Integer result = support.getIntParameter(parameterID);
+				if(result != null)
+					value = result.toString();
+			}
+			for (NetworkParameterValueOption option: paramDef.getOption()) {
+				if(option.getValue().equals(value))
+					return option.getLabel() + " (" + option.getValue() + ")";
+			}
+		}
+		if(type != null) {
+			if(type.equals(NetworkParameterType.INTEGER)) {
+				Integer result = support.getIntParameter(parameterID);
+				if(result != null)
+					return result.toString();
+				return "";
+			} else if(type.equals(NetworkParameterType.DOUBLE)) {
+				Double dvalue = support.getDoubleParameter(parameterID);
+				if(dvalue != null && paramDef.getDisplay() != null) {
+					String pattern = paramDef.getDisplay().getDecimalFormatPattern();
+					DecimalFormat format = new DecimalFormat(pattern);
+					return format.format(dvalue);
+				}
+				if(dvalue != null)
+					return dvalue.toString();
+				return "";
+			}
+		}
+		return support.getTextParameter(parameterID);
 	}
 }

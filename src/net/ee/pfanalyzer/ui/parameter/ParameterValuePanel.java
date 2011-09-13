@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
@@ -21,56 +22,67 @@ public abstract class ParameterValuePanel extends JPanel {
 	private JCheckBox inheritBox, emptyBox;
 	private boolean userAction = true;
 
-	public ParameterValuePanel(IParameterMasterElement element, NetworkParameter property, NetworkParameter propertyValue) {
+	public ParameterValuePanel(IParameterMasterElement element, NetworkParameter property, 
+			NetworkParameter propertyValue) {
+		this(element, property, propertyValue, true);
+	}
+
+	public ParameterValuePanel(IParameterMasterElement element, NetworkParameter property, 
+			NetworkParameter propertyValue, boolean editable) {
 		super(new BorderLayout());
 		this.master = element;
 		this.propertyDefinition = property;
 		this.propertyValue = propertyValue;
 		
 		createValuePanel();
+		if(propertyDefinition.getDescription() != null && propertyDefinition.getDescription().length() > 0)
+			getValuePanel().setToolTipText(propertyDefinition.getDescription());
 		boolean isDefinition = getMasterElement().hasParameterDefinition(property.getID());
-		if(isDefinition) {
-			emptyBox = new JCheckBox("empty");
-			emptyBox.setToolTipText("Leave this value empty.");
-			emptyBox.setSelected(propertyValue.isEmpty());
-			getValuePanel().setEnabled( ! propertyValue.isEmpty());
-			add(emptyBox, BorderLayout.EAST);
-			
-			emptyBox.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ParameterValuePanel.this.propertyValue.setEmpty(emptyBox.isSelected());
-					if(emptyBox.isSelected()) {
-						ParameterValuePanel.this.propertyValue.setValue(null);
-						getValuePanel().setEnabled(false);
-					} else {
-						getValuePanel().setEnabled(true);
+		boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose());
+		if( editable && ! isResult) {
+			if(isDefinition) {
+				emptyBox = new JCheckBox("empty");
+				emptyBox.setToolTipText("Leave this value empty.");
+				emptyBox.setSelected(propertyValue.isEmpty());
+				getValuePanel().setEnabled( ! propertyValue.isEmpty());
+				add(emptyBox, BorderLayout.EAST);
+				
+				emptyBox.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						ParameterValuePanel.this.propertyValue.setEmpty(emptyBox.isSelected());
+						if(emptyBox.isSelected()) {
+							ParameterValuePanel.this.propertyValue.setValue(null);
+							getValuePanel().setEnabled(false);
+						} else {
+							getValuePanel().setEnabled(true);
+						}
 					}
-				}
-			});
-		} else {
-			boolean required = getMasterElement().isRequired(property.getID());
-			boolean inherited = required ? false : getMasterElement().getOwnParameter(property.getID()) == null;
-			inheritBox = new JCheckBox("inherit");
-			if(required)
-				inheritBox.setToolTipText("<html>This value cannot be inherited from the super type(s)<br>since no value is specified there.");
-			else
-				inheritBox.setToolTipText("<html>Inherit this value from the super type(s),<br>i.e. do not define a particular value for this type.");
-			inheritBox.setSelected(inherited);
-			inheritBox.setEnabled( ! required);
-			getValuePanel().setEnabled( ! inherited);
-			add(inheritBox, BorderLayout.EAST);
-			
-			inheritBox.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					if(inheritBox.isSelected()) {
-						inheritValue();
-					} else {
-						getValuePanel().setEnabled(true);
+				});
+			} else {
+				boolean required = getMasterElement().isRequired(property.getID());
+				boolean inherited = required ? false : getMasterElement().getOwnParameter(property.getID()) == null;
+				inheritBox = new JCheckBox("inherit");
+				if(required)
+					inheritBox.setToolTipText("<html>This value cannot be inherited from the super type(s)<br>since no value is specified there.");
+				else
+					inheritBox.setToolTipText("<html>Inherit this value from the super type(s),<br>i.e. do not define a particular value for this type.");
+				inheritBox.setSelected(inherited);
+				inheritBox.setEnabled( ! required);
+				getValuePanel().setEnabled( ! inherited);
+				add(inheritBox, BorderLayout.EAST);
+				
+				inheritBox.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if(inheritBox.isSelected()) {
+							inheritValue();
+						} else {
+							getValuePanel().setEnabled(true);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 		setValue(propertyValue);
 		add(getValuePanel(), BorderLayout.CENTER);
@@ -94,7 +106,7 @@ public abstract class ParameterValuePanel extends JPanel {
 	
 	protected abstract void createValuePanel();
 	
-	private void setValue(NetworkParameter p) {
+	protected void setValue(NetworkParameter p) {
 		String value = null;
 		if(p == null)
 			value = "";

@@ -85,7 +85,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	public void refresh() {
 		selfSelection = true;
 		model.reloadTableData();
-		revalidate();
+		resizeAndRepaint();
 		selfSelection = false;
 	}
 
@@ -134,7 +134,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 			model.updateTableData();
 		else
 			model.reloadTableData();
-		revalidate();
+		resizeAndRepaint();
 		selfSelection = false;
 	}
 

@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.parameter;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ParameterSupport;
 
 public class ParameterMasterNetwork implements IParameterMasterElement {
 
@@ -50,5 +51,10 @@ public class ParameterMasterNetwork implements IParameterMasterElement {
 	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
 		NetworkChangeEvent event = new NetworkChangeEvent(network, parameterID, oldValue, newValue);
 		network.fireNetworkElementChanged(event);
+	}
+
+	@Override
+	public ParameterSupport getParameterSupport() {
+		return network;
 	}
 }

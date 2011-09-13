@@ -37,10 +37,11 @@ import javax.swing.table.AbstractTableModel;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
-import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
+import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
+import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
 
@@ -206,6 +207,8 @@ public class ManageParametersDialog extends BaseDialog {
 			commonPanel.add(new LabelField());
 			commonPanel.add(new JLabel("Description: "));
 			commonPanel.add(new DescriptionField());
+			commonPanel.add(new JLabel("Purpose: "));
+			commonPanel.add(new PurposeField());
 			commonPanel.add(new JLabel("Restriction: "));
 			restriction = new IntegerRestrictionField();
 			commonPanel.add(restriction);
@@ -609,6 +612,55 @@ public class ManageParametersDialog extends BaseDialog {
 						NetworkParameterValueRestriction.LIST };
 			}
 		}
+		
+		class PurposeField extends ComboBoxField {
+			
+			protected NetworkParameterPurposeRestriction[] getPurposes() {
+				return NetworkParameterPurposeRestriction.values();
+			}
+			@Override
+			protected String[] getLabels() {
+				NetworkParameterPurposeRestriction[] types = getPurposes();
+				String[] labels = new String[types.length];
+				for (int i = 0; i < labels.length; i++) {
+					labels[i] = types[i].value();
+				}
+				return labels;
+			}
+
+			@Override
+			protected String getValue() {
+				NetworkParameterPurposeRestriction purpose = property.getPurpose();
+				if(purpose == null)
+					return null;//NetworkParameterPurposeRestriction.PARAMETER.value();
+				return purpose.value();
+			}
+
+			@Override
+			protected String getDefaultValue() {
+				return NetworkParameterPurposeRestriction.PARAMETER.value();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				property.setPurpose(NetworkParameterPurposeRestriction.fromValue(value));
+			}
+			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				super.actionPerformed(e);
+//				typeChanged();
+//			}
+		}
+		
+//		class IntegerPurposeField extends RestrictionField {
+//			@Override
+//			protected NetworkParameterPurpose[] getRestrictions() {
+//				return new NetworkParameterPurpose[] { 
+//					NetworkParameterPurpose.PARAMETER, 
+//					NetworkParameterPurpose.RESULT };
+//			}
+//		}
 		
 		class IDField extends StringField {
 			@Override

@@ -18,6 +18,7 @@ public class ModelDB {
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
+	private ModelClassData networkClass;
 	
 	public ModelDB() {
 		this.db = CaseSerializer.readInternalModelDB();
@@ -38,9 +39,13 @@ public class ModelDB {
 		models.clear();
 //		System.out.println("model db: refresh model index");
 		// add models recursively
-		for (ModelClassData clazz : getData().getModelClass()) {
-			addModelsRecursive(clazz);
-		}
+		if(getData().getModelClass().size() != 1)
+			throw new RuntimeException("Only one root class is allowed in parameter database");
+		networkClass = getData().getModelClass().get(0);
+		addModelsRecursive(networkClass);
+//		for (ModelClassData clazz : getData().getModelClass()) {
+//			addModelsRecursive(clazz);
+//		}
 //		System.out.println("    " + models.size() + " models found");
 	}
 	
@@ -59,5 +64,9 @@ public class ModelDB {
 	
 	public ModelData getModel(String modelID) {
 		return models.get(modelID);
+	}
+	
+	public ModelClassData getNetworkClass() {
+		return networkClass;
 	}
 }

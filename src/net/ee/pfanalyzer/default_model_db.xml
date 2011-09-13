@@ -1,240 +1,250 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
 <power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
     <model-db>
-        <modelClass baseType="bus" ID="bus" label="Bus">
-            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BUS_I" type="integer" label="Bus" description="Bus number" restriction="bus-number" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BUS_TYPE" type="integer" label="Type" description="Bus type (1 = PQ, 2 = PV, 3 = ref, 4 = isolated)" restriction="list" empty="true">
-                <option value="1" label="PQ" ID="PQ"/>
-                <option value="2" label="PV" ID="PV"/>
-                <option value="3" label="Reference" ID="REF"/>
-                <option value="4" label="Isolated" ID="ISOLATED"/>
-                <display/>
-            </parameter>
-            <parameter ID="LATTITUDE" type="double" label="Lattitude" description="" empty="true"/>
-            <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
-            <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QD" type="double" label="Reactive Power Demand (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="GS" type="double" label="Shunt Conductance" description="MV demanded at V = 1.0 p.u." empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BS" type="double" label="Shunt Susceptance" description="MVAr injected at V = 1.0 p.u." empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BUS_AREA" type="integer" label="Area" description="Bus Area" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="VM" type="double" label="Voltage Magnitude" empty="true">
-                <display decimalFormatPattern="#.###"/>
-            </parameter>
-            <parameter ID="VA" type="double" label="Voltage Angle (degrees)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BASE_KV" type="double" label="Base-kV" description="Base voltage (kV)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="VMAX" type="double" label="Max. voltage (p.u.)" description="Maximum voltage magnitude" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="VMIN" type="double" label="Min. voltage (p.u.)" description="Minimum voltage magnitude" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="LAM_P" type="double" label="LaM P (u/MW)" description="Lagrange multiplier on real power mismatch" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="LAM_Q" type="double" label="LaM Q (u/MVAr)" description="Lagrange multiplier on reactive power mismatch" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_VMAX" type="double" label="Mult Vmax (u/p.u.)" description="Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_VMIN" type="double" label="Mult Vmin (u/p.u.)" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="ZONE" type="integer" label="Zone" empty="true">
-                <display/>
-            </parameter>
-            <model ID="unknown" label="Unknown Bus"/>
-        </modelClass>
-        <modelClass baseType="branch" ID="branch" label="Branch">
-            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="F_BUS" type="integer" label="From Bus" description="From Bus" restriction="bus-number" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="T_BUS" type="integer" label="To Bus" description="To Bus" restriction="bus-number" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BR_R" type="double" label="Resistance" empty="true">
-                <display increment="1.0E-4"/>
-            </parameter>
-            <parameter ID="BR_X" type="double" label="Reactance" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BR_B" type="double" label="Total line charging susceptance (p.u.)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RATE_A" type="double" label="MVA Rating A" description="long term rating" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RATE_B" type="double" label="MVA Rating B" description="short term rating" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RATE_C" type="double" label="MVA Rating C" description="emergency rating" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at &quot;from&quot; bus, &lt;br&gt;impedance at &quot;to&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="SHIFT" type="double" label="Transformer phase shift angle" description="angle in degrees, positive =&gt; delay" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" empty="false">
-                <option value="1" label="in-service" ID="1"/>
-                <option value="0" label="out-of-service" ID="0"/>
-                <display/>
-            </parameter>
-            <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="ANGMAX" label="Maximum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)">
-                <display/>
-            </parameter>
-            <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QF" type="double" label="Reactive power injected at &quot;from&quot; bus end (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="PT" type="double" label="Real power injected at &quot;to&quot; bus end (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QT" type="double" label="Reactive power injected at &quot;to&quot; bus end (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_SF" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_ST" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_ANGMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier lower angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <modelClass label="Cable"/>
-            <model ID="unknown" label="Unknown Branch"/>
-        </modelClass>
-        <modelClass ID="generator" label="Generator">
-            <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="bus-number" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QG" type="double" label="Reactive Power Output (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QMAX" type="double" label="Maximum Reactive Power Output (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QMIN" type="double" label="Minimum Reactive Power Output (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="VG" type="double" label="Voltage Magnitude Setpoint (p.u.)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MBASE" type="double" label="Total MVA Base" description="Total MVA Base of machine, defaults to baseMVA" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="GEN_STATUS" type="integer" label="Machine Status" restriction="list">
-                <option value="1" label="in-service" ID="1"/>
-                <option value="0" label="out-of-service" ID="0"/>
-                <display/>
-            </parameter>
-            <parameter ID="PMAX" type="double" label="Maximum real power output (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="PMIN" type="double" label="Minimum real power output (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="PC1" type="double" label="Lower real power output of PQ capability curve (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="PC2" type="double" label="Upper real power output of PQ capability curve (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QC1MIN" type="double" label="Minimum reactive power output at PC1 (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QC1MAX" type="double" label="Maximum reactive power output at PC1 (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QC2MIN" type="double" label="Minimum reactive power output at PC2 (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="QC2MAX" type="double" label="Maximum reactive power output at PC2 (MVAr)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RAMP_AGC" type="double" label="Ramp rate for loading following/AGC (MW/min)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RAMP_10" type="double" label="Ramp rate for 10 minute reserves (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RAMP_30" type="double" label="Ramp rate for 30 minute reserves (MW)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="RAMP_Q" type="double" label="Ramp rate for reactive power (2 sec timescale) (MVAr/min)" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="APF" type="double" label="Area participation factor" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_PMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_PMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_QMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MU_QMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="MODEL" type="integer" label="Cost model" restriction="list" empty="true">
-                <option value="1" label="Piecewise linear" ID="1"/>
-                <option value="2" label="polynomial" ID="2"/>
-                <display/>
-            </parameter>
-            <parameter ID="STARTUP" type="double" label="Startup cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="SHUTDOWN" type="double" label="Shutdown cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="NCOST" type="integer" label="Number cost" description="Number of cost coefficients for polynomial cost function, or number of data points for piecewise linear" empty="true">
-                <display/>
-            </parameter>
-            <parameter ID="COST" type="double" label="Parameters definining total cost function" description="Parameters definining total cost function f(p) begin in this column, units of f and p are $/hr and MW (or MVAr), respectively" empty="true">
-                <display/>
-            </parameter>
-            <model ID="unknown" label="Unknown Generator"/>
+        <modelClass label="Global Parameters">
+            <parameter ID="BASE_MVA" type="integer" label="Base MVA" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="SUCCESS" type="integer" label="Calculation was successful" restriction="list" purpose="result">
+                <option value="1" label="Yes" ID="1"/>
+                <option value="0" label="No" ID="0"/>
+                <display/>
+            </parameter>
+            <modelClass ID="branch" label="Branch">
+                <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="F_BUS" type="integer" label="From Bus" description="From Bus" restriction="bus-number" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="T_BUS" type="integer" label="To Bus" description="To Bus" restriction="bus-number" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BR_R" type="double" label="Resistance" empty="true">
+                    <display increment="1.0E-4"/>
+                </parameter>
+                <parameter ID="BR_X" type="double" label="Reactance" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BR_B" type="double" label="Total line charging susceptance (p.u.)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RATE_A" type="double" label="MVA Rating A" description="long term rating" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RATE_B" type="double" label="MVA Rating B" description="short term rating" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RATE_C" type="double" label="MVA Rating C" description="emergency rating" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at &quot;from&quot; bus, &lt;br&gt;impedance at &quot;to&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="SHIFT" type="double" label="Transformer phase shift angle" description="angle in degrees, positive =&gt; delay" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" empty="false">
+                    <option value="1" label="in-service" ID="1"/>
+                    <option value="0" label="out-of-service" ID="0"/>
+                    <display/>
+                </parameter>
+                <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="ANGMAX" label="Maximum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)">
+                    <display/>
+                </parameter>
+                <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="QF" type="double" label="Reactive power injected at &quot;from&quot; bus end (MVAr)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="PT" type="double" label="Real power injected at &quot;to&quot; bus end (MW)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="QT" type="double" label="Reactive power injected at &quot;to&quot; bus end (MVAr)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_SF" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_ST" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_ANGMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier lower angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <modelClass label="Cable"/>
+                <model ID="unknown" label="Unknown Branch"/>
+            </modelClass>
+            <modelClass ID="bus" label="Bus">
+                <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BUS_I" type="integer" label="Bus" description="Bus number" restriction="bus-number" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BUS_TYPE" type="integer" label="Type" description="Bus type (1 = PQ, 2 = PV, 3 = ref, 4 = isolated)" restriction="list" empty="true">
+                    <option value="1" label="PQ" ID="PQ"/>
+                    <option value="2" label="PV" ID="PV"/>
+                    <option value="3" label="Reference" ID="REF"/>
+                    <option value="4" label="Isolated" ID="ISOLATED"/>
+                    <display/>
+                </parameter>
+                <parameter ID="LATTITUDE" type="double" label="Lattitude" description="" empty="true"/>
+                <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
+                <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QD" type="double" label="Reactive Power Demand (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="GS" type="double" label="Shunt Conductance" description="MV demanded at V = 1.0 p.u." empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BS" type="double" label="Shunt Susceptance" description="MVAr injected at V = 1.0 p.u." empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="BUS_AREA" type="integer" label="Area" description="Bus Area" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="VM" type="double" label="Voltage Magnitude" empty="true" purpose="result">
+                    <display decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter ID="VA" type="double" label="Voltage Angle (degrees)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="BASE_KV" type="double" label="Base-kV" description="Base voltage (kV)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="VMAX" type="double" label="Max. voltage (p.u.)" description="Maximum voltage magnitude" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="VMIN" type="double" label="Min. voltage (p.u.)" description="Minimum voltage magnitude" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="LAM_P" type="double" label="LaM P (u/MW)" description="Lagrange multiplier on real power mismatch" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="LAM_Q" type="double" label="LaM Q (u/MVAr)" description="Lagrange multiplier on reactive power mismatch" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_VMAX" type="double" label="Mult Vmax (u/p.u.)" description="Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_VMIN" type="double" label="Mult Vmin (u/p.u.)" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="ZONE" type="integer" label="Zone" empty="true">
+                    <display/>
+                </parameter>
+                <model ID="unknown" label="Unknown Bus"/>
+            </modelClass>
+            <modelClass ID="generator" label="Generator">
+                <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="bus-number" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="QG" type="double" label="Reactive Power Output (MVAr)" empty="true" purpose="result">
+                    <display/>
+                </parameter>
+                <parameter ID="QMAX" type="double" label="Maximum Reactive Power Output (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QMIN" type="double" label="Minimum Reactive Power Output (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="VG" type="double" label="Voltage Magnitude Setpoint (p.u.)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MBASE" type="double" label="Total MVA Base" description="Total MVA Base of machine, defaults to baseMVA" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="GEN_STATUS" type="integer" label="Machine Status" restriction="list">
+                    <option value="1" label="in-service" ID="1"/>
+                    <option value="0" label="out-of-service" ID="0"/>
+                    <display/>
+                </parameter>
+                <parameter ID="PMAX" type="double" label="Maximum real power output (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PMIN" type="double" label="Minimum real power output (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PC1" type="double" label="Lower real power output of PQ capability curve (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PC2" type="double" label="Upper real power output of PQ capability curve (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QC1MIN" type="double" label="Minimum reactive power output at PC1 (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QC1MAX" type="double" label="Maximum reactive power output at PC1 (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QC2MIN" type="double" label="Minimum reactive power output at PC2 (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="QC2MAX" type="double" label="Maximum reactive power output at PC2 (MVAr)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RAMP_AGC" type="double" label="Ramp rate for loading following/AGC (MW/min)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RAMP_10" type="double" label="Ramp rate for 10 minute reserves (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RAMP_30" type="double" label="Ramp rate for 30 minute reserves (MW)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="RAMP_Q" type="double" label="Ramp rate for reactive power (2 sec timescale) (MVAr/min)" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="APF" type="double" label="Area participation factor" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_PMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_PMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_QMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MU_QMIN" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit (&lt;i&gt;u&lt;/i&gt;/MW)&lt;/html&gt;" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="MODEL" type="integer" label="Cost model" restriction="list" empty="true">
+                    <option value="1" label="Piecewise linear" ID="1"/>
+                    <option value="2" label="polynomial" ID="2"/>
+                    <display/>
+                </parameter>
+                <parameter ID="STARTUP" type="double" label="Startup cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="SHUTDOWN" type="double" label="Shutdown cost in US dollars" description="Not currently used by any MATPOWER functions" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="NCOST" type="integer" label="Number cost" description="Number of cost coefficients for polynomial cost function, or number of data points for piecewise linear" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="COST" type="double" label="Parameters definining total cost function" description="Parameters definining total cost function f(p) begin in this column, units of f and p are $/hr and MW (or MVAr), respectively" empty="true">
+                    <display/>
+                </parameter>
+                <model ID="unknown" label="Unknown Generator"/>
+            </modelClass>
         </modelClass>
     </model-db>
 </power_flow_case>

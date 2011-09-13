@@ -18,7 +18,7 @@ if busData(VM) < busData(VMIN) || busData(VM) > busData(VMAX)
 end
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Voltage magnitude (p.u.)');
 jflag.addParameter('VM');
-jflag.setWarning(false);
+jflag.setWarning(voltage_percentage > 90);
 jflag.setFailure(voltage_failure);
 jflag.setPercentage(voltage_percentage);
 jbus.addFlag(jflag);

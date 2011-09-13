@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.ui.parameter;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ParameterSupport;
 
 public interface IParameterMasterElement {
 	
@@ -17,4 +18,6 @@ public interface IParameterMasterElement {
 	boolean isRequired(String parameterID);
 	
 	void fireValueChanged(String parameterID, String oldValue, String newValue);
+	
+	ParameterSupport getParameterSupport();
 }

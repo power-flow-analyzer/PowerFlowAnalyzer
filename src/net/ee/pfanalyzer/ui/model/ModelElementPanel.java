@@ -1,20 +1,25 @@
 package net.ee.pfanalyzer.ui.model;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.parameter.IParameterMasterElement;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetworkElement;
@@ -32,12 +37,31 @@ public class ModelElementPanel extends ParameterContainer {
 	protected ModelElementPanel(ElementPanelController controller) {
 		super(null, true);
 		this.controller = controller;
+		setEditable(false);// default setting
 		
 		titleLabel = new JLabel("", SwingConstants.CENTER);
 		titleLabel.setFont(titleFont);
 		titleLabel.setBorder(new EmptyBorder(5, 10, 5, 10));
-		add(titleLabel, BorderLayout.NORTH);
 		
+		final JToggleButton editButton = PowerFlowAnalyzer.createToggleButton("Toggle editing mode", 
+				"pencil.png", "Toggle editing mode", false);
+		editButton.setMargin(new Insets(2, 2, 1, 1));
+		editButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setEditable( editButton.isSelected());
+				getController().reloadCard();
+			}
+		});
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setOpaque(false);
+		buttonPanel.add(editButton);
+		JPanel titlePanel = new JPanel(new BorderLayout());
+		titlePanel.setOpaque(false);
+		titlePanel.add(buttonPanel, BorderLayout.EAST);
+		titlePanel.add(titleLabel, BorderLayout.CENTER);
+		
+		add(titlePanel, BorderLayout.NORTH);
 	}
 	
 	public ElementPanelController getController() {
@@ -54,15 +78,28 @@ public class ModelElementPanel extends ParameterContainer {
 		setParameterMaster(parameterMaster);
 	}
 	
-	protected void addParameters(AbstractNetworkElement element) {
+	public void setNetworkElement(AbstractNetworkElement element) {
+		// remove old elements
+		removeAllElements();
+		// set title
+		setTitle(element.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT));
+		// set element
 		setCurrentElement(element);
 		Group modelGroup = addElementGroup("");
 		modelGroup.add(new JLabel("Model: "));
 		addModelLink(element);
+		// show flags
+		addFlags(element);
+		// show properties
+		addParameters(element);
+		finishLayout();
+	}
+	
+	private void addParameters(AbstractNetworkElement element) {
 		// add parameters from model
 		if(element.getModel() != null)
 			addParameters(element.getModel(), element.getModel(), getElementContainer());
-		Group propGroup = addElementGroup("Unknown Parameters");
+		Group propGroup = new Group("Unknown Parameters");
 		for (NetworkParameter parameter : element.getParameterList()) {
 //			if(showProperty(prop) == false)
 //				continue;
@@ -75,6 +112,8 @@ public class ModelElementPanel extends ParameterContainer {
 				propGroup.add(new JLabel(value));
 			}
 		}
+		if(propGroup.getComponentCount() > 0)
+			addElementGroup(propGroup);
 	}
 	
 	protected void addParameter(NetworkParameter paramDef, NetworkParameter propertyValue, Group panel) {
@@ -105,22 +144,28 @@ public class ModelElementPanel extends ParameterContainer {
 //	}
 	
 	protected void addFlags(AbstractNetworkElement childData) {
-		Group flagGroup = addElementGroup("Flags");
+		if(isEditable())
+			return; // do not show flags in editing mode
+		Group flagGroup = new Group("Flags");
 		for (NetworkFlag flag : childData.getFlags()) {
-			boolean isCorrect = flag.isCorrect();
 			JLabel label = new JLabel(flag.getLabel());
-			if(isCorrect == false)
-				label.setForeground(Color.RED);
+			if(flag.isFailure())
+				label.setForeground(Preferences.getFlagFailureColor());
+			else if(flag.isWarning())
+				label.setForeground(Preferences.getFlagWarningColor());
 			flagGroup.add(label);
 			double percentage = flag.getPercentage();
 			if(percentage > -1) {
-				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), isCorrect);
+				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
+						flag.isFailure(), flag.isWarning());
 				JPanel resizer = new JPanel(new BorderLayout());
 				resizer.add(progressBar, BorderLayout.CENTER);
-				resizer.add(new JLabel(" " + (int) Math.floor(percentage) + "% "), BorderLayout.EAST);
+//				resizer.add(new JLabel(" " + (int) Math.floor(percentage) + "% "), BorderLayout.EAST);
 				flagGroup.add(resizer);
 			} else
 				flagGroup.add(new JLabel("unknown"));
 		}
+		if(flagGroup.getComponentCount() > 0)
+			addElementGroup(flagGroup);
 	}
 }
