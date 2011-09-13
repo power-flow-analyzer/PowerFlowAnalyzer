@@ -499,6 +499,15 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private void openCase(PowerFlowCase caze) {
 		Network network = caze.getNetwork();
 		try {
+			if(network.getBusses().size() > 0 && network.getCombinedBusCount() == 0) {
+				int action = JOptionPane.showConfirmDialog(this, 
+						"This network does not contain any location data. " +
+						"Do you want to create default coordinates for all bus nodes?", 
+						"Create default coordinates?", 
+						JOptionPane.YES_NO_OPTION);
+				if(action == JOptionPane.YES_OPTION)
+					network.setDefaultCoordinates();
+			}
 			success.put(nextCase, true);
 			PowerFlowViewer viewer = new PowerFlowViewer(caze);
 			viewer.getSelectionManager().addActionUpdateListener(this);

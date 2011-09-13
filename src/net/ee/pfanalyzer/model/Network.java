@@ -57,6 +57,28 @@ public class Network extends ParameterSupport {
 	public void setGlobalParameterClass(ModelClassData globalParameterClass) {
 		this.globalParameterClass = globalParameterClass;
 	}
+	
+	public void setDefaultCoordinates() {
+		int columnCount = (int) Math.floor(Math.sqrt(getBusses().size()));
+		int rowCount = (int) Math.ceil(((double) getBusses().size()) / ((double) columnCount));
+		int row = 0;
+		int col = 0;
+		for (int i = 0; i < getBusses().size(); i++) {
+			Bus bus = getBusses().get(i);
+			double lattitudeSign = (row + 1) % 2 * -1;
+			double longitudeSign = (col + 1) % 2 * -1;
+			double lattitude = col + 1 + lattitudeSign * (row + 1) % columnCount * 0.2;
+			double longitude = row + 1 + longitudeSign * (col + 1) % rowCount * 0.2;
+			col++;
+			if(col == columnCount) {
+				col = 0;
+				row++;
+			}
+			bus.setLongitude(longitude);
+			bus.setLattitude(lattitude);
+		}
+		findCombinedElements();
+	}
 
 	@Override
 	public NetworkParameter getParameterValue(String id) {
