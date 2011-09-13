@@ -34,6 +34,8 @@ public class ParameterContainer extends JPanel {
 	private Box elementContainer;
 	private Group currentGroupContainer;
 	private boolean editable = true;
+	private boolean showNetworkParameters = false;
+	private boolean showResultsWhenEditing = true;
 
 	public ParameterContainer(IParameterMasterElement parameterMaster, boolean scrollable) {
 		super(new BorderLayout());
@@ -54,17 +56,22 @@ public class ParameterContainer extends JPanel {
 		this.parameterMaster = parameterMaster;
 	}
 
-	protected void addParameters(AbstractModelElementData element, AbstractModelElementData master, JComponent parent) {
+	public void addParameters(AbstractModelElementData element, AbstractModelElementData master, JComponent parent) {
 		if(element.getParent() != null)
 			addParameters(element.getParent(), master, parent);
 		Group paramPanel = new Group("Parameters of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
 		Group resultPanel = new Group("Results of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
 		for (NetworkParameter property : element.getParameter()) {
-			if(element.getParent() == null)
-				continue;// do not show global parameters
+			if(isShowNetworkParameters() == false && element.getParent() == null)
+				continue;// do not show network/global parameters
 			NetworkParameter propertyValue = parameterMaster.getParameterValue(property.getID());//ModelDBUtils.getParameterValue(master, property.getID());
 			boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(property.getPurpose());
-			if(isResult && isEditable()) {
+			boolean isScenarioParam = NetworkParameterPurposeRestriction.SCENARIO.equals(property.getPurpose());
+			if(isScenarioParam && element != master) {
+				parameterAdded(property);
+				continue;
+			}
+			if(isShowResultsWhenEditing() == false && isResult && isEditable()) {
 				parameterAdded(property);
 				continue;// do not show results in editing mode
 			}
@@ -85,7 +92,10 @@ public class ParameterContainer extends JPanel {
 		if(isParameterAdded(propertyDefinition))
 			return;
 		panel.add(createLabel(propertyDefinition));
-		if(isEditable() && NetworkParameterPurposeRestriction.PARAMETER.equals(propertyDefinition.getPurpose())) {
+		boolean editParameter = NetworkParameterPurposeRestriction.PARAMETER.equals(
+						propertyDefinition.getPurpose())
+				|| NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
+		if(isEditable() && editParameter) {
 			if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction()) == false) {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
 					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
@@ -184,7 +194,7 @@ public class ParameterContainer extends JPanel {
 		return currentGroupContainer;
 	}
 	
-	protected JComponent getElementContainer() {
+	public JComponent getElementContainer() {
 		return elementContainer;
 	}
 	
@@ -196,5 +206,21 @@ public class ParameterContainer extends JPanel {
 	
 	private void showModelDB(ModelData model) {
 		PowerFlowAnalyzer.getInstance().showModelDBDialog();
+	}
+
+	public boolean isShowNetworkParameters() {
+		return showNetworkParameters;
+	}
+
+	public void setShowNetworkParameters(boolean showNetworkParameters) {
+		this.showNetworkParameters = showNetworkParameters;
+	}
+
+	public boolean isShowResultsWhenEditing() {
+		return showResultsWhenEditing;
+	}
+
+	public void setShowResultsWhenEditing(boolean showResultsWhenEditing) {
+		this.showResultsWhenEditing = showResultsWhenEditing;
 	}
 }

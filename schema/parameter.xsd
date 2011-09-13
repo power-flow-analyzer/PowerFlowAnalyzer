@@ -56,6 +56,7 @@
         <restriction base="string">
             <enumeration value="parameter"/>
             <enumeration value="result"/>
+            <enumeration value="scenario"/>
         </restriction>
     </simpleType>
     

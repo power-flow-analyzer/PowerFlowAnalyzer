@@ -207,7 +207,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					}
 					if(obj != selection) {
 						selectionChanged(obj);
-						NetworkElementSelectionManager.getInstance().selectionChanged(obj);
+						NetworkElementSelectionManager.selectionChanged(NetworkViewer.this, obj);
 					}
 				} catch(Exception except) {
 					except.printStackTrace();

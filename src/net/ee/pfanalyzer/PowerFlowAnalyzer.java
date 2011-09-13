@@ -36,8 +36,8 @@ import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
-import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
+import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
@@ -76,7 +76,6 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	private MatpowerGUIServer server;
 	
-	private Map<String, PowerFlowCase> data = new HashMap<String, PowerFlowCase>();
 	private Map<String, Boolean> success = new HashMap<String, Boolean>();
 	private ClosableTabbedPane casesParent;
 	private CaseSelectionDialog caseDialog;
@@ -128,7 +127,13 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
+				cases.get(tabIndex).getViewer().getSelectionManager().removeActionUpdateListener(
+						PowerFlowAnalyzer.this);
 				cases.remove(tabIndex);
+				updateToolbarButtons();
+			}
+			@Override
+			public void tabOpened(int tabIndex) {
 				updateToolbarButtons();
 			}
 		});
@@ -165,11 +170,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		setJMenuBar(menuBar);
 		
 		pack();
-		setSize(800, 700);
+		setSize(1024, 700);
 		setVisible(true);
 		PreferencesInitializer.checkForEmptyPreferences();
 		
-		NetworkElementSelectionManager.getInstance().addActionUpdateListener(this);
 		server = new MatpowerGUIServer(this);
 	}
 	
@@ -219,9 +223,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_CASE_CALCULATE)) {
 				calculatePowerFlow();
 			} else if(e.getActionCommand().equals(ACTION_SELECT_PREVIOUS)) {
-				NetworkElementSelectionManager.getInstance().showPreviousElement();
+				if(getCurrentViewer() != null)
+					getCurrentViewer().getSelectionManager().showPreviousElement();
 			} else if(e.getActionCommand().equals(ACTION_SELECT_NEXT)) {
-				NetworkElementSelectionManager.getInstance().showNextElement();
+				if(getCurrentViewer() != null)
+					getCurrentViewer().getSelectionManager().showNextElement();
 			}
 		} catch(Exception error) {
 			error.printStackTrace();
@@ -358,6 +364,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void calculatePowerFlow() {
+		CaseCalculationDialog dialog = new CaseCalculationDialog(this, getCurrentCase());
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())
+			return;
 		String pfcase = findName("Power Flow");
 		nextCase = pfcase;
 		// call matlab script
@@ -368,7 +378,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	public void showModelDBDialog() {
-		getCurrentViewer().showModelDBDialog();
+		if(getCurrentViewer() != null)
+			getCurrentViewer().showModelDBDialog();
 	}
 	
 	private void openProgressDialog(final String pfcase) {
@@ -480,6 +491,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		}
 		caze.setNetworkData(networkData);
 		caze.getNetwork().fireNetworkChanged();
+		caze.getViewer().getSelectionManager().clearHistory();
 		success.put(nextCase, true);
 		updateToolbarButtons();
 	}
@@ -488,8 +500,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		Network network = caze.getNetwork();
 		try {
 			success.put(nextCase, true);
-			data.put(nextCase, caze);
 			PowerFlowViewer viewer = new PowerFlowViewer(caze);
+			viewer.getSelectionManager().addActionUpdateListener(this);
 			caze.setViewer(viewer);
 			cases.add(caze);
 			casesParent.addTab(nextCase, viewer.getContentPane());
@@ -562,10 +574,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbarButtons.get(ACTION_CASE_LAYOUT).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_MODEL_DB_PROPERTIES).setEnabled(getCurrentCase() != null);
 //		toolbarButtons.get(ACTION_PANEL_PROPERTIES).setEnabled(hasViewer);
-		toolbarButtons.get(ACTION_SELECT_PREVIOUS).setEnabled(
-				NetworkElementSelectionManager.getInstance().hasPreviousElement());
-		toolbarButtons.get(ACTION_SELECT_NEXT).setEnabled(
-				NetworkElementSelectionManager.getInstance().hasNextElement());
+		toolbarButtons.get(ACTION_SELECT_PREVIOUS).setEnabled(hasViewer
+				&& getCurrentViewer().getSelectionManager().hasPreviousElement());
+		toolbarButtons.get(ACTION_SELECT_NEXT).setEnabled(hasViewer
+				&& getCurrentViewer().getSelectionManager().hasNextElement());
 		setTitle(getWindowTitle());
 	}
 	

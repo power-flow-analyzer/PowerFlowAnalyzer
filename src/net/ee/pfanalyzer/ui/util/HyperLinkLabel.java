@@ -38,7 +38,7 @@ public class HyperLinkLabel extends JLabel {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				NetworkElementSelectionManager.getInstance().selectionChanged(networkElement);
+				NetworkElementSelectionManager.selectionChanged(HyperLinkLabel.this, networkElement);
 			}
 		};
 		addMouseListener(mouseListener);

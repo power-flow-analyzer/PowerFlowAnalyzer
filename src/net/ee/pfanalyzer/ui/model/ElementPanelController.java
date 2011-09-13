@@ -54,10 +54,13 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 		cBranchPanel = new CombinedBranchPanel(this, data);
 		add(cBranchPanel, COMBINED_BRANCH_CARD);
 		busPanel = new BusPanel(this);
+		busPanel.setShowResultsWhenEditing(false);
 		add(busPanel, SINGLE_BUS_CARD);
 		branchPanel = new BranchPanel(this);
+		branchPanel.setShowResultsWhenEditing(false);
 		add(branchPanel, SINGLE_BRANCH_CARD);
 		generatorPanel = new GeneratorPanel(this);
+		generatorPanel.setShowResultsWhenEditing(false);
 		add(generatorPanel, GENERATOR_CARD);
 		
 		cardLayout.show(this, NETWORK_CARD);

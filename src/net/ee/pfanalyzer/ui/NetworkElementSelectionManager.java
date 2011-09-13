@@ -3,14 +3,24 @@ package net.ee.pfanalyzer.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
+
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 
 public class NetworkElementSelectionManager implements INetworkElementSelectionListener {
 
-	private static NetworkElementSelectionManager INSTANCE = new NetworkElementSelectionManager();
+	public static NetworkElementSelectionManager getInstance(JComponent component) {
+		if(component instanceof PowerFlowViewer)
+			return ((PowerFlowViewer) component).getSelectionManager();
+		if(component.getParent() != null && component.getParent() instanceof JComponent)
+			return getInstance((JComponent) component.getParent());
+		return null;
+	}
 	
-	public static NetworkElementSelectionManager getInstance() {
-		return INSTANCE;
+	public static void selectionChanged(JComponent component, Object data) {
+		NetworkElementSelectionManager manager = getInstance(component);
+		if(manager != null)
+			manager.selectionChanged(data);
 	}
 	
 	private List<INetworkElementSelectionListener> networkElementListeners = new ArrayList<INetworkElementSelectionListener>();
@@ -19,7 +29,13 @@ public class NetworkElementSelectionManager implements INetworkElementSelectionL
 	private int currentView = 0;
 	private Object oldSelection;
 	
-	private NetworkElementSelectionManager() {
+	public NetworkElementSelectionManager() {
+		clearHistory();
+	}
+	
+	public void clearHistory() {
+		currentView = 0;
+		viewHistory.clear();
 		viewHistory.add(null);// add the whole network as first entry in history
 	}
 	

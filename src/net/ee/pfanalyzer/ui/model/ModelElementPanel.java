@@ -34,7 +34,7 @@ public class ModelElementPanel extends ParameterContainer {
 	private Font titleFont = new Font(null, Font.BOLD, 16);
 //	private Font groupFont = new Font(null, Font.BOLD, 12);
 	
-	protected ModelElementPanel(ElementPanelController controller) {
+	public ModelElementPanel(ElementPanelController controller) {
 		super(null, true);
 		this.controller = controller;
 		setEditable(false);// default setting
@@ -101,8 +101,6 @@ public class ModelElementPanel extends ParameterContainer {
 			addParameters(element.getModel(), element.getModel(), getElementContainer());
 		Group propGroup = new Group("Unknown Parameters");
 		for (NetworkParameter parameter : element.getParameterList()) {
-//			if(showProperty(prop) == false)
-//				continue;
 			NetworkParameter paramDef = element.getParameterDefinition(parameter.getID());
 			String value = element.getParameterDisplayValue(parameter.getID());
 			if(paramDef != null) {
@@ -116,7 +114,7 @@ public class ModelElementPanel extends ParameterContainer {
 			addElementGroup(propGroup);
 	}
 	
-	protected void addParameter(NetworkParameter paramDef, NetworkParameter propertyValue, Group panel) {
+	public void addParameter(NetworkParameter paramDef, NetworkParameter propertyValue, Group panel) {
 		if(isParameterAdded(paramDef))
 			return;
 		NetworkParameterType type = paramDef.getType();
@@ -137,11 +135,6 @@ public class ModelElementPanel extends ParameterContainer {
 		}
 		super.addParameter(paramDef, propertyValue, panel);
 	}
-	
-//	private boolean showProperty(ElementProperty p) {
-//		return getController().getViewerProperty(
-//				IPreferenceConstants.PROPERTY_UI_SHOW_MODEL_PREFIX + p.getPropertyName(), true);
-//	}
 	
 	protected void addFlags(AbstractNetworkElement childData) {
 		if(isEditable())

@@ -27,6 +27,8 @@ public class ParameterPanel extends ParameterContainer {
 		super(new ParameterMasterModel(element), false);
 		node = treeNode;
 		master = element;
+		if(master.getParent() == null)
+			setShowNetworkParameters(true);
 		referenceLabel = new JLabel(ModelDBUtils.getParameterID(master));
 		JPanel commonPanel = addElementGroup("Common Parameters");
 		commonPanel.add(new JLabel("Label: "));

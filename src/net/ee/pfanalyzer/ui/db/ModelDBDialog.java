@@ -210,11 +210,11 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		
 		splitter.setLeftComponent(treeParent);
 		splitter.setRightComponent(propPanelResizer);
-		splitter.setDividerLocation(300);
+		splitter.setDividerLocation(200);
 		setCenterComponent(splitter, false);
 		showElementProperties(null);
 		updateButtons(null);
-		showDialog(700, 500);
+		showDialog(900, 500);
 	}
 	
 	private DefaultMutableTreeNode getSelectedNode() {
@@ -280,7 +280,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			setText("<html><p>Select an element from the tree on the left side.</p>" +
 					"<p>You can add new models/model classes, edit and remove existing elements.</p>");
 		}
-		propPanel.validate();
+		propPanel.revalidate();
 		propPanel.repaint();
 	}
 	

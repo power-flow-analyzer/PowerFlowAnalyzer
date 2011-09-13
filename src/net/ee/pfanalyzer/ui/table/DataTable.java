@@ -2,6 +2,7 @@ package net.ee.pfanalyzer.ui.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
@@ -12,6 +13,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicTableHeaderUI;
+import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
@@ -61,6 +64,9 @@ public class DataTable extends JTable implements INetworkDataViewer {
 				int realIndex = 
                     columnModel.getColumn(index).getModelIndex();
 				return model.getColumnDescription(realIndex);
+			}
+			public void updateUI() {
+				setUI(new DataTableHeaderUI());
 			}
 		};
 	}
@@ -118,7 +124,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	public void networkChanged(NetworkChangeEvent event) {
 //		System.out.println("table: networkChanged");
 		model.setData(getNetwork().getElements(elementID));
-		refresh();
+//		refresh();
 	}
 
 	@Override
@@ -148,7 +154,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 			return;
 		selfSelection = true;
 		Object selection = (getSelectedRow() >= 0) ? model.getDataObject(getSelectedRow()) : null;
-		NetworkElementSelectionManager.getInstance().selectionChanged(selection);
+		NetworkElementSelectionManager.selectionChanged(this, selection);
 		selfSelection = false;
 	}
 	
@@ -194,5 +200,31 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	    	}
 	    	return this;
 	    }
+	}
+	
+	public void updateUI() {
+		setUI(new DataTableUI());
+	}
+	
+	class DataTableUI extends BasicTableUI {
+		public Dimension getPreferredSize(JComponent c) {
+			try {
+				return super.getPreferredSize(c);
+			} catch(Exception e) {
+//				System.err.println("Exception caught 1");
+				return new Dimension(0, 0);
+			}
+		}
+	}
+	
+	class DataTableHeaderUI extends BasicTableHeaderUI {
+		public Dimension getPreferredSize(JComponent c) {
+			try {
+				return super.getPreferredSize(c);
+			} catch(Exception e) {
+//				System.err.println("Exception caught 2");
+				return new Dimension(0, 0);
+			}
+		}
 	}
 }

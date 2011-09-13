@@ -10,6 +10,15 @@
                 <option value="0" label="No" ID="0"/>
                 <display/>
             </parameter>
+            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" value="PF" empty="true" purpose="scenario">
+                <option value="PF" label="AC Standard" ID="PF"/>
+                <option value="OPF" label="AC Optimal" ID="OPF"/>
+                <option value="UOPF" label="AC Optimal with unit-decommitment heuristic" ID="UOPF"/>
+                <option value="DCPF" label="DC Standard" ID="DCPF"/>
+                <option value="DCOPF" label="DC Optimal" ID="DCOPF"/>
+                <option value="DUOPF" label="DC Optimal with unit-decommitment heuristic" ID="DUOPF"/>
+                <display/>
+            </parameter>
             <modelClass ID="branch" label="Branch">
                 <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
                     <display/>

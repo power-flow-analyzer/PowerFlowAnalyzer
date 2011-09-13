@@ -18,6 +18,7 @@ public class NetworkPanel extends ModelElementPanel {
 		super(controller);
 		this.data = data;
 		setParameterMaster(new ParameterMasterNetwork(data));
+		setShowNetworkParameters(true);
 		setTitle("Network Overview");
 		updateNetwork();
 	}

@@ -30,12 +30,12 @@ import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
-public class PowerFlowViewer implements INetworkElementSelectionListener {
+public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
 
 	private PowerFlowCase powerFlowCase;
 	
 	private NetworkViewer viewer;
-//	private NetworkElementSelectionManager selectionManager;
+	private NetworkElementSelectionManager selectionManager;
 	private JPanel contentPane = new JPanel(new BorderLayout());
 	private ClosableTabbedPane dataTabs;
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -51,8 +51,10 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
 	
 	public PowerFlowViewer(PowerFlowCase caze) {
+		super(new BorderLayout());
+		contentPane = this;
 		this.powerFlowCase = caze;
-//		selectionManager = new NetworkElementSelectionManager();
+		selectionManager = new NetworkElementSelectionManager();
 		viewer = new NetworkViewer(getNetwork());
 		viewerController = new NetworkViewerController(viewer);
 		viewer.setController(viewerController);
@@ -100,16 +102,11 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 				diagrams.remove(tabIndex);
 				fireActionUpdate();
 			}
+			@Override
+			public void tabOpened(int tabIndex) {
+			}
 		});
 	}
-	
-//	public void setNetwork(Network network) {
-//		this.network = network;
-//		for (INetworkDataViewer viewer : viewers) {
-//			viewer.setData(network);
-//			viewer.refresh();
-//		}
-//	}
 	
 	private void addTable(String label, String elementID) {
 		INetworkDataViewer table = new DataTable(elementID);
@@ -177,6 +174,10 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 		return panelController;
 	}
 	
+	public NetworkElementSelectionManager getSelectionManager() {
+		return selectionManager;
+	}
+
 	public JComponent getContentPane() {
 		return contentPane;
 	}
@@ -207,13 +208,13 @@ public class PowerFlowViewer implements INetworkElementSelectionListener {
 		else if(data instanceof Generator)
 			dataTabs.setSelectedIndex(2);
 	}
-
+	
 	public void addNetworkElementSelectionListener(INetworkElementSelectionListener listener) {
-		NetworkElementSelectionManager.getInstance().addNetworkElementSelectionListener(listener);
+		getSelectionManager().addNetworkElementSelectionListener(listener);
 	}
 	
 	public void removeNetworkElementSelectionListener(INetworkElementSelectionListener listener) {
-		NetworkElementSelectionManager.getInstance().removeNetworkElementSelectionListener(listener);
+		getSelectionManager().removeNetworkElementSelectionListener(listener);
 	}
 
 	public void addActionUpdateListener(IActionUpdater listener) {

@@ -26,7 +26,13 @@ public class ClosableTabbedPane {
 	private JTabbedPane tabbedPane;
 	
 	public ClosableTabbedPane() {
-		tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane() {
+			public void setSelectedIndex(int index) {
+				super.setSelectedIndex(index);
+				if(getTabListener() != null)
+					getTabListener().tabOpened(index);
+			}
+		};
 	}
 	
 	public void addTab(String title, Component component) {

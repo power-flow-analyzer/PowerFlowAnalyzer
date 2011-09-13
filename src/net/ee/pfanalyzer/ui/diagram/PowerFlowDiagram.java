@@ -77,7 +77,7 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 					AbstractNetworkElement obj = getObjectFromScreen(e.getX(), e.getY());
 					if(obj != selection) {
 						selectionChanged(obj);
-						NetworkElementSelectionManager.getInstance().selectionChanged(obj);
+						NetworkElementSelectionManager.selectionChanged(PowerFlowDiagram.this, obj);
 					}
 				} catch(Exception except) {
 					except.printStackTrace();
