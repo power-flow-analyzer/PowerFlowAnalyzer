@@ -8,6 +8,7 @@ import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
 
@@ -21,6 +22,7 @@ public class Network extends ParameterSupport {
 	
 	private NetworkData networkData;
 	private ModelClassData globalParameterClass;
+	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
 	
@@ -48,6 +50,39 @@ public class Network extends ParameterSupport {
 		networkData = data;
 		updateNetworkData();
 		findCombinedElements();
+	}
+	
+	public Network copy() throws Exception {
+		NetworkData copiedData = (NetworkData) CaseSerializer.copy(getData());
+		copiedData.getScenario().clear();// remove all scenarios
+		Network newNetwork = new Network(copiedData);
+		return newNetwork;
+	}
+	
+	public void addScenario(Network scenario) {
+		getData().getScenario().add(scenario.getData());
+		getScenarios().add(scenario);
+	}
+	
+	public void removeScenario(Network scenario) {
+		Object removed = null;
+		for (int i = 0; i < getScenarios().size(); i++) {
+			if(getScenarios().get(i).getData() == scenario.getData()) {
+				removed = getData().getScenario().remove(i);
+				break;
+			}
+		}
+		if(removed == null)
+			throw new RuntimeException("Scenario data could not be deleted from network");
+		removed = null;
+		for (int i = 0; i < getScenarios().size(); i++) {
+			if(getScenarios().get(i) == scenario) {
+				removed = getScenarios().remove(i);
+				break;
+			}
+		}
+		if(removed == null)
+			throw new RuntimeException("Scenario could not be deleted from network");
 	}
 	
 	public ModelClassData getGlobalParameterClass() {
@@ -89,6 +124,19 @@ public class Network extends ParameterSupport {
 			return ModelDBUtils.getParameterValue(getGlobalParameterClass(), id);
 		return null;
 	}
+	
+	public List<Network> getScenarios() {
+		return scenarios;
+	}
+	
+	public List<NetworkParameter> getScenarioParameters() {
+		List<NetworkParameter> parameters = new ArrayList<NetworkParameter>();
+		for (NetworkParameter parameter : getGlobalParameterClass().getParameter()) {
+			if(NetworkParameterPurposeRestriction.SCENARIO.equals(parameter.getPurpose()))
+				parameters.add(parameter);
+		}
+		return parameters;
+	}
 
 	private void updateNetworkData() {
 		// update elements
@@ -96,6 +144,7 @@ public class Network extends ParameterSupport {
 		getBusses().clear();
 		getBranches().clear();
 		getGenerators().clear();
+		getScenarios().clear();
 //		System.out.println("network: update data");
 		for (int i = 0; i < networkData.getElement().size(); i++) {
 			AbstractNetworkElementData element = networkData.getElement().get(i);
@@ -119,6 +168,10 @@ public class Network extends ParameterSupport {
 		// set bus references in generators
 		for (Generator generator : getGenerators()) {
 			generator.setBus(getBus(generator.getBusNumber()));
+		}
+		for (NetworkData data : networkData.getScenario()) {
+			Network scenario = new Network(data);
+			getScenarios().add(scenario);
 		}
 	}
 	
@@ -365,6 +418,32 @@ public class Network extends ParameterSupport {
 	public void setSuccessful(boolean successful) {
 		this.successful = successful;
 	}
+    
+    public String getName() {
+    	if(getData().getName() == null)
+    		return "";
+    	return getData().getName();
+    }
+    
+    public void setName(String value) {
+    	if(value == null || value.trim().isEmpty())
+    		getData().setName(null);
+    	else
+    		getData().setName(value);
+    }
+    
+    public String getDescription() {
+    	if(getData().getDescription() == null)
+    		return "";
+    	return getData().getDescription();
+    }
+    
+    public void setDescription(String value) {
+    	if(value == null || value.trim().isEmpty())
+    		getData().setDescription(null);
+    	else
+    		getData().setDescription(value);
+    }
 	
 	public String toXML() throws IllegalDataException {
 		try {

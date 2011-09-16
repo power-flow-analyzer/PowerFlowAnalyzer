@@ -36,6 +36,7 @@ import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
+import net.ee.pfanalyzer.ui.PowerFlowContainer;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
 import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
@@ -364,7 +365,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void calculatePowerFlow() {
-		CaseCalculationDialog dialog = new CaseCalculationDialog(this, getCurrentCase());
+		CaseCalculationDialog dialog = new CaseCalculationDialog(this, getCurrentNetwork());
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())
 			return;
@@ -372,7 +373,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		nextCase = pfcase;
 		// call matlab script
 		callMatlabCommand("calc_power_flow", new Object[] {
-				getCurrentCase().getNetwork() },
+				getCurrentNetwork() },
 				0, true);
 		openProgressDialog(pfcase);
 	}
@@ -489,8 +490,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			return;
 		}
-		caze.setNetworkData(networkData);
-		caze.getNetwork().fireNetworkChanged();
+		Network network = getCurrentNetwork();
+		if(network == null)
+			return;
+		caze.setNetworkData(network, networkData);
+		network.fireNetworkChanged();
 		caze.getViewer().getSelectionManager().clearHistory();
 		success.put(nextCase, true);
 		updateToolbarButtons();
@@ -509,11 +513,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					network.setDefaultCoordinates();
 			}
 			success.put(nextCase, true);
-			PowerFlowViewer viewer = new PowerFlowViewer(caze);
+			PowerFlowContainer viewer = new PowerFlowContainer(caze);
 			viewer.getSelectionManager().addActionUpdateListener(this);
 			caze.setViewer(viewer);
 			cases.add(caze);
-			casesParent.addTab(nextCase, viewer.getContentPane());
+			casesParent.addTab(nextCase, viewer);
 			casesParent.selectLastTab();
 			viewer.addActionUpdateListener(this);
 			if(showSuccessMessage) {
@@ -554,10 +558,22 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					"Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
+//	private PowerFlowContainer getCurrentContainer() {
+//		if(casesParent.isEmpty())
+//			return null;
+//		return cases.get(casesParent.getSelectedIndex()).getViewer();
+//	}
+	
 	private PowerFlowViewer getCurrentViewer() {
 		if(casesParent.isEmpty())
 			return null;
-		return cases.get(casesParent.getSelectedIndex()).getViewer();
+		return cases.get(casesParent.getSelectedIndex()).getViewer().getCurrentViewer();
+	}
+	
+	private Network getCurrentNetwork() {
+		if(getCurrentViewer() != null)
+			return getCurrentViewer().getNetwork();
+		return null;
 	}
 	
 	private PowerFlowCase getCurrentCase() {

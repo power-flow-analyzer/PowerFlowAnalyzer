@@ -13,10 +13,10 @@ import net.ee.pfanalyzer.ui.model.ModelElementPanel;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetwork;
 import net.ee.pfanalyzer.ui.util.Group;
 
-public class CaseCalculationDialog extends BaseDialog {
+public class SetScenarioParametersDialog extends BaseDialog {
 
-	public CaseCalculationDialog(Frame frame, Network network) {
-		super(frame, "Calculate Power Flow", true);
+	public SetScenarioParametersDialog(Frame frame, Network network) {
+		super(frame, "Set scenario parameters", true);
 		setText("Select the desired scenario parameters and press OK.");
 		JPanel contentPane = new JPanel(new BorderLayout());
 		

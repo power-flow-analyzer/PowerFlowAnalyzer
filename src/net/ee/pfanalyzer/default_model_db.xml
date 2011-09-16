@@ -5,12 +5,12 @@
             <parameter ID="BASE_MVA" type="integer" label="Base MVA" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="SUCCESS" type="integer" label="Calculation was successful" restriction="list" purpose="result">
+            <parameter ID="SUCCESS" type="integer" label="Calculation converged" restriction="list" purpose="result">
                 <option value="1" label="Yes" ID="1"/>
                 <option value="0" label="No" ID="0"/>
                 <display/>
             </parameter>
-            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" value="PF" empty="true" purpose="scenario">
+            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="result">
                 <option value="PF" label="AC Standard" ID="PF"/>
                 <option value="OPF" label="AC Optimal" ID="OPF"/>
                 <option value="UOPF" label="AC Optimal with unit-decommitment heuristic" ID="UOPF"/>

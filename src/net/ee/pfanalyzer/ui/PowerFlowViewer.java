@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,10 +32,10 @@ import net.ee.pfanalyzer.ui.util.TabListener;
 public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
 
 	private PowerFlowCase powerFlowCase;
+	private Network network;
 	
 	private NetworkViewer viewer;
 	private NetworkElementSelectionManager selectionManager;
-	private JPanel contentPane = new JPanel(new BorderLayout());
 	private ClosableTabbedPane dataTabs;
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -51,9 +50,13 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
 	
 	public PowerFlowViewer(PowerFlowCase caze) {
+		this(caze, caze.getNetwork());
+	}
+	
+	public PowerFlowViewer(PowerFlowCase caze, Network network) {
 		super(new BorderLayout());
-		contentPane = this;
 		this.powerFlowCase = caze;
+		this.network = network;
 		selectionManager = new NetworkElementSelectionManager();
 		viewer = new NetworkViewer(getNetwork());
 		viewerController = new NetworkViewerController(viewer);
@@ -74,7 +77,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		verticalSplitPane.setOneTouchExpandable(true);
 		verticalSplitPane.setDividerLocation(450);
 		verticalSplitPane.setDividerSize(10);
-		contentPane.add(verticalSplitPane, BorderLayout.CENTER);
+		add(verticalSplitPane, BorderLayout.CENTER);
 		
 //		dataPanel.add(diagramTabs.getComponent(), BorderLayout.CENTER);
 		
@@ -93,7 +96,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		diagramTabs.setTabListener(new TabListener() {
 			@Override
 			public boolean tabClosing(int tabIndex) {
-				int choice = JOptionPane.showConfirmDialog(PowerFlowViewer.this.getContentPane(), 
+				int choice = JOptionPane.showConfirmDialog(PowerFlowViewer.this, 
 						"Do you want to close this diagram?", "Close diagram", JOptionPane.YES_NO_OPTION);
 				return choice == JOptionPane.YES_OPTION;
 			}
@@ -163,7 +166,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	}
 	
 	public Network getNetwork() {
-		return powerFlowCase.getNetwork();
+		return network;
 	}
 
 	public NetworkViewerController getViewerController() {
@@ -178,16 +181,16 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		return selectionManager;
 	}
 
-	public JComponent getContentPane() {
-		return contentPane;
-	}
+//	public JComponent getContentPane() {
+//		return this;
+//	}
 	
 	public void showModelDBDialog() {
 		if(modelDBDialog != null) {
 			modelDBDialog.setVisible(true);
 			modelDBDialog.toFront();
 		} else {
-			modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(getContentPane()), 
+			modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(this), 
 					getPowerFlowCase().getModelDB().getData());
 			AbstractNetworkElement selectedElement = (AbstractNetworkElement) 
 					(selection  instanceof AbstractNetworkElement ? selection : null);
