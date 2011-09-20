@@ -67,13 +67,14 @@ public class ParameterValueBox extends ParameterValuePanel implements ActionList
 			return;
 		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);
 		int optionIndex = getOptionIndexForLabel((String) box.getSelectedItem());
+		String value = null;
 		if(optionIndex > -1) {
-			String value = getOptions().get(optionIndex).getValue();
-			property.setValue(value);
-			fireValueChanged(oldValue, value);
-			oldValue = value;
-			refresh();
+			value = getOptions().get(optionIndex).getValue();
 		} else {
 		}
+		property.setValue(value);
+		fireValueChanged(oldValue, value);
+		oldValue = value;
+		refresh();
 	}
 }
