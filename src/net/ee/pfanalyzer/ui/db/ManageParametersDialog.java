@@ -129,11 +129,11 @@ public class ManageParametersDialog extends BaseDialog {
 		
 		splitter.setLeftComponent(treeParent);
 		splitter.setRightComponent(propPanelResizer);
-		splitter.setDividerLocation(150);
+		splitter.setDividerLocation(200);
 		setCenterComponent(splitter, false);
 		showElementProperties(null);
 		updateButtons(null);
-		showDialog(500, 400);
+		showDialog(700, 500);
 	}
 	
 	private void updateButtons(NetworkParameter property) {
@@ -256,6 +256,11 @@ public class ManageParametersDialog extends BaseDialog {
 			} else if(NetworkParameterValueRestriction.LIST.equals(property.getRestriction())) {
 				valuePanel.setLayout(new BorderLayout());
 				valuePanel.add(new OptionTableField(), BorderLayout.NORTH);
+			} else if(NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE.equals(property.getRestriction())) {
+				valuePanel.add(new JLabel("Parameter ID: "));
+				valuePanel.add(new ExistingParameterIDField());
+				valuePanel.add(new JLabel("Restrict for elements: "));
+				valuePanel.add(new ElementRestrictionField());
 			}
 			valuePanel.setVisible(valuePanel.getComponentCount() > 0);
 			valuePanel.revalidate();
@@ -602,7 +607,9 @@ public class ManageParametersDialog extends BaseDialog {
 					return new NetworkParameterValueRestriction[] { 
 							NetworkParameterValueRestriction.NONE, 
 							NetworkParameterValueRestriction.BUS_NUMBER, 
-							NetworkParameterValueRestriction.LIST };
+							NetworkParameterValueRestriction.LIST,
+							NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE,
+							NetworkParameterValueRestriction.UNIQUE_PARAMETER_VALUE };
 				else if(NetworkParameterType.BOOLEAN.equals(property.getType()))
 					return new NetworkParameterValueRestriction[] { 
 							NetworkParameterValueRestriction.NONE};
@@ -820,6 +827,30 @@ public class ManageParametersDialog extends BaseDialog {
 			@Override
 			protected void setValue(String value) {
 				displayOptions.setDecimalFormatPattern(value);
+			}
+		}
+		
+		class ExistingParameterIDField extends StringField {
+			@Override
+			protected String getValue() {
+				return displayOptions.getParameterID();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				displayOptions.setParameterID(value);
+			}
+		}
+		
+		class ElementRestrictionField extends StringField {
+			@Override
+			protected String getValue() {
+				return displayOptions.getElementRestriction();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				displayOptions.setElementRestriction(value);
 			}
 		}
 	}

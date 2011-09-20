@@ -117,20 +117,22 @@ public class ModelElementPanel extends ParameterContainer {
 	public void addParameter(NetworkParameter paramDef, NetworkParameter propertyValue, Group panel) {
 		if(isParameterAdded(paramDef))
 			return;
-		NetworkParameterType type = paramDef.getType();
-		NetworkParameterValueRestriction restriction = paramDef.getRestriction();
-		Bus bus = null;
-		if(restriction != null 
-				&& NetworkParameterType.INTEGER.equals(type)
-				&& NetworkParameterValueRestriction.BUS_NUMBER.equals(restriction)) {
-			int busNumber = element.getIntParameter(propertyValue.getID(), -1);
-			if(busNumber != -1)
-				bus = element.getNetwork().getBus(busNumber);
-			if(bus != null && bus != element) {
-				panel.add(new JLabel(getLabel(paramDef) + ": "));
-				panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
-				parameterAdded(paramDef);
-				return;
+		if(isEditable() == false) {
+			NetworkParameterType type = paramDef.getType();
+			NetworkParameterValueRestriction restriction = paramDef.getRestriction();
+			if(restriction != null 
+					&& NetworkParameterType.INTEGER.equals(type)
+					&& NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE.equals(restriction)) {
+				int busNumber = element.getIntParameter(propertyValue.getID(), -1);
+				Bus bus = null;
+				if(busNumber != -1)
+					bus = element.getNetwork().getBus(busNumber);
+				if(bus != null && bus != element) {
+					panel.add(new JLabel(getLabel(paramDef) + ": "));
+					panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
+					parameterAdded(paramDef);
+					return;
+				}
 			}
 		}
 		super.addParameter(paramDef, propertyValue, panel);

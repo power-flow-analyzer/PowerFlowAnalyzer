@@ -36,6 +36,10 @@ public class Group extends JPanel {
 	}
 	
 	public void addElementLink(AbstractNetworkElement childData, int displayFlags) {
+		add(createElementLink(childData, displayFlags));
+	}
+	
+	public HyperLinkLabel createElementLink(AbstractNetworkElement childData, int displayFlags) {
 		Color foreground = Preferences.getHyperlinkForeground();
 		if(childData.hasFailures())
 			foreground = Preferences.getFlagFailureColor();
@@ -43,7 +47,7 @@ public class Group extends JPanel {
 			foreground = Preferences.getFlagWarningColor();
 		else if(childData.isActive() == false)
 			foreground = Preferences.getDisabledForeground();
-		add(new HyperLinkLabel(childData.getDisplayName(displayFlags), childData, foreground));
+		return new HyperLinkLabel(childData.getDisplayName(displayFlags), childData, foreground);
 	}
 	
 	public void removeFlags() {

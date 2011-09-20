@@ -13,7 +13,7 @@ public class ParameterMasterNetwork implements IParameterMasterElement {
 		this.network = network;
 	}
 	
-	protected Network getNetwork() {
+	public Network getNetwork() {
 		return network;
 	}
 	

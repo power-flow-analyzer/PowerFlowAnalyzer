@@ -96,7 +96,16 @@ public class ParameterContainer extends JPanel {
 						propertyDefinition.getPurpose())
 				|| NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
 		if(isEditable() && editParameter) {
-			if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction()) == false) {
+			if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction())) {// list
+				ParameterValueBox box = new ParameterValueBox(
+						parameterMaster, propertyDefinition, propertyValue);
+				panel.add(box);
+			} else if(parameterMaster instanceof ParameterMasterNetworkElement 
+					&& NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE.equals(propertyDefinition.getRestriction())) {
+				ParameterRestrictionValueBox box = new ParameterRestrictionValueBox(
+						(ParameterMasterNetworkElement) parameterMaster, propertyDefinition, propertyValue);
+				panel.add(box);
+			} else {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
 					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
 					panel.add(box);
@@ -110,9 +119,6 @@ public class ParameterContainer extends JPanel {
 					ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
 					panel.add(box);
 				}
-			} else { // list
-				ParameterValueBox box = new ParameterValueBox(parameterMaster, propertyDefinition, propertyValue);
-				panel.add(box);
 			}
 		} else { //if(NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose())) {
 			panel.add(new ParameterTextLabel(parameterMaster, propertyDefinition, propertyValue));
@@ -151,6 +157,10 @@ public class ParameterContainer extends JPanel {
 	}
 	
 	protected void addModelLink(final AbstractNetworkElement element) {
+		currentGroupContainer.add(createModelLink(element));
+	}
+	
+	protected JComponent createModelLink(final AbstractNetworkElement element) {
 		String modelName = element.getModelID();
 		if(element.getModel() != null)
 			modelName = element.getModel().getLabel() + " (\"" + modelName + "\")";
@@ -167,7 +177,7 @@ public class ParameterContainer extends JPanel {
 			});
 			linkPanel.add(changeModelButton, BorderLayout.EAST);
 		}
-		currentGroupContainer.add(linkPanel);
+		return linkPanel;
 	}
 	
 	protected void removeAllElements() {
@@ -207,7 +217,7 @@ public class ParameterContainer extends JPanel {
 	private void showModelDB(ModelData model) {
 		PowerFlowAnalyzer.getInstance().showModelDBDialog();
 	}
-
+	
 	public boolean isShowNetworkParameters() {
 		return showNetworkParameters;
 	}

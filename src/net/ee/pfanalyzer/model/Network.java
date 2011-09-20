@@ -242,6 +242,10 @@ public class Network extends ParameterSupport {
 	public List<AbstractNetworkElement> getElements(String idPrefix) {
 		List<AbstractNetworkElement> list = new ArrayList<AbstractNetworkElement>();
 		for (AbstractNetworkElement element : getElements()) {
+			if(idPrefix == null || idPrefix.isEmpty()) {
+				list.add(element);// just copy all elements to new list
+				continue;
+			}
 			if(element.getModel() == null) {
 //				System.err.println("model is null");
 				continue;
@@ -250,6 +254,17 @@ public class Network extends ParameterSupport {
 				list.add(element);
 		}
 		return list;
+	}
+	
+	public List<AbstractNetworkElement> getElements(String idPrefix, String parameterID, String parameterValue) {
+		List<AbstractNetworkElement> result = new ArrayList<AbstractNetworkElement>();
+		List<AbstractNetworkElement> list = getElements(idPrefix);
+		for (AbstractNetworkElement element : list) {
+			NetworkParameter parameter = element.getParameterValue(parameterID);
+			if(parameter != null && parameter.getValue() != null && parameter.getValue().equals(parameterValue))
+				result.add(element);
+		}
+		return result;
 	}
 	
 	private void findCombinedElements() {

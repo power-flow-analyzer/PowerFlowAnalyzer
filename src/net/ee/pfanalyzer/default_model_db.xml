@@ -23,11 +23,11 @@
                 <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
                     <display/>
                 </parameter>
-                <parameter ID="F_BUS" type="integer" label="From Bus" description="From Bus" restriction="bus-number" empty="true">
-                    <display/>
+                <parameter ID="F_BUS" type="integer" label="From Bus" description="From Bus" restriction="existing parameter value" empty="true">
+                    <display elementRestriction="bus" parameterID="BUS_I"/>
                 </parameter>
-                <parameter ID="T_BUS" type="integer" label="To Bus" description="To Bus" restriction="bus-number" empty="true">
-                    <display/>
+                <parameter ID="T_BUS" type="integer" label="To Bus" description="To Bus" restriction="existing parameter value" empty="true">
+                    <display elementRestriction="bus" parameterID="BUS_I"/>
                 </parameter>
                 <parameter ID="BR_R" type="double" label="Resistance" empty="true">
                     <display increment="1.0E-4"/>

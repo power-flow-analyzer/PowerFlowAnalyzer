@@ -41,6 +41,8 @@
             <enumeration value="none"/>
             <enumeration value="bus-number"/>
             <enumeration value="list"/>
+            <enumeration value="unique parameter value"/>
+            <enumeration value="existing parameter value"/>
         </restriction>
     </simpleType>
     
@@ -50,6 +52,8 @@
         <attribute name="increment" type="double" default="1"/>
         <attribute name="precision" type="double"/>
         <attribute name="decimalFormatPattern" type="string" default="#.########"/>
+        <attribute name="parameterID" type="string"/>
+        <attribute name="elementRestriction" type="string"/>
     </complexType>
     
     <simpleType name="NetworkParameterPurposeRestriction">
