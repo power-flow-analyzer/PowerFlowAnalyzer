@@ -5,7 +5,8 @@ import java.util.List;
 public class CombinedBranch extends CombinedNetworkElement<Branch> {
 
 	private CombinedBus fromBus, toBus;
-	private Boolean isCorrect = null;
+	private Boolean hasErrors = null;
+	private Boolean hasWarnings = null;
 	
 	public CombinedBranch(CombinedBus fromBus, CombinedBus toBus, Branch branch) {
 		addBranch(branch);
@@ -64,16 +65,30 @@ public class CombinedBranch extends CombinedNetworkElement<Branch> {
 	}
 	
 	@Override
-	public boolean isCorrect() {
-		if(isCorrect == null) {
-			isCorrect = true;
+	public boolean hasFailures() {
+		if(hasErrors == null) {
+			hasErrors = false;
 			for (Branch branch : getBranches()) {
-				if(branch.isCorrect() == false) {
-					isCorrect = false;
+				if(branch.hasFailures()) {
+					hasErrors = true;
 					break;
 				}
 			}
 		}
-		return isCorrect;
+		return hasErrors;
+	}
+	
+	@Override
+	public boolean hasWarnings() {
+		if(hasWarnings == null) {
+			hasWarnings = false;
+			for (Branch branch : getBranches()) {
+				if(branch.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+		}
+		return hasWarnings;
 	}
 }

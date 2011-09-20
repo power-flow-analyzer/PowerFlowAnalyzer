@@ -65,16 +65,16 @@
                     <display/>
                 </parameter>
                 <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="QF" type="double" label="Reactive power injected at &quot;from&quot; bus end (MVAr)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="PT" type="double" label="Real power injected at &quot;to&quot; bus end (MW)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="QT" type="double" label="Reactive power injected at &quot;to&quot; bus end (MVAr)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="MU_SF" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus (&lt;i&gt;u&lt;/i&gt;/MVA)&lt;/html&gt;" empty="true">
                     <display/>
@@ -123,10 +123,10 @@
                     <display/>
                 </parameter>
                 <parameter ID="VM" type="double" label="Voltage Magnitude" empty="true" purpose="result">
-                    <display decimalFormatPattern="#.###"/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="VA" type="double" label="Voltage Angle (degrees)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="BASE_KV" type="double" label="Base-kV" description="Base voltage (kV)" empty="true">
                     <display/>
@@ -162,10 +162,10 @@
                     <display/>
                 </parameter>
                 <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="QG" type="double" label="Reactive Power Output (MVAr)" empty="true" purpose="result">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="QMAX" type="double" label="Maximum Reactive Power Output (MVAr)" empty="true">
                     <display/>

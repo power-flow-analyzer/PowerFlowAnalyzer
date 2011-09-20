@@ -10,7 +10,8 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	private List<Generator> generators = new ArrayList<Generator>();
 	private List<Transformer> transformers = new ArrayList<Transformer>();
 	private double longitude, lattitude;
-	private Boolean isCorrect = null;
+	private Boolean hasFailures = null;
+	private Boolean hasWarnings = null;
 	
 	public CombinedBus(Bus bus, double longitude, double lattitude) {
 		this.longitude = longitude;
@@ -82,28 +83,54 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	}
 	
 	@Override
-	public boolean isCorrect() {
-		if(isCorrect == null) {
-			isCorrect = true;
+	public boolean hasFailures() {
+		if(hasFailures == null) {
+			hasFailures = false;
 			for (Bus bus : getBusNodes()) {
-				if(bus.isCorrect() == false) {
-					isCorrect = false;
+				if(bus.hasFailures()) {
+					hasFailures = true;
 					break;
 				}
 			}
 			for (Generator gen : getGenerators()) {
-				if(gen.isCorrect() == false) {
-					isCorrect = false;
+				if(gen.hasFailures()) {
+					hasFailures = true;
 					break;
 				}
 			}
 			for (Transformer t : getTransformers()) {
-				if(t.isCorrect() == false) {
-					isCorrect = false;
+				if(t.hasFailures()) {
+					hasFailures = true;
 					break;
 				}
 			}
 		}
-		return isCorrect;
+		return hasFailures;
+	}
+	
+	@Override
+	public boolean hasWarnings() {
+		if(hasWarnings == null) {
+			hasWarnings = false;
+			for (Bus bus : getBusNodes()) {
+				if(bus.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+			for (Generator gen : getGenerators()) {
+				if(gen.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+			for (Transformer t : getTransformers()) {
+				if(t.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+		}
+		return hasWarnings;
 	}
 }

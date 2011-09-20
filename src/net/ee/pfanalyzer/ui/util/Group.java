@@ -25,9 +25,13 @@ public class Group extends JPanel {
 	}
 	
 	public void addElementLink(CombinedNetworkElement<?> element) {
-		Color foreground = Color.BLUE;
-		if(element.isCorrect() == false)
-			foreground = Color.RED;
+		Color foreground;
+		if(element.hasFailures())
+			foreground = Preferences.getFlagFailureColor();
+		else if(element.hasWarnings())
+			foreground = Preferences.getFlagWarningColor();
+		else
+			foreground = Preferences.getHyperlinkForeground();
 		add(new HyperLinkLabel(element.getLabel(), element, foreground));
 	}
 	

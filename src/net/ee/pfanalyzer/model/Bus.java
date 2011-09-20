@@ -79,7 +79,7 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 	public String getDisplayName(int displayFlags) {
 		String name = getName();
 		String text = name == null ? "Bus " + (getBusNumber()) : name;
-		if((displayFlags & DISPLAY_ADDITIONAL_INFO) != 0)
+		if(getBaseVoltage() > 0 && (displayFlags & DISPLAY_ADDITIONAL_INFO) != 0)
 			text += " (" + getBaseVoltage() + " kV)";
 		if(isSlackNode())
 			text += " (Slack Bus)";

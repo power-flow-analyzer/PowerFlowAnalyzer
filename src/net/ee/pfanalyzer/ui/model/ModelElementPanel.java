@@ -156,7 +156,7 @@ public class ModelElementPanel extends ParameterContainer {
 //				resizer.add(new JLabel(" " + (int) Math.floor(percentage) + "% "), BorderLayout.EAST);
 				flagGroup.add(resizer);
 			} else
-				flagGroup.add(new JLabel("unknown"));
+				flagGroup.add(new JLabel("unknown (" + percentage + "%)"));
 		}
 		if(flagGroup.getComponentCount() > 0)
 			addElementGroup(flagGroup);

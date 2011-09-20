@@ -32,6 +32,7 @@ import net.ee.pfanalyzer.model.IInternalParameters;
 import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
+import net.ee.pfanalyzer.preferences.Preferences;
 
 public class NetworkViewer extends JComponent implements INetworkElementSelectionListener, INetworkChangeListener {
 
@@ -578,7 +579,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 			if(drawBusNodes) {
 				for (int i = 0; i < data.getCombinedBusCount(); i++) {
 					CombinedBus cbus = data.getCombinedBus(i);
-					boolean isCorrect = cbus.isCorrect();
+					boolean hasFailures = cbus.hasFailures();
+					boolean hasWarnings = cbus.hasWarnings();
 					boolean isSlack = false;
 					boolean isSelected = isSelection(cbus);
 					boolean isHovered = isHovered(cbus);
@@ -591,13 +593,16 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 						if( ! isHovered && isHovered(bus))
 							isHovered = true;
 					}
-					if(isCorrect) {
+					if(hasFailures)
+						g.setColor(Preferences.getFlagFailureColor());
+					else if(hasWarnings)
+						g.setColor(Preferences.getFlagWarningColor());
+					else {
 						if(isSlack)
 							g.setColor(Color.BLUE);
 						else
 							g.setColor(Color.BLACK);
-					} else
-						g.setColor(Color.RED);
+					}
 					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber(), horizontalScale, verticalScale);
 					double x = coords[0];//getBusXDouble(cbus.getFirstBus().getBusNumber(), horizontalScale);
 					double y = coords[1];//getBusYDouble(cbus.getFirstBus().getBusNumber(), verticalScale);
@@ -631,10 +636,16 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 								isHovered = true;
 							
 						}
-						if(isCorrect)
-							g.setColor(Color.BLACK);
-						else
-							g.setColor(Color.RED);
+						if(hasFailures)
+							g.setColor(Preferences.getFlagFailureColor());
+						else if(hasWarnings)
+							g.setColor(Preferences.getFlagWarningColor());
+						else {
+							if(isSlack)
+								g.setColor(Color.BLUE);
+							else
+								g.setColor(Color.BLACK);
+						}
 						int x_gen = (int) x;//getBusX(busIndex, horizontalScale);
 						int y_gen = (int) y;//getBusY(busIndex, verticalScale);
 						if(x == -1 || y == -1)

@@ -21,7 +21,7 @@ public class Preferences {
 	private final static Color COLOR_HYPERLINK_FOREGROUND = Color.BLUE;
 	private final static Color COLOR_DISABLED_FOREGROUND = Color.DARK_GRAY;
 	private final static Color COLOR_FLAG_ERROR = Color.RED;
-	private final static Color COLOR_FLAG_WARNING = Color.ORANGE.darker();
+	private final static Color COLOR_FLAG_WARNING = new Color(255, 150, 0);
 	private final static Color COLOR_FLAG_CORRECT = Color.GREEN.darker();
 	
 	static {

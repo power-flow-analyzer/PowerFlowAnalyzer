@@ -462,6 +462,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 					System.exit(0);
 				}
 			});
+			dialog.showDialog(900, 500);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

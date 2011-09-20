@@ -10,7 +10,9 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	
 	public abstract String getLabel();
 	
-	public abstract boolean isCorrect();
+	public abstract boolean hasWarnings();
+	
+	public abstract boolean hasFailures();
 	
 	public int getIndex() {
 		return index;
