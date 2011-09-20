@@ -17,12 +17,17 @@ jflag.setPercentage(real_power_percentage);
 jgenerator.addFlag(jflag);
 
 %% reactive power output
-if(genData(QG) >= 0)
+if(genData(QG) >= 0) % positive reactive power
     reactive_power_percentage = genData(QG) / genData(QMAX) * 100;
     reactive_power_failure = genData(QG) > genData(QMAX);
-else
-    reactive_power_percentage = genData(QG) / genData(QMIN) * 100;
-    reactive_power_failure = genData(QG) < genData(QMIN);
+else % negative reactive power
+    if genData(QMIN) < 0
+        reactive_power_percentage = genData(QG) / genData(QMIN) * 100;
+        reactive_power_failure = genData(QG) < genData(QMIN);
+    else
+        reactive_power_percentage = 101;
+        reactive_power_failure = true;
+    end
 end
 
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Reactive power Output');
