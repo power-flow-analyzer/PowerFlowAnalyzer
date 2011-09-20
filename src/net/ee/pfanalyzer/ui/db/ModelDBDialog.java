@@ -214,7 +214,6 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		setCenterComponent(splitter, false);
 		showElementProperties(null);
 		updateButtons(null);
-		showDialog(900, 500);
 	}
 	
 	private DefaultMutableTreeNode getSelectedNode() {

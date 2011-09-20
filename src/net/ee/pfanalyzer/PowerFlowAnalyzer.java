@@ -128,8 +128,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
-				cases.get(tabIndex).getViewer().getSelectionManager().removeActionUpdateListener(
-						PowerFlowAnalyzer.this);
+				NetworkContainer container = cases.get(tabIndex).getViewer();
+				container.getSelectionManager().removeActionUpdateListener(PowerFlowAnalyzer.this);
+				container.dispose();
 				cases.remove(tabIndex);
 				updateToolbarButtons();
 			}
@@ -379,8 +380,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	public void showModelDBDialog() {
-		if(getCurrentViewer() != null)
-			getCurrentViewer().showModelDBDialog();
+		if(getCurrentContainer() != null)
+			getCurrentContainer().showModelDBDialog();
 	}
 	
 	private void openProgressDialog(final String pfcase) {
@@ -554,11 +555,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					"Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
-//	private PowerFlowContainer getCurrentContainer() {
-//		if(casesParent.isEmpty())
-//			return null;
-//		return cases.get(casesParent.getSelectedIndex()).getViewer();
-//	}
+	private NetworkContainer getCurrentContainer() {
+		if(casesParent.isEmpty())
+			return null;
+		return cases.get(casesParent.getSelectedIndex()).getViewer();
+	}
 	
 	private PowerFlowViewer getCurrentViewer() {
 		if(casesParent.isEmpty())
@@ -617,6 +618,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		stopServer();
 		dispose();
 		Preferences.saveProperties();
+		for (PowerFlowCase caze : cases) {
+			caze.getViewer().dispose();
+		}
 	}
 	
 	public void ping() {

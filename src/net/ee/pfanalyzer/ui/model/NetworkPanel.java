@@ -38,17 +38,17 @@ public class NetworkPanel extends ModelElementPanel {
 		if(data.getCombinedBusCount() > 0) { // show combined elements
 			addElementGroup("Areas");
 			for (int i = 0; i < data.getCombinedBusCount(); i++) {
-				if(data.getCombinedBus(i).getBusNodes().size() == 1)
-					addElementLink(data.getCombinedBus(i).getFirstBus(), AbstractNetworkElement.DISPLAY_DEFAULT);
-				else
+//				if(data.getCombinedBus(i).getBusNodes().size() == 1)
+//					addElementLink(data.getCombinedBus(i).getFirstBus(), AbstractNetworkElement.DISPLAY_DEFAULT);
+//				else
 					addElementLink(data.getCombinedBus(i));
 			}
 			
 			addElementGroup("Power Lines");
 			for (int i = 0; i < data.getCombinedBranchCount(); i++) {
-				if(data.getCombinedBranch(i).getBranches().size() == 1)
-					addElementLink(data.getCombinedBranch(i).getFirstBranch(), AbstractNetworkElement.DISPLAY_NAME);
-				else
+//				if(data.getCombinedBranch(i).getBranches().size() == 1)
+//					addElementLink(data.getCombinedBranch(i).getFirstBranch(), AbstractNetworkElement.DISPLAY_NAME);
+//				else
 					addElementLink(data.getCombinedBranch(i));
 			}
 		} 

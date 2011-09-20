@@ -1,7 +1,6 @@
 package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +10,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.SwingUtilities;
 
-import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
-import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.table.DataTable;
@@ -42,16 +38,10 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private NetworkViewerController viewerController;
 	private ElementPanelController panelController;
 	private ClosableTabbedPane diagramTabs = new ClosableTabbedPane();
-	private ModelDBDialog modelDBDialog;
-	private Object selection;
 
 	private List<DiagramSheet> diagrams = new ArrayList<DiagramSheet>();
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
-	
-//	public PowerFlowViewer(PowerFlowCase caze) {
-//		this(caze, caze.getNetwork());
-//	}
 	
 	public PowerFlowViewer(PowerFlowCase caze, Network network) {
 		super(new BorderLayout());
@@ -181,27 +171,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		return selectionManager;
 	}
 
-//	public JComponent getContentPane() {
-//		return this;
-//	}
-	
-	public void showModelDBDialog() {
-		if(modelDBDialog != null) {
-			modelDBDialog.setVisible(true);
-			modelDBDialog.toFront();
-		} else {
-			modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(this), 
-					getPowerFlowCase().getModelDB().getData());
-			AbstractNetworkElement selectedElement = (AbstractNetworkElement) 
-					(selection  instanceof AbstractNetworkElement ? selection : null);
-			modelDBDialog.setSelectedElement(selectedElement);
-			addNetworkElementSelectionListener(modelDBDialog);
-		}
-	}
-
 	@Override
 	public void selectionChanged(Object data) {
-		selection = data;
 		if(data == null)
 			return;
 		if(data instanceof Bus)

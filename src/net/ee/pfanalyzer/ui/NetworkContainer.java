@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.AddScenarioDialog;
 import net.ee.pfanalyzer.ui.dialog.SetScenarioParametersDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
@@ -28,6 +29,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 	private NetworkTabbedPane networkTabs = new NetworkTabbedPane();
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	
+	private ModelDBDialog modelDBDialog;
+
 	public NetworkContainer(PowerFlowCase caze, List<Network> networks) {
 		this(caze);
 	}
@@ -36,11 +39,15 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		super(new BorderLayout());
 		this.powerFlowCase = caze;
 		
+		modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(this), 
+				getPowerFlowCase().getModelDB().getData());
+		
 		for (int i = 0; i < caze.getNetworks().size(); i++) {
 			Network scenario = caze.getNetworks().get(i);
 			PowerFlowViewer viewer = new PowerFlowViewer(caze, scenario);
 			networkTabs.addNetworkTab(getScenarioName(scenario), viewer, true);
 			viewer.addActionUpdateListener(this);
+			viewer.addNetworkElementSelectionListener(modelDBDialog);
 		}
 		networkTabs.setTabListener(new TabListener() {
 			PowerFlowViewer lastViewer;
@@ -71,6 +78,15 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 			}
 		});
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
+	}
+	
+	public void showModelDBDialog() {
+		if(modelDBDialog.isVisible() == false) {
+			modelDBDialog.showDialog(900, 500);
+		} else {
+			modelDBDialog.setVisible(true);
+			modelDBDialog.toFront();
+		}
 	}
 	
 	public PowerFlowCase getPowerFlowCase() {
@@ -143,6 +159,10 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		}
 	}
 	
+	public void dispose() {
+		modelDBDialog.setVisible(false);
+	}
+	
 	class NetworkTabbedPane extends ClosableTabbedPane {
 		
 		AddNetworkButton addScenarioButton = new AddNetworkButton();
@@ -172,6 +192,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 				PowerFlowViewer viewer = new PowerFlowViewer(getPowerFlowCase(), newNetwork);
 				addNetworkTab(newNetwork.getName(), viewer, true);
 				viewer.addActionUpdateListener(NetworkContainer.this);
+				viewer.addNetworkElementSelectionListener(modelDBDialog);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
