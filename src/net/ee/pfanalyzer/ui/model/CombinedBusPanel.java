@@ -43,14 +43,14 @@ public class CombinedBusPanel extends ModelElementPanel {
 		setTitle(data.getLabel());
 		
 		// add bus nodes
-		JLabel label = new JLabel("\u2211 Real Power Demand: ");
-//		label.setFont(labelFont);
-		busGroup.add(label);
-		busGroup.add(sumRealPowerDemandLabel);
-		label = new JLabel("\u2211 Reactive Power Demand: ");
-//		label.setFont(labelFont);
-		busGroup.add(label);
-		busGroup.add(sumReactivePowerDemandLabel);
+//		JLabel label = new JLabel("\u2211 Real Power Demand: ");
+////		label.setFont(labelFont);
+//		busGroup.add(label);
+//		busGroup.add(sumRealPowerDemandLabel);
+//		label = new JLabel("\u2211 Reactive Power Demand: ");
+////		label.setFont(labelFont);
+//		busGroup.add(label);
+//		busGroup.add(sumReactivePowerDemandLabel);
 		busGroup.add(new JLabel("Busses (" + data.getNetworkElementCount() + "):"));
 		busGroup.add(new JPanel());// add vertical space
 		double realPowerSum = 0;
@@ -65,14 +65,14 @@ public class CombinedBusPanel extends ModelElementPanel {
 		sumReactivePowerDemandLabel.setText(format.format(reactivePowerSum) + " MVAr");
 		
 		// add generators
-		label = new JLabel("\u2211 Real Power Output: ");
-//		label.setFont(labelFont);
-		generatorGroup.add(label);
-		generatorGroup.add(sumRealPowerGenerationLabel);
-		label = new JLabel("\u2211 Reactive Power Output: ");
-//		label.setFont(labelFont);
-		generatorGroup.add(label);
-		generatorGroup.add(sumReactivePowerGenerationLabel);
+//		label = new JLabel("\u2211 Real Power Output: ");
+////		label.setFont(labelFont);
+//		generatorGroup.add(label);
+//		generatorGroup.add(sumRealPowerGenerationLabel);
+//		label = new JLabel("\u2211 Reactive Power Output: ");
+////		label.setFont(labelFont);
+//		generatorGroup.add(label);
+//		generatorGroup.add(sumReactivePowerGenerationLabel);
 		generatorGroup.add(new JLabel("Generators (" + data.getGenerators().size() + "):"));
 		generatorGroup.add(new JPanel());// add vertical space
 		realPowerSum = 0;

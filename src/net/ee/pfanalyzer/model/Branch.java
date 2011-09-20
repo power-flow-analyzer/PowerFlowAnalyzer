@@ -23,7 +23,6 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	
 	public int getInitialBranchStatus() {
 		return getIntParameter(PROPERTY_INITIAL_BRANCH_STATUS, -1);
-//		return (int) Math.round(getData()[INITIAL_BRANCH_STATUS]);
 	}
 	
 	public boolean isActive() {
@@ -60,20 +59,12 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	}
 	
 	public int getFromBusNumber() {
-		return getIntParameter(PROPERTY_FROM_BUS_NUMBER);
+		return getIntParameter(PROPERTY_FROM_BUS_NUMBER, -1);
 	}
 
-//	public int getFromBusIndex() {
-//		return getFromBusNumber() - 1;
-//	}
-	
 	public int getToBusNumber() {
-		return getIntParameter(PROPERTY_TO_BUS_NUMBER);
+		return getIntParameter(PROPERTY_TO_BUS_NUMBER, -1);
 	}
-	
-//	public int getToBusIndex() {
-//		return getToBusNumber() - 1;
-//	}
 	
 	@Override
 	public String getDisplayName(int displayFlags) {

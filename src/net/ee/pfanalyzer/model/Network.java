@@ -9,6 +9,7 @@ import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
+import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
 
@@ -21,6 +22,7 @@ public class Network extends ParameterSupport {
 	private List<CombinedBranch> combinedBranchList = new ArrayList<CombinedBranch>();
 	
 	private NetworkData networkData;
+	private PowerFlowCase caze;
 	private ModelClassData globalParameterClass;
 	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
@@ -52,7 +54,15 @@ public class Network extends ParameterSupport {
 		findCombinedElements();
 	}
 	
-	public Network copy() throws Exception {
+	public PowerFlowCase getPowerFlowCase() {
+		return caze;
+	}
+
+	void setPowerFlowCase(PowerFlowCase caze) {
+		this.caze = caze;
+	}
+
+	Network copy() throws Exception {
 		NetworkData copiedData = (NetworkData) CaseSerializer.copy(getData());
 		copiedData.getScenario().clear();// remove all scenarios
 		copiedData.setInternalID(-1L);// clear internal ID
@@ -171,16 +181,26 @@ public class Network extends ParameterSupport {
 //		System.out.println("    " + getElements().size() + " elements added");
 		// set bus references in branches
 		for (Branch branch : getBranches()) {
-			branch.setFromBus(getBus(branch.getFromBusNumber()));
-			branch.setToBus(getBus(branch.getToBusNumber()));
+			updateElement(branch);
 		}
 		// set bus references in generators
 		for (Generator generator : getGenerators()) {
-			generator.setBus(getBus(generator.getBusNumber()));
+			updateElement(generator);
 		}
 		for (NetworkData data : networkData.getScenario()) {
 			Network scenario = new Network(data);
 			getScenarios().add(scenario);
+		}
+	}
+	
+	private void updateElement(AbstractNetworkElement element) {
+		if(element instanceof Branch) {
+			Branch branch = (Branch) element;
+			branch.setFromBus(getBus(branch.getFromBusNumber()));
+			branch.setToBus(getBus(branch.getToBusNumber()));
+		} else if(element instanceof Generator) {
+			Generator generator = (Generator) element;
+			generator.setBus(getBus(generator.getBusNumber()));
 		}
 	}
 	
@@ -201,14 +221,38 @@ public class Network extends ParameterSupport {
 		}
 	}
 	
+	public void fireNetworkElementAdded(AbstractNetworkElement element) {
+		findCombinedElements();
+		NetworkChangeEvent event = new NetworkChangeEvent(this);
+		event.setNetworkElement(element);
+		for (INetworkChangeListener listener : listeners) {
+			listener.networkElementAdded(event);
+		}
+	}
+	
+	public void fireNetworkElementRemoved(AbstractNetworkElement element) {
+//		updateNetworkData();
+		findCombinedElements();
+		NetworkChangeEvent event = new NetworkChangeEvent(this);
+		event.setNetworkElement(element);
+		for (INetworkChangeListener listener : listeners) {
+			listener.networkElementAdded(event);
+		}
+	}
+	
 	public void fireNetworkElementChanged(NetworkChangeEvent event) {
 		// don't fire the event if old value is equal to new value
 		if(event.getNewValue() == null && event.getOldValue() == null
 				|| event.getNewValue() != null && event.getNewValue().equals(event.getOldValue()))
 			return;
+		if(event.getNetworkElement() != null)
+			updateElement(event.getNetworkElement());
 		// check if combined busses and branches must be updated
 		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
-				|| IInternalParameters.LATTITUDE.equals(event.getParameterID()))
+				|| IInternalParameters.LATTITUDE.equals(event.getParameterID())
+				|| IInternalParameters.FROM_BUS.equals(event.getParameterID())
+				|| IInternalParameters.TO_BUS.equals(event.getParameterID())
+				|| IInternalParameters.GEN_BUS.equals(event.getParameterID()))
 			findCombinedElements();
 		for (INetworkChangeListener listener : listeners) {
 			listener.networkElementChanged(event);
@@ -218,6 +262,24 @@ public class Network extends ParameterSupport {
 	@Override
 	public List<NetworkParameter> getParameterList() {
 		return networkData.getParameter();
+	}
+	
+	public AbstractNetworkElement createElement(String modelID) {
+		AbstractNetworkElement element = new Bus(this, getBusses().size());
+		if(modelID.startsWith("bus.")) {
+			element = new Bus(this, getBusses().size());
+//			System.out.println("    adding bus: " + modelID);
+		} else if(modelID.startsWith("branch.")) {
+			element = new Branch(this, getBranches().size());
+//				System.out.println("    adding branch: " + modelID);
+		} else if(modelID.startsWith("generator.")) {
+			element = new Generator(this, getGenerators().size());
+//			System.out.println("    adding generator: " + modelID);
+		}
+		element.setModelID(modelID);
+		if(getPowerFlowCase() != null)
+			getPowerFlowCase().updateNetworkElement(element);
+		return element;
 	}
 	
 	public void addElement(AbstractNetworkElement element) {
@@ -233,6 +295,18 @@ public class Network extends ParameterSupport {
 			getBranches().add((Branch) element);
 		else if(element instanceof Generator)
 			getGenerators().add((Generator) element);
+	}
+	
+	public void removeElement(AbstractNetworkElement element) {
+//		System.out.println("remove element from network");
+		networkData.getElement().remove(ListUtils.getIndexOf(networkData.getElement(), element.getElementData()));
+		getElements().remove(ListUtils.getIndexOf(getElements(), element));
+		if(element instanceof Bus)
+			getBusses().remove(ListUtils.getIndexOf(getBusses(), (Bus) element));
+		else if(element instanceof Branch)
+			getBranches().remove(ListUtils.getIndexOf(getBranches(), (Branch) element));
+		else if(element instanceof Generator)
+			getGenerators().remove(ListUtils.getIndexOf(getGenerators(), (Generator) element));
 	}
 	
 	public List<AbstractNetworkElement> getElements() {

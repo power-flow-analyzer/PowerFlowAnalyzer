@@ -1,7 +1,6 @@
 package net.ee.pfanalyzer.model;
 
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
-import net.ee.pfanalyzer.model.matpower.ICoordinateDataConstants;
 
 public class Bus extends AbstractNetworkElement implements IExtendedBusParameters {
 
@@ -39,7 +38,7 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 	}
 	
 	public int getBaseVoltage() {
-		return getIntParameter(PROPERTY_BASE_VOLTAGE);
+		return getIntParameter(PROPERTY_BASE_VOLTAGE, 0);
 	}
 	
 	public void setName(String name) {
@@ -64,15 +63,6 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 	
 	public void setLattitude(double value) {
 		setParameter(PROPERTY_LATTITUDE, value);
-	}
-	
-	public void setCoordinates(double[] values) {
-		setLongitude(values[ICoordinateDataConstants.LONGITUDE]);
-		setLattitude(values[ICoordinateDataConstants.LATITUDE]);
-	}
-	
-	public double[] getCoordinates() {
-		return new double[] { getLongitude(), getLattitude() };
 	}
 	
 	@Override

@@ -158,8 +158,8 @@
                 <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
                     <display/>
                 </parameter>
-                <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="bus-number" empty="true">
-                    <display/>
+                <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="existing parameter value" empty="true">
+                    <display elementRestriction="bus" parameterID="BUS_I"/>
                 </parameter>
                 <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true" purpose="result">
                     <display decimalFormatPattern="#.##"/>

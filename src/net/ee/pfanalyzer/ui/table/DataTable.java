@@ -61,6 +61,8 @@ public class DataTable extends JTable implements INetworkDataViewer {
 			public String getToolTipText(MouseEvent e) {
 				Point p = e.getPoint();
 				int index = getColumnModel().getColumnIndexAtX(p.x);
+				if(index == -1)
+					return null;
 				int realIndex = 
                     columnModel.getColumn(index).getModelIndex();
 				return model.getColumnDescription(realIndex);
@@ -130,6 +132,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	@Override
 	public void networkElementAdded(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkElementAdded");
+		model.setData(getNetwork().getElements(elementID));
 		refresh();
 	}
 
@@ -146,6 +149,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 
 	@Override
 	public void networkElementRemoved(NetworkChangeEvent event) {
+		model.setData(getNetwork().getElements(elementID));
 		refresh();
 	}
 

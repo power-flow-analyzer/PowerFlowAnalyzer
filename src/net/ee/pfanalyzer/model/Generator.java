@@ -21,12 +21,8 @@ public class Generator extends AbstractNetworkElement implements IGeneratorDataC
 	}
 	
 	public int getBusNumber() {
-		return getIntParameter(PROPERTY_BUS_NUMBER);
+		return getIntParameter(PROPERTY_BUS_NUMBER, -1);
 	}
-	
-//	public int getBusIndex() {
-//		return getBusNumber() - 1;
-//	}
 	
 //	public int getRealBusIndex() {
 //		return BusIndexConverter.getRealBusIndex(getBusNumber());
@@ -41,8 +37,7 @@ public class Generator extends AbstractNetworkElement implements IGeneratorDataC
 	}
 
 	public int getMachineStatus() {
-		return getIntParameter(PROPERTY_MACHINE_STATUS);
-//		return (int) Math.round(getData()[MACHINE_STATUS]);
+		return getIntParameter(PROPERTY_MACHINE_STATUS, -1);
 	}
 	
 	public boolean isActive() {
@@ -50,13 +45,11 @@ public class Generator extends AbstractNetworkElement implements IGeneratorDataC
 	}
 	
 	public double getRealPowerOutput() {
-		return getDoubleParameter(PROPERTY_REAL_POWER_OUTPUT);
-//		return getData()[REAL_POWER_OUTPUT];
+		return getDoubleParameter(PROPERTY_REAL_POWER_OUTPUT, 0);
 	}
 	
 	public double getReactivePowerOutput() {
-		return getDoubleParameter(PROPERTY_REACTIVE_POWER_OUTPUT);
-//		return getData()[REACTIVE_POWER_OUTPUT];
+		return getDoubleParameter(PROPERTY_REACTIVE_POWER_OUTPUT, 0);
 	}
 	
 	@Override

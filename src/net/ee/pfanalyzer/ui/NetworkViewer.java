@@ -745,7 +745,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				for (Branch branch : cbranch.getBranches()) {
 					tooltipText += "<li>" + branch.getDisplayName(AbstractNetworkElement.DISPLAY_NAME);
 					int baseVoltage = getBaseVoltage(branch);
-					if(baseVoltage != VOLTAGE_LEVEL_UNKNOWN)
+					if(baseVoltage != 0)
 						tooltipText += " (" + baseVoltage + " kV)";
 					tooltipText += "</li>";
 				}
@@ -803,7 +803,10 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	
 	private int getBaseVoltage(Branch branch) {
 		// from and to bus should have the same voltage level!
-		return data.getBus(branch.getFromBusNumber()).getBaseVoltage();
+		Bus bus = data.getBus(branch.getFromBusNumber());
+		if(bus == null)
+			return 0;
+		return bus.getBaseVoltage();
 	}
 	
 	public void selectionChanged(Object data) {
@@ -829,7 +832,10 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	public void networkElementChanged(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkElementChanged");
 		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
-				|| IInternalParameters.LATTITUDE.equals(event.getParameterID()))
+				|| IInternalParameters.LATTITUDE.equals(event.getParameterID())
+				|| IInternalParameters.FROM_BUS.equals(event.getParameterID())
+				|| IInternalParameters.TO_BUS.equals(event.getParameterID())
+				|| IInternalParameters.GEN_BUS.equals(event.getParameterID()))
 			initializeInternalCoordinates();
 		repaint();
 	}

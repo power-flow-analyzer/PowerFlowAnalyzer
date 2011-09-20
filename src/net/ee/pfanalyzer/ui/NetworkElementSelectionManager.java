@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
+import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 
 public class NetworkElementSelectionManager implements INetworkElementSelectionListener {
@@ -39,9 +40,22 @@ public class NetworkElementSelectionManager implements INetworkElementSelectionL
 		viewHistory.add(null);// add the whole network as first entry in history
 	}
 	
+	public Object getSelection() {
+		return oldSelection;
+	}
+	
 	@Override
 	public void selectionChanged(Object data) {
 		selectionChanged(data, true);
+	}
+	
+	public void removeFromHistory(Object data) {
+		int index;
+		while( ( index = ListUtils.getIndexOf(viewHistory, data)) > -1) {
+			viewHistory.remove(index);
+//			System.out.println("removed from history");
+		}
+		fireActionUpdate();
 	}
 	
 	private void selectionChanged(Object selection, boolean addToHistory) {

@@ -68,6 +68,7 @@ public class PowerFlowCase {
 	}
 	
 	private Network addNetworkInternal(Network network) {
+		network.setPowerFlowCase(this);
 		networks.add(network);
 		if(network.getInternalID() == -1) {
 			maxNetworkID++;
@@ -139,15 +140,19 @@ public class PowerFlowCase {
 		network.setGlobalParameterClass(getModelDB().getNetworkClass());
 		// setting model references in network elements
 		for (AbstractNetworkElement element : network.getElements()) {
-			ModelData model = getModelDB().getModel(element.getModelID());
-//			System.out.println("    model id: " + element.getModelID());
-//			if(model != null)
-//				System.out.println("    setting model: " + element.getModelID());
-			element.setModel(model);
+			updateNetworkElement(element);
 		}
 		for (Network scenario : network.getScenarios()) {
 			updateNetworkData(scenario);
 		}
+	}
+	
+	void updateNetworkElement(AbstractNetworkElement element) {
+		ModelData model = getModelDB().getModel(element.getModelID());
+//		System.out.println("    model id: " + element.getModelID());
+//		if(model != null)
+//			System.out.println("    setting model: " + element.getModelID());
+		element.setModel(model);
 	}
 
 	public Network createNetworkCopy(Network network) throws Exception {

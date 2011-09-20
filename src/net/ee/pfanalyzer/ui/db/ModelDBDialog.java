@@ -40,6 +40,7 @@ import javax.swing.tree.TreeSelectionModel;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CaseSerializer;
+import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.CaseData;
@@ -48,6 +49,7 @@ import net.ee.pfanalyzer.model.data.ModelDBData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.INetworkElementSelectionListener;
+import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
 
 public class ModelDBDialog extends BaseDialog implements PropertyChangeListener, INetworkElementSelectionListener {
@@ -60,6 +62,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 	
 //	private CaseData pfCase;
 	private ModelDBData db;
+	private Network network;
 	private JComponent propPanel;
 	private JLabel elementTitleLabel;
 	private JTree modelTree;
@@ -68,14 +71,23 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 	private DefaultMutableTreeNode currentNode;
 	private AbstractNetworkElement selectedElement;
 	private final boolean devMode;
-	private JButton addClassButton, addModelButton, removeButton, managePropsButton, setModelButton;
+	private JButton addClassButton, addModelButton, removeButton, managePropsButton, performActionButton;
 	
 	public ModelDBDialog(Frame frame, ModelDBData modelDB) {
 		this(frame, modelDB, false);
 	}
 	
-	public ModelDBDialog(Frame frame, ModelDBData modelDB, boolean devMode) {
-		super(frame, "Model Database", false);
+	private ModelDBDialog(Frame frame, ModelDBData modelDB, boolean devMode) {
+		this(frame, modelDB, null, devMode);
+	}
+	
+	public ModelDBDialog(Frame frame, ModelDBData modelDB, Network network) {
+		this(frame, modelDB, network, false);
+	}
+	
+	private ModelDBDialog(Frame frame, ModelDBData modelDB, Network net, boolean devMode) {
+		super(frame, "Model Database", net != null);
+		this.network = net;
 		this.devMode = devMode;
 //		this.controller = controller;
 //		setText("The following options apply directly to all views.");
@@ -137,23 +149,14 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		propPanelResizer.add(titlePanel, BorderLayout.NORTH);
 		propPanelResizer.add(new JScrollPane(propPanel), BorderLayout.CENTER);
 		
-		setModelButton = new JButton("Set Model");
-		setModelButton.addActionListener(new ActionListener() {
+		performActionButton = new JButton(network == null ? "Set Model" : "Create new element");
+		performActionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AbstractModelElementData selected = getSelectedElement();
-				if(selected instanceof ModelData && selectedElement != null) {
-					String oldModelID = selectedElement.getModelID();
-					ModelData model = (ModelData) selected;
-					selectedElement.setModel(model);
-					String newModelID = ModelDBUtils.getParameterID(model);
-					selectedElement.setModelID(newModelID);
-					selectedElement.getNetwork().fireNetworkElementChanged(new NetworkChangeEvent(
-							selectedElement, oldModelID, newModelID));
-				}
+				performAction();
 			}
 		});
-		addBottomComponent(setModelButton);
+		addBottomComponent(performActionButton);
 		addButton("Close", true, true);
 
 		managePropsButton = new JButton("Manage Parameters...");
@@ -216,6 +219,39 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		updateButtons(null);
 	}
 	
+	private void performAction() {
+		if(network != null)
+			createElement();
+		else
+			setModel();
+	}
+	
+	private void setModel() {
+		AbstractModelElementData selected = getSelectedElement();
+		if(selected instanceof ModelData && selectedElement != null) {
+			String oldModelID = selectedElement.getModelID();
+			ModelData model = (ModelData) selected;
+			selectedElement.setModel(model);
+			String newModelID = ModelDBUtils.getParameterID(model);
+			selectedElement.setModelID(newModelID);
+			selectedElement.getNetwork().fireNetworkElementChanged(new NetworkChangeEvent(
+					selectedElement, oldModelID, newModelID));
+		}
+	}
+	
+	private void createElement() {
+		AbstractModelElementData selected = getSelectedElement();
+		if(selected instanceof ModelData) {
+			String modelID = ModelDBUtils.getParameterID(selected);
+			AbstractNetworkElement element = network.createElement(modelID);
+			network.addElement(element);
+			network.fireNetworkElementAdded(element);
+			NetworkElementSelectionManager.selectionChanged(
+					PowerFlowAnalyzer.getInstance().getCurrentViewer(), element);
+			setVisible(false);
+		}
+	}
+	
 	private DefaultMutableTreeNode getSelectedNode() {
 		if(modelTree.getSelectionPath() == null)
 			return null;
@@ -238,26 +274,26 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			addModelButton.setEnabled(false);
 			removeButton.setEnabled(false);
 			managePropsButton.setEnabled(false);
-			setModelButton.setEnabled(false);
+			performActionButton.setEnabled(false);
 		} else {
 			if(treeNode.getUserObject() instanceof ModelClassData) {
 				addClassButton.setEnabled(true);
 				addModelButton.setEnabled(true);
 				removeButton.setEnabled(true);
 				managePropsButton.setEnabled(true);
-				setModelButton.setEnabled(false);
+				performActionButton.setEnabled(false);
 			} else if(treeNode.getUserObject() instanceof ModelData) {
 				addClassButton.setEnabled(false);
 				addModelButton.setEnabled(false);
 				removeButton.setEnabled(true);
 				managePropsButton.setEnabled(true);
-				setModelButton.setEnabled(selectedElement != null);
+				performActionButton.setEnabled(network != null ? true : selectedElement != null);
 			} else {
 				addClassButton.setEnabled(false);
 				addModelButton.setEnabled(false);
 				removeButton.setEnabled(false);
 				managePropsButton.setEnabled(false);
-				setModelButton.setEnabled(false);
+				performActionButton.setEnabled(false);
 			}
 		}
 	}

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
@@ -30,6 +31,8 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.io.MatpowerGUIServer;
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.NetworkData;
@@ -38,8 +41,10 @@ import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
+import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
+import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -64,6 +69,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //	private final static String ACTION_DIAGRAM_EDIT = "action.diagram.edit";
 //	private final static String ACTION_DIAGRAM_REMOVE = "action.diagram.remove";
 
+	private final static String ACTION_NETWORK_ADD_ELEMENT = "action.network.add.element";
+	private final static String ACTION_NETWORK_REMOVE_ELEMENT = "action.network.remove.element";
+	
 	private final static String ACTION_MAP_PROPERTIES = "action.map.properties";
 //	private final static String ACTION_PANEL_PROPERTIES = "action.panel.properties";
 	private final static String ACTION_MODEL_DB_PROPERTIES = "action.model.db.properties";
@@ -151,16 +159,19 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_CASE_CALCULATE, "Calculate power flow", "calculator.png", "Calculate power flow"));
 		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_NETWORK_ADD_ELEMENT, "Add a new network element", "plugin_add.png", "Add element"));
+		toolbar.add(createToolbarButton(ACTION_NETWORK_REMOVE_ELEMENT, "Remove the selected network element", "plugin_delete.png", "Remove element"));
+		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_DIAGRAM_ADD, "Create a new diagram sheet", "chart_bar_add.png", "New Diagram"));
 //		toolbar.add(createToolbarButton(ACTION_DIAGRAM_EDIT, "Edit diagram sheet", "chart_bar_edit.png", "Edit Diagram"));
 //		toolbar.add(createToolbarButton(ACTION_DIAGRAM_REMOVE, "Remove diagram", "chart_bar_delete.png", "Remove Diagram"));
-		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 //		toolbar.add(createToolbarButton(ACTION_PANEL_PROPERTIES, "Edit model view", "table_edit.png", "Edit model view"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_LAYOUT, "Change layout", "grid.png", "Change layout"));
 //		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_APP_PROPERTIES, "Edit program settings", "widgets.png", "App settings"));
-		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open Model Database", "database.png", "Model DB"));
+		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
@@ -224,6 +235,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				showModelDBDialog();
 			} else if(e.getActionCommand().equals(ACTION_CASE_CALCULATE)) {
 				calculatePowerFlow();
+			} else if(e.getActionCommand().equals(ACTION_NETWORK_ADD_ELEMENT)) {
+				createNewElement();
+			} else if(e.getActionCommand().equals(ACTION_NETWORK_REMOVE_ELEMENT)) {
+				removeElement();
 			} else if(e.getActionCommand().equals(ACTION_SELECT_PREVIOUS)) {
 				if(getCurrentViewer() != null)
 					getCurrentViewer().getSelectionManager().showPreviousElement();
@@ -379,6 +394,42 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				getCurrentNetwork() },
 				0, true);
 		openProgressDialog(pfcase);
+	}
+	
+	private void createNewElement() {
+		if(getCurrentCase() == null || getCurrentNetwork() == null)
+			return;
+		ModelDBDialog dialog = new ModelDBDialog(this, 
+				getCurrentCase().getModelDB().getData(), getCurrentNetwork());
+		dialog.showDialog(900, 500);
+	}
+	
+	private void removeElement() {
+		if(getCurrentViewer() == null || getCurrentViewer().getSelectionManager().getSelection() == null)
+			return;
+		Object selection = getCurrentViewer().getSelectionManager().getSelection();
+		Vector<AbstractNetworkElement> elements2remove = new Vector<AbstractNetworkElement>();
+		if(selection instanceof AbstractNetworkElement) {
+			elements2remove.add((AbstractNetworkElement) selection);
+		} else if(selection instanceof CombinedNetworkElement<?>) {
+			for (AbstractNetworkElement element : ((CombinedNetworkElement<?>) selection).getNetworkElements()) {
+				elements2remove.add(element);
+			}
+		}
+		ElementSelectionDialog dialog = new ElementSelectionDialog(this, elements2remove, 
+				"Delete Network Elements", "Select the network elements you want to remove from the current network");
+		if(dialog.isCancelPressed())
+			return;
+		if(dialog.getSelectedElements().size() > 0) {
+			getCurrentViewer().getSelectionManager().removeFromHistory(selection);
+			for (AbstractNetworkElement element : dialog.getSelectedElements()) {
+				getCurrentNetwork().removeElement(element);
+//				getCurrentNetwork().fireNetworkElementRemoved(element);
+				getCurrentViewer().getSelectionManager().removeFromHistory(element);
+			}
+			getCurrentNetwork().fireNetworkChanged();
+			getCurrentViewer().getSelectionManager().selectionChanged(null);
+		}
 	}
 	
 	public void showModelDBDialog() {
@@ -563,7 +614,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		return cases.get(casesParent.getSelectedIndex()).getViewer();
 	}
 	
-	private PowerFlowViewer getCurrentViewer() {
+	public PowerFlowViewer getCurrentViewer() {
 		if(casesParent.isEmpty())
 			return null;
 		return cases.get(casesParent.getSelectedIndex()).getViewer().getCurrentViewer();
@@ -595,6 +646,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbarButtons.get(ACTION_DIAGRAM_EDIT).setEnabled(hasDiagrams);
 		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_CASE_CALCULATE).setEnabled(isMatlabEnv && hasViewer);
+		toolbarButtons.get(ACTION_NETWORK_ADD_ELEMENT).setEnabled(hasViewer);
+		toolbarButtons.get(ACTION_NETWORK_REMOVE_ELEMENT).setEnabled(hasViewer
+				&& getCurrentViewer().getSelectionManager().getSelection() != null);
 //		toolbarButtons.get(ACTION_CASE_LAYOUT).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_MODEL_DB_PROPERTIES).setEnabled(getCurrentCase() != null);
 //		toolbarButtons.get(ACTION_PANEL_PROPERTIES).setEnabled(hasViewer);
