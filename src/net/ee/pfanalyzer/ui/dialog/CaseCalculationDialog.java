@@ -2,6 +2,8 @@ package net.ee.pfanalyzer.ui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -15,9 +17,16 @@ import net.ee.pfanalyzer.ui.util.Group;
 
 public class CaseCalculationDialog extends BaseDialog {
 
+	private final static String DEFAULT_TEXT = "Select the desired scenario parameters and press OK.";
+	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.";
+	
+	private List<NetworkParameter> parameters = new ArrayList<NetworkParameter>();
+	private Network network;
+	
 	public CaseCalculationDialog(Frame frame, Network network) {
 		super(frame, "Calculate Power Flow", true);
-		setText("Select the desired scenario parameters and press OK.");
+		this.network = network;
+		setText(DEFAULT_TEXT);
 		JPanel contentPane = new JPanel(new BorderLayout());
 		
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
@@ -31,6 +40,7 @@ public class CaseCalculationDialog extends BaseDialog {
 				continue;
 			NetworkParameter propertyValue = network.getParameterValue(parameter.getID());
 			parameterPanel.addParameter(parameter, propertyValue, paramPanel);
+			parameters.add(parameter);
 		}
 		
 		addOKButton();
@@ -40,4 +50,16 @@ public class CaseCalculationDialog extends BaseDialog {
 		setCenterComponent(contentPane);
 	}
 
+	@Override
+	protected boolean checkInput() {
+		for (NetworkParameter parameter : parameters) {
+			NetworkParameter value = network.getParameterValue(parameter.getID());
+			if(value == null || value.getValue() == null) {
+				setText(ERROR_TEXT);
+				return false;
+			}
+		}
+		setText(DEFAULT_TEXT);
+		return true;
+	}
 }
