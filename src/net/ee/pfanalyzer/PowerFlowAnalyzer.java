@@ -271,7 +271,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void createNewCase() {
-		openCase(new PowerFlowCase());
+		PowerFlowCase caze = new PowerFlowCase();
+		caze.addNetwork(new Network());
+		openCase(caze);
 	}
 	
 	private void openCaseFile() {

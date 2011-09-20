@@ -31,10 +31,6 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 	
 	private ModelDBDialog modelDBDialog;
 
-	public NetworkContainer(PowerFlowCase caze, List<Network> networks) {
-		this(caze);
-	}
-
 	public NetworkContainer(PowerFlowCase caze) {
 		super(new BorderLayout());
 		this.powerFlowCase = caze;
@@ -172,20 +168,25 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		}
 		
 		private void addNetwork() {
+			Network newNetwork = null;
 			try {
-				AddScenarioDialog scenarioSelectionDialog = new AddScenarioDialog(
-						(Frame) SwingUtilities.getWindowAncestor(NetworkContainer.this), 
-						getCurrentViewer().getNetwork());
-				scenarioSelectionDialog.showDialog(-1, -1);
-				if(scenarioSelectionDialog.isCancelPressed())
-					return;
-				Network newNetwork = getPowerFlowCase().createNetworkCopy(getCurrentViewer().getNetwork());
-				if(scenarioSelectionDialog.getSelectedScenarioType() == AddScenarioDialog.SCENARIO_TYPE_SET_PARAMETER) {
-					SetScenarioParametersDialog setParameterDialog = new SetScenarioParametersDialog(
-						(Frame) SwingUtilities.getWindowAncestor(NetworkContainer.this), newNetwork);
-					setParameterDialog.showDialog(-1, -1);
-					if(setParameterDialog.isCancelPressed())
+				if(getCurrentViewer() != null) {
+					AddScenarioDialog scenarioSelectionDialog = new AddScenarioDialog(
+							(Frame) SwingUtilities.getWindowAncestor(NetworkContainer.this), 
+							getCurrentViewer().getNetwork());
+					scenarioSelectionDialog.showDialog(-1, -1);
+					if(scenarioSelectionDialog.isCancelPressed())
 						return;
+					newNetwork = getPowerFlowCase().createNetworkCopy(getCurrentViewer().getNetwork());
+					if(scenarioSelectionDialog.getSelectedScenarioType() == AddScenarioDialog.SCENARIO_TYPE_SET_PARAMETER) {
+						SetScenarioParametersDialog setParameterDialog = new SetScenarioParametersDialog(
+							(Frame) SwingUtilities.getWindowAncestor(NetworkContainer.this), newNetwork);
+						setParameterDialog.showDialog(-1, -1);
+						if(setParameterDialog.isCancelPressed())
+							return;
+					}
+				} else {
+					newNetwork = new Network();
 				}
 				getPowerFlowCase().addNetwork(newNetwork);
 				newNetwork.setName(getScenarioName(newNetwork));
