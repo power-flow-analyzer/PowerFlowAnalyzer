@@ -36,7 +36,7 @@ import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
-import net.ee.pfanalyzer.ui.PowerFlowContainer;
+import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
 import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
@@ -86,7 +86,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private String workingDirectory;
 
 	private boolean largeIcons = Preferences.getBooleanProperty(PROPERTY_UI_LARGE_ICONS);
-	private boolean showSuccessMessage = Preferences.getBooleanProperty(PROPERTY_UI_SHOW_SUCCESS_MESSAGE);
+//	private boolean showSuccessMessage = Preferences.getBooleanProperty(PROPERTY_UI_SHOW_SUCCESS_MESSAGE);
 	
 	private final int environment;
 	
@@ -473,7 +473,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	public void createNewCase(NetworkData networkData) {
 		PowerFlowCase caze = new PowerFlowCase();
-		caze.setNetworkData(networkData);
+		caze.addNetwork(networkData);
 		openCase(caze);
 	}
 	
@@ -485,7 +485,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					JOptionPane.YES_NO_OPTION);
 			if(action == JOptionPane.YES_OPTION) {
 				caze = new PowerFlowCase();
-				caze.setNetworkData(networkData);
+				caze.addNetwork(networkData);
 				openCase(caze);
 			}
 			return;
@@ -501,31 +501,25 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void openCase(PowerFlowCase caze) {
-		Network network = caze.getNetwork();
 		try {
-			if(network.getBusses().size() > 0 && network.getCombinedBusCount() == 0) {
-				int action = JOptionPane.showConfirmDialog(this, 
-						"This network does not contain any location data. " +
-						"Do you want to create default coordinates for all bus nodes?", 
-						"Create default coordinates?", 
-						JOptionPane.YES_NO_OPTION);
-				if(action == JOptionPane.YES_OPTION)
-					network.setDefaultCoordinates();
+			for (Network network : caze.getNetworks()) {
+				if(network.getBusses().size() > 0 && network.getCombinedBusCount() == 0) {
+					int action = JOptionPane.showConfirmDialog(this, 
+							"This network does not contain any location data. " +
+							"Do you want to create default coordinates for all bus nodes?", 
+							"Create default coordinates?", 
+							JOptionPane.YES_NO_OPTION);
+					if(action == JOptionPane.YES_OPTION)
+						network.setDefaultCoordinates();
+				}
 			}
 			success.put(nextCase, true);
-			PowerFlowContainer viewer = new PowerFlowContainer(caze);
-			viewer.getSelectionManager().addActionUpdateListener(this);
+			NetworkContainer viewer = new NetworkContainer(caze);
+			viewer.addActionUpdateListener(this);
 			caze.setViewer(viewer);
 			cases.add(caze);
 			casesParent.addTab(nextCase, viewer);
 			casesParent.selectLastTab();
-			viewer.addActionUpdateListener(this);
-			if(showSuccessMessage) {
-				if(network.isSuccessful())
-					JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation was successful!\n\nTime: " + network.getTime() + " seconds");
-				else
-					JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation was NOT successful!", "Error", JOptionPane.ERROR_MESSAGE);
-			}
 		} catch(Throwable t) {
 			JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation caused an error: " + t, "Error", JOptionPane.ERROR_MESSAGE);
 			t.printStackTrace();
@@ -534,6 +528,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	public String getWorkingDirectory() {
+		if(workingDirectory == null)
+			return System.getProperty("user.home");
 		return workingDirectory;
 	}
 

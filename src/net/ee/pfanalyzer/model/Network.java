@@ -55,8 +55,17 @@ public class Network extends ParameterSupport {
 	public Network copy() throws Exception {
 		NetworkData copiedData = (NetworkData) CaseSerializer.copy(getData());
 		copiedData.getScenario().clear();// remove all scenarios
+		copiedData.setInternalID(-1L);// clear internal ID
 		Network newNetwork = new Network(copiedData);
 		return newNetwork;
+	}
+	
+	public long getInternalID() {
+		return getData().getInternalID();
+	}
+	
+	public void setInternalID(long id) {
+		getData().setInternalID(id);
 	}
 	
 	public void addScenario(Network scenario) {
@@ -64,26 +73,26 @@ public class Network extends ParameterSupport {
 		getScenarios().add(scenario);
 	}
 	
-	public void removeScenario(Network scenario) {
-		Object removed = null;
-		for (int i = 0; i < getScenarios().size(); i++) {
-			if(getScenarios().get(i).getData() == scenario.getData()) {
-				removed = getData().getScenario().remove(i);
-				break;
-			}
-		}
-		if(removed == null)
-			throw new RuntimeException("Scenario data could not be deleted from network");
-		removed = null;
-		for (int i = 0; i < getScenarios().size(); i++) {
-			if(getScenarios().get(i) == scenario) {
-				removed = getScenarios().remove(i);
-				break;
-			}
-		}
-		if(removed == null)
-			throw new RuntimeException("Scenario could not be deleted from network");
-	}
+//	public void removeScenario(Network scenario) {
+//		Object removed = null;
+//		for (int i = 0; i < getScenarios().size(); i++) {
+//			if(getScenarios().get(i).getData() == scenario.getData()) {
+//				removed = getData().getScenario().remove(i);
+//				break;
+//			}
+//		}
+//		if(removed == null)
+//			throw new RuntimeException("Scenario data could not be deleted from network");
+//		removed = null;
+//		for (int i = 0; i < getScenarios().size(); i++) {
+//			if(getScenarios().get(i) == scenario) {
+//				removed = getScenarios().remove(i);
+//				break;
+//			}
+//		}
+//		if(removed == null)
+//			throw new RuntimeException("Scenario could not be deleted from network");
+//	}
 	
 	public ModelClassData getGlobalParameterClass() {
 		return globalParameterClass;

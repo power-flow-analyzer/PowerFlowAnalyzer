@@ -83,6 +83,10 @@ public class ClosableTabbedPane {
 		return getTabbedPane().getSelectedComponent();
 	}
 	
+	public Component getTabComponent(int index) {
+		return getTabbedPane().getComponentAt(index);
+	}
+	
 	public void setSelectedIndex(int index) {
 		if(index < getTabCount())
 			getTabbedPane().setSelectedIndex(index);

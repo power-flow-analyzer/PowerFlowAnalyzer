@@ -1,27 +1,28 @@
 package net.ee.pfanalyzer.model;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
-import net.ee.pfanalyzer.ui.PowerFlowContainer;
+import net.ee.pfanalyzer.ui.NetworkContainer;
 
 public class PowerFlowCase {
 
 	private File caseFile;
 	private CaseData pfCase;
-	private Network network;
+	private List<Network> networks = new ArrayList<Network>();
 	private ModelDB modelDB;
-	private PowerFlowContainer viewer;
+	private NetworkContainer viewer;
+	private long maxNetworkID = 0;
 	
 	public PowerFlowCase() {
 		pfCase = new CaseData();
-		network = new Network();
 		modelDB = new ModelDB();
-		pfCase.setNetwork(network.getData());
 		pfCase.setModelDb(modelDB.getData());
-		updateNetworkData(getNetwork());
+		updateAllNetworkData();
 	}
 	
 	public PowerFlowCase(File caseFile) {
@@ -29,9 +30,10 @@ public class PowerFlowCase {
 		try {
 			CaseSerializer serializer = new CaseSerializer();
 			pfCase = serializer.readCase(caseFile);
-			network = new Network(pfCase.getNetwork());
 			modelDB = new ModelDB(pfCase.getModelDb());
-			updateNetworkData(getNetwork());
+			for (NetworkData netData : pfCase.getNetwork()) {
+				addNetworkInternal(netData);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,35 +51,93 @@ public class PowerFlowCase {
 		return modelDB;
 	}
 	
-	public Network getNetwork() {
-		return network;
+	public List<Network> getNetworks() {
+		return networks;
 	}
 	
-	public PowerFlowContainer getViewer() {
+	public NetworkContainer getViewer() {
 		return viewer;
 	}
 
-	public void setViewer(PowerFlowContainer viewer) {
+	public void setViewer(NetworkContainer viewer) {
 		this.viewer = viewer;
 	}
-
-	public void setNetworkData(NetworkData networkData) {
-		setNetworkData(getNetwork(), networkData);
+	
+	private Network addNetworkInternal(NetworkData netData) {
+		return addNetworkInternal(new Network(netData));
+	}
+	
+	private Network addNetworkInternal(Network network) {
+		networks.add(network);
+		if(network.getInternalID() == -1) {
+			maxNetworkID++;
+			while(getNetwork(maxNetworkID) != null) {
+				maxNetworkID++;
+			}
+			network.setInternalID(maxNetworkID);
+		} else
+			maxNetworkID = Math.max(maxNetworkID, network.getInternalID());
+		updateNetworkData(network);
+		return network;
+	}
+	
+	public Network addNetwork(Network network) {
+		addNetworkInternal(network);
+		pfCase.getNetwork().add(network.getData());
+		return network;
+	}
+	
+	public Network addNetwork(NetworkData netData) {
+		Network network = addNetworkInternal(netData);
+		pfCase.getNetwork().add(netData);
+		return network;
+	}
+	
+	public void removeNetwork(Network network) {
+		for (int i = 0; i < getNetworks().size(); i++) {
+			if(getNetworks().get(i).getInternalID() == network.getInternalID()) {
+				getNetworks().remove(i);
+				break;
+			}
+		}
+		removeNetwork(network.getData());
+	}
+	
+	private void removeNetwork(NetworkData network) {
+		for (int i = 0; i < pfCase.getNetwork().size(); i++) {
+			if(pfCase.getNetwork().get(i).getInternalID() == network.getInternalID()) {
+				pfCase.getNetwork().remove(i);
+				break;
+			}
+		}
+	}
+	
+	public Network getNetwork(long networkID) {
+		for (Network network : getNetworks()) {
+			if(network.getInternalID() == networkID)
+				return network;
+		}
+		return null;
 	}
 
 	public void setNetworkData(Network network, NetworkData networkData) {
-		if(getNetwork() == network)
-			pfCase.setNetwork(networkData);
+		removeNetwork(networkData);
+		pfCase.getNetwork().add(networkData);
 		network.setData(networkData);
 		updateNetworkData(network);
 //		getNetwork().fireNetworkChanged();
 	}
 	
+	private void updateAllNetworkData() {
+		for (Network net : getNetworks())
+			updateNetworkData(net);
+	}
+	
 	private void updateNetworkData(Network network) {
+//		System.out.println("case: setting network data with " + network.getElements().size() + " elements");
 		// setting network class containing global parameters
 		network.setGlobalParameterClass(getModelDB().getNetworkClass());
 		// setting model references in network elements
-//		System.out.println("case: setting network data with " + getNetwork().getElements().size() + " elements");
 		for (AbstractNetworkElement element : network.getElements()) {
 			ModelData model = getModelDB().getModel(element.getModelID());
 //			System.out.println("    model id: " + element.getModelID());
@@ -89,13 +149,19 @@ public class PowerFlowCase {
 			updateNetworkData(scenario);
 		}
 	}
-	
-	public Network createScenario(Network network) throws Exception {
-		Network scenario = network.copy();
-		network.addScenario(scenario);
-		updateNetworkData(scenario);
-		return scenario;
+
+	public Network createNetworkCopy(Network network) throws Exception {
+		Network newNet = network.copy();
+		updateNetworkData(newNet);
+		return newNet;
 	}
+	
+//	public Network createScenario(Network network) throws Exception {
+//		Network scenario = network.copy();
+//		network.addScenario(scenario);
+//		updateNetworkData(scenario);
+//		return scenario;
+//	}
 	
 	public void save() {
 		try {

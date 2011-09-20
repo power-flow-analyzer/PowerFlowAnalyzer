@@ -10,7 +10,7 @@
                 <option value="0" label="No" ID="0"/>
                 <display/>
             </parameter>
-            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="result">
+            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="scenario">
                 <option value="PF" label="AC Standard" ID="PF"/>
                 <option value="OPF" label="AC Optimal" ID="OPF"/>
                 <option value="UOPF" label="AC Optimal with unit-decommitment heuristic" ID="UOPF"/>

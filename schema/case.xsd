@@ -13,7 +13,7 @@
     <complexType name="CaseData">
         <sequence>
             <element name="model-db" type="mpui:ModelDBData" minOccurs="1" maxOccurs="1"/>
-            <element name="network" type="mpui:NetworkData" minOccurs="1" maxOccurs="1"/>
+            <element name="network" type="mpui:NetworkData" minOccurs="1" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="version" type="string" default="1.0.0"/>
     </complexType>

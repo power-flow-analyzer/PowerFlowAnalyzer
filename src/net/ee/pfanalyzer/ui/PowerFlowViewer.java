@@ -49,9 +49,9 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
 	
-	public PowerFlowViewer(PowerFlowCase caze) {
-		this(caze, caze.getNetwork());
-	}
+//	public PowerFlowViewer(PowerFlowCase caze) {
+//		this(caze, caze.getNetwork());
+//	}
 	
 	public PowerFlowViewer(PowerFlowCase caze, Network network) {
 		super(new BorderLayout());
@@ -222,10 +222,12 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 
 	public void addActionUpdateListener(IActionUpdater listener) {
 		actionUpdater.add(listener);
+		getSelectionManager().addActionUpdateListener(listener);
 	}
 	
 	public void removeActionUpdateListener(IActionUpdater listener) {
 		actionUpdater.remove(listener);
+		getSelectionManager().removeActionUpdateListener(listener);
 	}
 	
 	private void fireActionUpdate() {
