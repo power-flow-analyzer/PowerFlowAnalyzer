@@ -169,12 +169,12 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				try {
 					changeZoom();
 					if(lastX > -1 && lastY > -1) {
-						double diffLat = getLatitudeDifference(lastX, e.getX());
-						minLatitude += diffLat;
-						maxLatitude += diffLat;
-						double diffLong = getLongitudeDifference(lastY, e.getY());
-						minLongitude -= diffLong;
-						maxLongitude -= diffLong;
+						double diffLat = getLatitudeDifference(lastY, e.getY());
+						minLatitude -= diffLat;
+						maxLatitude -= diffLat;
+						double diffLong = getLongitudeDifference(lastX, e.getX());
+						minLongitude += diffLong;
+						maxLongitude += diffLong;
 						initializeInternalCoordinates();
 						repaint();
 					}
@@ -239,12 +239,12 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 						int y = e.getY();
 						int centerX = getWidth()/2;
 						int centerY = getHeight()/2;
-						double diffLat = getLatitudeDifference(x, centerX) * factor;
-						double diffLong = getLongitudeDifference(y, centerY) * factor;
-						minLatitude += diffLat;
-						maxLatitude += diffLat;
-						minLongitude -= diffLong;
-						maxLongitude -= diffLong;
+						double diffLat = getLatitudeDifference(y, centerY) * factor;
+						double diffLong = getLongitudeDifference(x, centerX) * factor;
+						minLatitude -= diffLat;
+						maxLatitude -= diffLat;
+						minLongitude += diffLong;
+						maxLongitude += diffLong;
 					}
 					initializeInternalCoordinates();
 					repaint();
@@ -263,24 +263,24 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		this.controller = controller;
 	}
 	
-	private double getLatitudeDifference(int x1, int x2) {
-		int diffX = x1 - x2;
+	private double getLatitudeDifference(int y1, int y2) {
+		int diffY = y1 - y2;
 		double latitudeDiff = maxLatitude - minLatitude;
-		return diffX * latitudeDiff / getWidth();
+		return diffY * latitudeDiff / getHeight();
 	}
 	
-	private double getLongitudeDifference(int y1, int y2) {
-		int diffY = y1 - y2;
+	private double getLongitudeDifference(int x1, int x2) {
+		int diffX = x1 - x2;
 		double longitudeDiff = maxLongitude - minLongitude;
-		return diffY * longitudeDiff / getHeight();
+		return diffX * longitudeDiff / getWidth();
 	}
 	
 	private void initializeInternalCoordinates() {
 		if(perfectFit == false) {
-			internalMinX = converter.getX(minLatitude);
-			internalMaxX = converter.getX(maxLatitude);
-			internalMinY = converter.getY(minLongitude);
-			internalMaxY = converter.getY(maxLongitude);
+			internalMinX = converter.getX(minLongitude);
+			internalMaxX = converter.getX(maxLongitude);
+			internalMinY = converter.getY(minLatitude);
+			internalMaxY = converter.getY(maxLatitude);
 		}
 		for (int i = 0; i < data.getBusses().size(); i++) {
 			Bus bus = data.getBusses().get(i);
@@ -291,8 +291,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				internalBusCoords.put(bus.getBusNumber(), new int[]{-1, -1});
 				continue;
 			}
-			int x = converter.getX(lattitude);
-			int y = converter.getY(longitude);
+			int x = converter.getX(longitude);
+			int y = converter.getY(lattitude);
 			internalBusCoords.put(bus.getBusNumber(), new int[]{x, y});
 			if(perfectFit) {
 				if(i == 0) {// initialize min/max values
