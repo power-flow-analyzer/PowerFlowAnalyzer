@@ -21,6 +21,7 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -54,9 +55,9 @@ import net.ee.pfanalyzer.ui.dialog.BaseDialog;
 
 public class ModelDBDialog extends BaseDialog implements PropertyChangeListener, INetworkElementSelectionListener {
 	
-	private final static String INTERNAL_MODEL_DB_DEV_FILE = 
-		"C:/Uni/Diplomarbeit/workspace_matlab/PowerFlowAnalyzer/src"
-		+ CaseSerializer.INTERNAL_MODEL_DB_INPUT_FILE;
+//	private final static String INTERNAL_MODEL_DB_DEV_FILE = 
+//		"C:/Uni/Diplomarbeit/workspace_matlab/PowerFlowAnalyzer/src"
+//		+ CaseSerializer.INTERNAL_MODEL_DB_INPUT_FILE;
 	
 //	private ElementPanelController controller;
 	
@@ -471,14 +472,38 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		}
 	}
 	
+	private static File INPUT_FILE;
+	
 	public static void main(String[] args) {
+		startAsApplication(args, true);
+	}
+	
+	public static void startAsApplication(String[] args, final boolean exitJava) {
+		if(args == null || args.length == 0 || args[0] == null || args[0].trim().isEmpty()) {
+			JFileChooser chooser = new JFileChooser();
+			int action = chooser.showOpenDialog(null);
+			if(action == JFileChooser.APPROVE_OPTION)
+				INPUT_FILE = chooser.getSelectedFile();
+			else
+				return;
+		} else if(args.length > 1 && args[1] != null && args[1].trim().isEmpty() == false){
+			INPUT_FILE = new File(args[1], args[0]);
+		} else
+			INPUT_FILE = new File(args[0]);
+		if(INPUT_FILE.exists() == false) {
+			System.err.println("File cannot be found: " + INPUT_FILE);
+			return;
+		}
 		try {
 			final CaseSerializer serializer = new CaseSerializer();
-			final CaseData pfCase = serializer.readCase(new File(INTERNAL_MODEL_DB_DEV_FILE));
+			final CaseData pfCase = serializer.readCase(INPUT_FILE);
 			ModelDBData db = pfCase.getModelDb();
 			ModelDBDialog dialog = new ModelDBDialog(null, db) {
 				protected void okPressed() {
-					System.exit(0);
+					if(exitJava)
+						System.exit(0);
+					else
+						dispose();
 				}
 			};
 			JButton saveButton = new JButton("Save DB");
@@ -486,8 +511,9 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						serializer.writeCase(pfCase, new File(INTERNAL_MODEL_DB_DEV_FILE));
+						serializer.writeCase(pfCase, INPUT_FILE);
 					} catch (Exception e2) {
+						System.err.println("Cannot write file: " + INPUT_FILE);
 						e2.printStackTrace();
 					}
 				}
@@ -495,11 +521,15 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			dialog.addBottomComponent(saveButton);
 			dialog.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
-					System.exit(0);
+					if(exitJava)
+						System.exit(0);
+//					else
+//						dispose();
 				}
 			});
 			dialog.showDialog(900, 500);
 		} catch (Exception e) {
+			System.err.println("Cannot read file: " + INPUT_FILE);
 			e.printStackTrace();
 		}
 	}
