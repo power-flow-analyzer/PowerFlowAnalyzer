@@ -109,7 +109,7 @@ public class ClosableTabbedPane {
 			closeTab(getSelectedIndex());
 	}
 	
-	private void closeTab(int index) {
+	public void closeTab(int index) {
 		if(getTabListener() != null) {
 			if(getTabListener().tabClosing(index)) {
 				getTabbedPane().remove(index);

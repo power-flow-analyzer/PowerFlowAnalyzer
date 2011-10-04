@@ -39,8 +39,20 @@ public abstract class ParameterNumberSpinnerField extends ParameterValuePanel im
 			if(Double.isNaN(max) == false)
 				model.setMaximum(new Double(max));
 			model.setStepSize(new Double(getIncrement()));
-			spinner.setEditor(new JSpinner.NumberEditor(spinner, getDecimalFormatPattern()));
+			spinner.setEditor(new JSpinner.NumberEditor(spinner, getNumberDecimalFormatPattern()));
 		}
+	}
+	
+	protected String getNumberDecimalFormatPattern() {
+		String pattern = "";
+		for (int i = 0; i < getDecimalFormatPattern().length(); i++) {
+			char c = getDecimalFormatPattern().charAt(i);
+			if(c == '%') {
+				pattern += "##";
+			} else
+				pattern += c;
+		}
+		return pattern;
 	}
 	
 	protected JComponent getValuePanel() {

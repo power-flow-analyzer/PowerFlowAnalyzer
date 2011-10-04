@@ -24,6 +24,7 @@ import net.ee.pfanalyzer.preferences.Preferences;
 
 public class FileSelectionPanel extends JPanel {
 	private JComboBox fileLocationBox;
+	private JButton browseButton;
 	private FileFilter fileFilter;
 	private Vector<String> files = new Vector<String>();
 	private String propertyKey;
@@ -53,7 +54,7 @@ public class FileSelectionPanel extends JPanel {
 			}
 		});
 		add(fileLocationBox, BorderLayout.CENTER);
-		JButton browseButton = new JButton("Browse...");
+		browseButton = new JButton("Browse...");
 		browseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				openFile();
@@ -199,6 +200,12 @@ public class FileSelectionPanel extends JPanel {
 			}
 		}
 		return -1;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		fileLocationBox.setEnabled(enabled);
+		browseButton.setEnabled(enabled);
 	}
 	
 	class PathRenderer extends DefaultListCellRenderer implements ListCellRenderer {

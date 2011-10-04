@@ -18,9 +18,9 @@ public class PowerFlowCase {
 	private NetworkContainer viewer;
 	private long maxNetworkID = 0;
 	
-	public PowerFlowCase() {
+	public PowerFlowCase(ModelDB modelDB) {
 		pfCase = new CaseData();
-		modelDB = new ModelDB();
+		this.modelDB = modelDB;
 		pfCase.setModelDb(modelDB.getData());
 		updateAllNetworkData();
 	}

@@ -18,7 +18,7 @@ public class ParameterDoubleField extends ParameterNumberSpinnerField {
 
 	@Override
 	protected String getTextValue(Object value) {
-		return new DecimalFormat(getDecimalFormatPattern(), 
+		return new DecimalFormat(getNumberDecimalFormatPattern(), 
 				new DecimalFormatSymbols(Locale.ENGLISH)).format(((Double) value).doubleValue());
 	}
 }

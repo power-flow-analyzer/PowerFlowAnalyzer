@@ -121,6 +121,8 @@ public class ModelDBUtils {
 	}
 	
 	public static String getParameterDisplayValue(ParameterSupport support, NetworkParameter paramDef) {
+		if(support == null)
+			return "";
 		String parameterID = paramDef.getID();
 		NetworkParameterType type = paramDef.getType();
 		if(NetworkParameterValueRestriction.LIST.equals(paramDef.getRestriction())) {

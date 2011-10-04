@@ -22,7 +22,6 @@ import net.ee.pfanalyzer.model.data.ModelDBData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.ObjectFactory;
-import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 
 import org.xml.sax.InputSource;
 
@@ -126,10 +125,21 @@ public class CaseSerializer {
 		return writer.toString();
 	}
 	
+	public static ModelDBData readModelDB(File f) throws IllegalDataException {
+		try {
+			CaseSerializer serializer = new CaseSerializer();
+			CaseData pfCase = serializer.readCase(f);
+			updateParents(pfCase);
+			return pfCase.getModelDb();
+		} catch (Exception e) {
+			throw new IllegalDataException("Cannot load internal model DB", e);
+		}
+	}
+	
 	public static ModelDBData readInternalModelDB() throws IllegalDataException {
 		try {
 			CaseSerializer serializer = new CaseSerializer();
-			CaseData pfCase = serializer.readCase(ModelDBDialog.class.getResourceAsStream(
+			CaseData pfCase = serializer.readCase(CaseSerializer.class.getResourceAsStream(
 					INTERNAL_MODEL_DB_INPUT_FILE));
 			updateParents(pfCase);
 			return pfCase.getModelDb();

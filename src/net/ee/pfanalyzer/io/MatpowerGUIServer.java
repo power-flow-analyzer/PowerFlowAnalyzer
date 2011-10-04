@@ -88,9 +88,9 @@ public class MatpowerGUIServer implements Runnable, IConnectionConstants {
 						NetworkData network = netImport.network;
 						if(network != null) {
 							if(IMPORT_TYPE_NEW_CASE_DATA_VALUE.equals(netImport.importType))
-								application.createNewCase(network);
+								application.updateNetwork(network, true);
 							else if(IMPORT_TYPE_REPLACE_CASE_DATA_VALUE.equals(netImport.importType))
-								application.updateNetwork(network);
+								application.updateNetwork(network, false);
 						}
 						out.close();
 					} else if(action.equals(SET_WORKING_DIR_CONNECTION)) {

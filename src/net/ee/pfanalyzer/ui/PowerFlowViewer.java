@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,6 +43,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private List<DiagramSheet> diagrams = new ArrayList<DiagramSheet>();
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
+	private JLabel networkDescriptionLabel = new JLabel();
 	
 	public PowerFlowViewer(PowerFlowCase caze, Network network) {
 		super(new BorderLayout());
@@ -67,8 +69,11 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		verticalSplitPane.setOneTouchExpandable(true);
 		verticalSplitPane.setDividerLocation(450);
 		verticalSplitPane.setDividerSize(10);
+		add(networkDescriptionLabel, BorderLayout.NORTH);
 		add(verticalSplitPane, BorderLayout.CENTER);
 		
+		networkDescriptionLabel.setText(network.getDescription());
+		networkDescriptionLabel.setFont(networkDescriptionLabel.getFont().deriveFont(14f));
 //		dataPanel.add(diagramTabs.getComponent(), BorderLayout.CENTER);
 		
 		addTable("Bus Data", "bus");
@@ -165,6 +170,10 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 
 	public ElementPanelController getPanelController() {
 		return panelController;
+	}
+	
+	public void updateNetworkDescription() {
+		networkDescriptionLabel.setText(network.getDescription());
 	}
 	
 	public NetworkElementSelectionManager getSelectionManager() {

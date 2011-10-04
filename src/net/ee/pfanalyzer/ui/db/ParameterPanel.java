@@ -121,21 +121,11 @@ public class ParameterPanel extends ParameterContainer {
 	
 	abstract class ParameterTextBox extends JTextField implements ActionListener, KeyListener {
 		
-		private String parameterID;
-//		private NetworkParameter parameter;
 		
 		public ParameterTextBox(String parameterID) {
 			super();
-			this.parameterID = parameterID;
 			initField();
 		}
-		
-//		public ParameterTextField(NetworkParameter parameter) {
-//			super();
-//			this.parameter = parameter;
-//			this.parameterID = parameter.getID();
-//			initField();
-//		}
 		
 		private void initField() {
 			if(getParameterValue() != null)
@@ -158,10 +148,6 @@ public class ParameterPanel extends ParameterContainer {
 		
 		protected abstract String getParameterValue();
 		
-		public String getParameterID() {
-			return parameterID;
-		}
-
 		@Override
 		public void keyReleased(KeyEvent e) {
 			setParameterValue(getText());

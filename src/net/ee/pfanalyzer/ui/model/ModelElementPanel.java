@@ -19,6 +19,7 @@ import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.parameter.IParameterMasterElement;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
@@ -135,7 +136,10 @@ public class ModelElementPanel extends ParameterContainer {
 				}
 			}
 		}
-		super.addParameter(paramDef, propertyValue, panel);
+		// hide empty values
+		String displayValue = ModelDBUtils.getParameterDisplayValue(element, paramDef);
+		if(isEditable() || displayValue != null && displayValue.length() > 0)
+			super.addParameter(paramDef, propertyValue, panel);
 	}
 	
 	protected void addFlags(AbstractNetworkElement childData) {

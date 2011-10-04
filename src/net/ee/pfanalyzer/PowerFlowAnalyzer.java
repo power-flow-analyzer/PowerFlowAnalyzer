@@ -32,7 +32,9 @@ import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.io.MatpowerGUIServer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.CaseSerializer;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
+import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.NetworkData;
@@ -43,8 +45,9 @@ import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
-import net.ee.pfanalyzer.ui.dialog.CaseSelectionDialog;
+import net.ee.pfanalyzer.ui.dialog.OpenCaseDialog;
 import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
+import net.ee.pfanalyzer.ui.dialog.NewCaseDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -87,7 +90,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	private Map<String, Boolean> success = new HashMap<String, Boolean>();
 	private ClosableTabbedPane casesParent;
-	private CaseSelectionDialog caseDialog;
+	private OpenCaseDialog caseDialog;
 	String nextCase;
 	private List<PowerFlowCase> cases = new ArrayList<PowerFlowCase>();
 	private Map<String, JButton> toolbarButtons = new HashMap<String, JButton>();
@@ -137,7 +140,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			@Override
 			public void tabClosed(int tabIndex) {
 				NetworkContainer container = cases.get(tabIndex).getViewer();
-				container.getSelectionManager().removeActionUpdateListener(PowerFlowAnalyzer.this);
+				if(container.getSelectionManager() != null)
+					container.getSelectionManager().removeActionUpdateListener(PowerFlowAnalyzer.this);
 				container.dispose();
 				cases.remove(tabIndex);
 				updateToolbarButtons();
@@ -285,38 +289,60 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		return button;
 	}
 	
-	private void createNewCase() {
-		PowerFlowCase caze = new PowerFlowCase();
-		caze.addNetwork(new Network());
+	private boolean createNewCase() {
+		NewCaseDialog dialog = new NewCaseDialog(this);
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())// cancel pressed
+			return false;
+		int inputSource = dialog.getSelectedParameterSource();
+		ModelDB database = null;
+		if(inputSource == 0)
+			database = new ModelDB();
+		else if(inputSource == 1)
+			database = new ModelDB(CaseSerializer.readModelDB(new File(dialog.getSelectedParameterFile())));
+		if(database == null)
+			return false;
+		PowerFlowCase caze = new PowerFlowCase(database);
+//		caze.addNetwork(new Network());
 		openCase(caze);
+		return true;
+	}
+	
+	public void importMatpowerCase(String inputFile) {
+		String pfcase = findName(inputFile);
+		nextCase = pfcase;
+		File caseFile = new File(inputFile);
+		openProgressDialog(pfcase);
+		callMatlabCommand("import_matpower_case", new Object[] { caseFile.getAbsolutePath() }, 0, true);
+	}
+	
+	public void importFromScript(String inputFile) {
+		String pfcase = findName(inputFile);
+		nextCase = pfcase;
+		File caseFile = new File(inputFile);
+		String path = caseFile.getParentFile().getAbsolutePath();
+		// change working directory in matlab if necessary
+		if(path.equals(workingDirectory) == false) {
+			callMatlabCommand("cd", new Object[] { path }, 0, true);
+		}
+		String mFile = caseFile.getName().substring(0, caseFile.getName().lastIndexOf(".m"));
+		callMatlabCommand(mFile, new Object[0], 0, true);
+		openProgressDialog(pfcase);
 	}
 	
 	private void openCaseFile() {
-		caseDialog = new CaseSelectionDialog(this, getWorkingDirectory());
+		caseDialog = new OpenCaseDialog(this);
 		caseDialog.showDialog(-1, -1);
-		if(caseDialog.isCancelPressed())// cancel pressed
+		if(caseDialog.isCancelPressed()) { // cancel pressed
+			caseDialog = null;
 			return;
+		}
 		String inputFile = caseDialog.getSelectedInputFile();
 		String pfcase = findName(inputFile);
 		nextCase = pfcase;
 		File caseFile = new File(inputFile);
-		int inputSource = caseDialog.getSelectedInputSource();
-//		boolean showProgress = true;
-		if(inputSource == CaseSelectionDialog.CASE_FILE_INPUT_SOURCE) {
-			openCase(new PowerFlowCase(caseFile));
-		} else if(inputSource == CaseSelectionDialog.MATPOWER_CASE_INPUT_SOURCE) {
-			callMatlabCommand("import_matpower_case", new Object[] { caseFile.getAbsolutePath() }, 0, true);
-		} else if(inputSource == CaseSelectionDialog.MATLAB_SCRIPT_INPUT_SOURCE) {
-			String path = caseFile.getParentFile().getAbsolutePath();
-			// change working directory in matlab if necessary
-			if(path.equals(workingDirectory) == false) {
-				callMatlabCommand("cd", new Object[] { path }, 0, true);
-			}
-			String mFile = caseFile.getName().substring(0, caseFile.getName().lastIndexOf(".m"));
-			callMatlabCommand(mFile, new Object[0], 0, true);
-		}
+		openCase(new PowerFlowCase(caseFile));
 		caseDialog = null;
-//		if(showProgress)
 		openProgressDialog(pfcase);
 	}
 	
@@ -324,7 +350,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		if(getCurrentCase().getCaseFile() == null) {
 			JFileChooser fileChooser = new JFileChooser(getWorkingDirectory());
 			fileChooser.setAcceptAllFileFilterUsed(true);
-			fileChooser.setFileFilter(CaseSelectionDialog.CASE_FILE_FILTER);
+			fileChooser.setFileFilter(OpenCaseDialog.CASE_FILE_FILTER);
 			int action = fileChooser.showSaveDialog(this);
 			if(action == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = fileChooser.getSelectedFile();
@@ -501,71 +527,44 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		PowerFlowAnalyzer.this.success.put(nextCase, false);
 	}
 	
-//	public void setPowerFlowData(final Network data) {
-//		try {
-//			PowerFlowAnalyzer.this.success.put(nextCase, true);
-//			PowerFlowAnalyzer.this.data.put(nextCase, data);
-//			PowerFlowViewer viewer = new PowerFlowViewer(data);
-//			cases.add(viewer);
-//			casesParent.addTab(nextCase, viewer.getContentPane());
-//			casesParent.selectLastTab();
-//			viewer.addActionUpdateListener(this);
-////			if(powerFlowCase != null)
-////				powerFlowCase.setNetworkData(data.getData());
-//			if(showSuccessMessage) {
-//				if(data.isSuccessful())
-//					JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation was successful!\n\nTime: " + data.getTime() + " seconds");
-//				else
-//					JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation was NOT successful!", "Error", JOptionPane.ERROR_MESSAGE);
-//			}
-//		} catch(Throwable t) {
-//			JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation caused an error: " + t, "Error", JOptionPane.ERROR_MESSAGE);
-//			t.printStackTrace();
-//		}
-//		updateToolbarButtons();
-//	}
-	
-	public void createNewCase(NetworkData networkData) {
-		PowerFlowCase caze = new PowerFlowCase();
-		caze.addNetwork(networkData);
-		openCase(caze);
-	}
-	
-	public void updateNetwork(NetworkData networkData) {
-		PowerFlowCase caze = getCurrentCase();
-		if(caze == null) {
-			int action = JOptionPane.showConfirmDialog(this, 
-					"Do you want to import the network data as a new case?", "Create new case?", 
-					JOptionPane.YES_NO_OPTION);
-			if(action == JOptionPane.YES_OPTION) {
-				caze = new PowerFlowCase();
-				caze.addNetwork(networkData);
-				openCase(caze);
+	public void updateNetwork(NetworkData networkData, boolean createNewNetwork) {
+		try {
+			PowerFlowCase caze = getCurrentCase();
+			if(caze == null) {
+				int action = JOptionPane.showConfirmDialog(this, 
+						"Do you want to import the network data as a new case?", "Create new case?", 
+						JOptionPane.YES_NO_OPTION);
+				if(action == JOptionPane.YES_OPTION) {
+					createNewCase();
+					caze = getCurrentCase();
+				}
+				if(caze == null)
+					return;
 			}
-			return;
+			if(createNewNetwork) {
+				Network network = caze.addNetwork(networkData);
+				checkForMissingCoordinates(network);
+				caze.getViewer().updateActions();
+			} else {// update network
+				Network network = getCurrentNetwork();
+				if(network == null)
+					return;
+				caze.setNetworkData(network, networkData);
+				network.fireNetworkChanged();
+				caze.getViewer().getSelectionManager().clearHistory();
+			}
+			success.put(nextCase, true);
+		} catch(Throwable t) {
+			JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation caused an error: " + t, "Error", JOptionPane.ERROR_MESSAGE);
+			t.printStackTrace();
 		}
-		Network network = getCurrentNetwork();
-		if(network == null)
-			return;
-		caze.setNetworkData(network, networkData);
-		network.fireNetworkChanged();
-		caze.getViewer().getSelectionManager().clearHistory();
-		success.put(nextCase, true);
 		updateToolbarButtons();
 	}
 	
 	private void openCase(PowerFlowCase caze) {
 		try {
 			for (Network network : caze.getNetworks()) {
-				if(network.getBusses().size() > 0 && network.getCombinedBusCount() == 0) {
-					int action = JOptionPane.showConfirmDialog(this, 
-							"This network does not contain any location data. " +
-							"Do you want to create default coordinates for all bus nodes?", 
-							"Create default coordinates?", 
-							JOptionPane.YES_NO_OPTION);
-					if(action == JOptionPane.YES_OPTION)
-						network.setDefaultCoordinates();
-				}
+				checkForMissingCoordinates(network);
 			}
 			success.put(nextCase, true);
 			NetworkContainer viewer = new NetworkContainer(caze);
@@ -581,6 +580,18 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		updateToolbarButtons();
 	}
 	
+	private void checkForMissingCoordinates(Network network) {
+		if(network.getBusses().size() > 0 && network.getCombinedBusCount() == 0) {
+			int action = JOptionPane.showConfirmDialog(this, 
+					"This network does not contain any location data. " +
+					"Do you want to create default coordinates for all bus nodes?", 
+					"Create default coordinates?", 
+					JOptionPane.YES_NO_OPTION);
+			if(action == JOptionPane.YES_OPTION)
+				network.setDefaultCoordinates();
+		}
+	}
+	
 	public String getWorkingDirectory() {
 		if(workingDirectory == null)
 			return System.getProperty("user.home");
@@ -593,8 +604,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 
 	public void setWorkingDirectory(String workingDirectory, boolean signalToUser) {
 		this.workingDirectory = workingDirectory;
-		if(caseDialog != null)
-			caseDialog.setWorkingDirectory(workingDirectory);
+		if(getCurrentContainer() != null)
+			getCurrentContainer().setWorkingDirectory(workingDirectory);
 //		else if(signalToUser)
 //			JOptionPane.showMessageDialog(this, "Matlab current folder changed to:\n" + workingDirectory);
 	}
