@@ -26,18 +26,18 @@ end
 % create busses
 for i=1:length(mpc.bus(:,1))
     % erstelle neuen Bus
-    jbus = create_bus(jnetwork, mpc.bus(i,:), i - 1);
+    jbus = create_bus(jnetwork, mpc.bus(i,:));
     % füge neuen Bus dem Netzwerk hinzu
     jnetwork.addElement(jbus);
 end
 % create branches
 for i=1:length(mpc.branch(:,1))
-    jnetwork.addElement(create_branch(jnetwork, mpc.branch(i,:), i - 1));
+    jnetwork.addElement(create_branch(jnetwork, mpc.branch(i,:)));
 end
 % create generators
 for i=1:length(mpc.gen(:,1))
     jnetwork.addElement(create_generator(...
-            jnetwork, mpc.gen(i,:), mpc.gencost(i,:), i - 1));
+            jnetwork, mpc.gen(i,:), mpc.gencost(i,:)));
 end
 
 end

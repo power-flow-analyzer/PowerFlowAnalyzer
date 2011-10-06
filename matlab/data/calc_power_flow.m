@@ -13,14 +13,18 @@ algo = jnetwork.getTextParameter('POWER_FLOW_ALGO');
 if strcmp(algo, 'PF')
     mpc2 = runpf(mpc, mpopt);
 elseif strcmp(algo, 'OPF')
+    check_gencost(mpc.gencost);
     mpc2 = runopf(mpc, mpopt);
 elseif strcmp(algo, 'UOPF')
+    check_gencost(mpc.gencost);
     mpc2 = runuopf(mpc, mpopt);
 elseif strcmp(algo, 'DCPF')
     mpc2 = rundcpf(mpc, mpopt);
 elseif strcmp(algo, 'DCOPF')
+    check_gencost(mpc.gencost);
     mpc2 = rundcopf(mpc, mpopt);
 elseif strcmp(algo, 'DUOPF')
+    check_gencost(mpc.gencost);
     mpc2 = runduopf(mpc, mpopt);
 end
 
