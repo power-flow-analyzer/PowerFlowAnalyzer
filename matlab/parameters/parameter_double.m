@@ -3,6 +3,6 @@ function [ value ] = parameter_double( ...
 %PARAMETER_DOUBLE Summary of this function goes here
 %   Detailed explanation goes here
 
-value = network_element.getDoubleParameter(parameter_name);
+value = network_element.getDoubleParameter(parameter_name, 0);
 end
 

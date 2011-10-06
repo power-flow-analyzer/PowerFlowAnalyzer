@@ -3,6 +3,6 @@ function [ value ] = parameter_int( ...
 %PARAMETER_INT Summary of this function goes here
 %   Detailed explanation goes here
 
-value = network_element.getIntParameter(parameter_name);
+value = network_element.getIntParameter(parameter_name, 0);
 end
 
