@@ -46,6 +46,11 @@ public abstract class ParameterSupport {
 		return null;
 	}
 	
+	public boolean hasParameterValue(String id) {
+		NetworkParameter parameter = getParameterValue(id); 
+		return parameter != null && getParameterValue(id).getValue() != null;
+	}
+	
 	public int getIntParameter(String name, int defaultValue) {
 		Integer value = getIntParameter(name);
 		if(value == null)
