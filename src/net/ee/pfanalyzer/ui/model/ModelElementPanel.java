@@ -127,7 +127,7 @@ public class ModelElementPanel extends ParameterContainer {
 				int busNumber = element.getIntParameter(propertyValue.getID(), -1);
 				Bus bus = null;
 				if(busNumber != -1)
-					bus = element.getNetwork().getBus(busNumber);
+					bus = element.getNetwork().getBus(busNumber);// TODO verallgemeinern
 				if(bus != null && bus != element) {
 					panel.add(new JLabel(getLabel(paramDef) + ": "));
 					panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
@@ -138,7 +138,7 @@ public class ModelElementPanel extends ParameterContainer {
 		}
 		// hide empty values
 		String displayValue = ModelDBUtils.getParameterDisplayValue(element, paramDef);
-		if(isEditable() || displayValue != null && displayValue.length() > 0)
+		if(isEditable() || element == null || displayValue != null && displayValue.length() > 0)
 			super.addParameter(paramDef, propertyValue, panel);
 	}
 	
