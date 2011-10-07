@@ -62,15 +62,15 @@ public class ParameterContainer extends JPanel {
 		Group paramPanel = new Group("Parameters of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
 		Group resultPanel = new Group("Results of \"" + element.getLabel() + "\"");new JPanel(new GridLayout(0, 2));
 		for (NetworkParameter property : element.getParameter()) {
-			if(isShowNetworkParameters() == false && element.getParent() == null)
-				continue;// do not show network/global parameters
+			if(element != master && property.isInherit() == false) // && element.getParent() == null 
+				continue;// do not show parameters which must not be inherited
 			NetworkParameter propertyValue = parameterMaster.getParameterValue(property.getID());//ModelDBUtils.getParameterValue(master, property.getID());
 			boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(property.getPurpose());
-			boolean isScenarioParam = NetworkParameterPurposeRestriction.SCENARIO.equals(property.getPurpose());
-			if(isScenarioParam && element != master) {
-				parameterAdded(property);
-				continue;
-			}
+//			boolean isScenarioParam = NetworkParameterPurposeRestriction.SCENARIO.equals(property.getPurpose());
+//			if(isScenarioParam && element != master) {
+//				parameterAdded(property);
+//				continue;
+//			}
 			if(isShowResultsWhenEditing() == false && isResult && isEditable()) {
 				parameterAdded(property);
 				continue;// do not show results in editing mode
