@@ -288,7 +288,10 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 				addModelButton.setEnabled(false);
 				removeButton.setEnabled(true);
 				managePropsButton.setEnabled(true);
-				performActionButton.setEnabled(network != null ? true : selectedElement != null);
+				performActionButton.setEnabled(network != null ? getSelectedElement() != null 
+						&& ModelDBUtils.isNetworkClass(getSelectedElement()) : 
+					selectedElement != null && getSelectedElement() != null 
+							&& ModelDBUtils.isNetworkClass(getSelectedElement()));
 			} else {
 				addClassButton.setEnabled(false);
 				addModelButton.setEnabled(false);
