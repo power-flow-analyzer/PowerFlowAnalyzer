@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
@@ -90,6 +91,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		});
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
+		overviewPane.updateScriptActions();
 	}
 	
 	private int getNetworkTabIndex(Network network) {
@@ -152,6 +154,16 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		return null;
 	}
 	
+	public PowerFlowViewer getViewer(Network network) {
+		Component c = networkTabs.getVisibleTabComponent();
+		if(c != null && c instanceof PowerFlowViewer) {
+			PowerFlowViewer viewer = (PowerFlowViewer) c;
+			if(viewer.getNetwork() == network  || viewer.getNetwork().getInternalID() == network.getInternalID())
+				return viewer;
+		}
+		return null;
+	}
+	
 	public int getViewerCount() {
 		return networkTabs.getTabCount() - 1;
 	}
@@ -196,6 +208,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		// forward request to own listeners
 		fireActionUpdate();
 		overviewPane.refreshList();
+		overviewPane.updateScriptActions();
 	}
 	
 	private void updateTabTitles() {
@@ -239,6 +252,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		private NetworkDescription networkDescription = new NetworkDescription();
 		private HyperLinkAction createEmptyNetworkAction, importMatpowerNetworkAction, importFromScriptAction,
 				duplicateNetworkAction, deleteNetworkAction;
+		private JPanel scriptActionPane;
 		private ImportFromScriptDialog importFromScriptDialg;
 		
 		NetworkOverviewPane() {
@@ -349,8 +363,12 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 			networkActionPane.add(duplicateNetworkAction);
 			networkActionPane.add(deleteNetworkAction);
 			
+			scriptActionPane = new JPanel(new GridLayout(0, 1));
+			scriptActionPane.setBorder(new TitledBorder("Execute Script"));
+			
 			JPanel actionGroupPanel = new JPanel();
 			actionGroupPanel.add(networkActionPane);
+			actionGroupPanel.add(scriptActionPane);
 			
 			JPanel actionContainer = new JPanel(new BorderLayout());
 			JPanel networkDataPane = new JPanel(new GridLayout(0, 2));
@@ -391,6 +409,22 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 			importFromScriptAction.setEnabled(isMatlabEnv);
 			duplicateNetworkAction.setEnabled(singleSelection);
 			deleteNetworkAction.setEnabled( ! emptySelection);
+		}
+		
+		private void updateScriptActions() {
+			scriptActionPane.removeAll();
+			for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
+				HyperLinkAction action = new HyperLinkAction(script.getLabel()) {
+					@Override
+					protected void actionPerformed() {
+						Network network = getSelectedNetwork();
+						if(network == null)
+							return;
+						PowerFlowAnalyzer.getInstance().executeScript(network, script);
+					}
+				};
+				scriptActionPane.add(action);
+			}
 		}
 		
 		class NetworkListModel extends AbstractListModel {
