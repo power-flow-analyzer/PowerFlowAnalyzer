@@ -23,7 +23,7 @@ public class Network extends ParameterSupport {
 	
 	private NetworkData networkData;
 	private PowerFlowCase caze;
-	private ModelClassData globalParameterClass;
+	private ModelClassData globalParameterClass, scriptParameterClass;
 	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
@@ -112,6 +112,14 @@ public class Network extends ParameterSupport {
 		this.globalParameterClass = globalParameterClass;
 	}
 	
+	public ModelClassData getScriptParameterClass() {
+		return scriptParameterClass;
+	}
+
+	public void setScriptParameterClass(ModelClassData scriptParameterClass) {
+		this.scriptParameterClass = scriptParameterClass;
+	}
+
 	public void setDefaultCoordinates() {
 		int columnCount = (int) Math.floor(Math.sqrt(getBusses().size()));
 		int rowCount = (int) Math.ceil(((double) getBusses().size()) / ((double) columnCount));
@@ -139,8 +147,13 @@ public class Network extends ParameterSupport {
 		NetworkParameter parameter = super.getParameterValue(id);
 		if(parameter != null)
 			return parameter;
-		if(getGlobalParameterClass() != null)
-			return ModelDBUtils.getParameterValue(getGlobalParameterClass(), id);
+		if(getGlobalParameterClass() != null) {
+			parameter = ModelDBUtils.getParameterValue(getGlobalParameterClass(), id);
+			if(parameter != null)
+				return parameter;
+		}
+		if(getScriptParameterClass() != null)
+			return ModelDBUtils.getParameterValue(getScriptParameterClass(), id);
 		return null;
 	}
 	
