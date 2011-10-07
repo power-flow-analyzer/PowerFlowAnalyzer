@@ -28,8 +28,11 @@ public class NetworkPanel extends ModelElementPanel {
 		if(data.getParameterList().size() > 0) {
 			Group globalParameters = addElementGroup("Global Network Parameters");
 			for (NetworkParameter parameter : data.getParameterList()) {
-				NetworkParameter paramDef = ModelDBUtils.getOwnParameter(
+				NetworkParameter paramDef = ModelDBUtils.getParameterDefinition(
 						data.getGlobalParameterClass(), parameter.getID());
+				if(paramDef == null)
+					paramDef = ModelDBUtils.findChildParameterDefinition(
+							data.getScriptParameterClass(), parameter.getID());
 				if(paramDef == null)
 					paramDef = parameter; // fallback if parameter not defined in db
 				addParameter(paramDef, parameter, globalParameters);
