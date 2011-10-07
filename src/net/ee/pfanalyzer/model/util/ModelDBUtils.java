@@ -2,7 +2,10 @@ package net.ee.pfanalyzer.model.util;
 
 import java.text.DecimalFormat;
 
+import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
+import net.ee.pfanalyzer.model.data.ModelClassData;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
@@ -14,7 +17,7 @@ public class ModelDBUtils {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
 			id = "<empty>";
-		if(element.getParent() != null) {
+		if(element.getParent() != null && isRootClass(element.getParent()) == false) {
 			String parentID = getParameterID(element.getParent());
 			if("<empty>".equals(parentID))
 				return id;
@@ -156,5 +159,37 @@ public class ModelDBUtils {
 			}
 		}
 		return support.getTextParameter(parameterID);
+	}
+	
+	public static boolean isNetworkClass(AbstractModelElementData element) {
+		return ModelDB.ROOT_NETWORK_CLASS.equals(getRootClass(element).getID());
+	}
+	
+	public static boolean isScriptClass(AbstractModelElementData element) {
+		return ModelDB.ROOT_SCRIPT_CLASS.equals(getRootClass(element).getID());
+	}
+	
+	public static boolean isRootClass(AbstractModelElementData element) {
+		return getRootClass(element) == element;
+	}
+	
+	public static AbstractModelElementData getRootClass(AbstractModelElementData element) {
+		// get parent of element
+		if(element.getParent() != null)
+			return getRootClass(element.getParent());
+		// element is root
+		return element;
+	}
+	
+	public static NetworkParameter findChildParameterDefinition(ModelClassData clazz, String id) {
+		NetworkParameter p = getOwnParameter(clazz, id);
+		if(p != null)
+			return p;
+		for (ModelData model : clazz.getModel()) {
+			p = getOwnParameter(model, id);
+			if(p != null)
+				return p;
+		}
+		return null;
 	}
 }
