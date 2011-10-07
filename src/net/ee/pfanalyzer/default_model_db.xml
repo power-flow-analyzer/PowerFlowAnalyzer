@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
 <power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
     <model-db>
-        <modelClass label="Global Parameters">
-            <parameter ID="BASE_MVA" type="integer" label="Base MVA" empty="true">
+        <modelClass ID="network" label="Network Elements">
+            <parameter ID="BASE_MVA" type="integer" label="Base MVA" empty="true" inherit="false">
                 <display/>
             </parameter>
-            <parameter ID="SUCCESS" type="integer" label="Calculation converged" restriction="list" purpose="result">
+            <parameter ID="SUCCESS" type="integer" label="Calculation converged" restriction="list" inherit="false" purpose="result">
                 <option value="1" label="Yes" ID="1"/>
                 <option value="0" label="No" ID="0"/>
-                <display/>
-            </parameter>
-            <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="scenario">
-                <option value="PF" label="AC Standard" ID="PF"/>
-                <option value="OPF" label="AC Optimal" ID="OPF"/>
-                <option value="UOPF" label="AC Optimal with unit-decommitment heuristic" ID="UOPF"/>
-                <option value="DCPF" label="DC Standard" ID="DCPF"/>
-                <option value="DCOPF" label="DC Optimal" ID="DCOPF"/>
-                <option value="DUOPF" label="DC Optimal with unit-decommitment heuristic" ID="DUOPF"/>
                 <display/>
             </parameter>
             <modelClass ID="branch" label="Branch">
@@ -254,6 +245,23 @@
                 </parameter>
                 <model ID="unknown" label="Unknown Generator"/>
             </modelClass>
+        </modelClass>
+        <modelClass ID="script" label="Scripts">
+            <parameter ID="SCRIPT" type="text" label="Script" empty="true">
+                <display/>
+            </parameter>
+            <model ID="calc_power_flow" label="Calculate Power Flow">
+                <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="scenario">
+                    <option value="PF" label="AC Standard" ID="PF"/>
+                    <option value="OPF" label="AC Optimal" ID="OPF"/>
+                    <option value="UOPF" label="AC Optimal with unit-decommitment heuristic" ID="UOPF"/>
+                    <option value="DCPF" label="DC Standard" ID="DCPF"/>
+                    <option value="DCOPF" label="DC Optimal" ID="DCOPF"/>
+                    <option value="DUOPF" label="DC Optimal with unit-decommitment heuristic" ID="DUOPF"/>
+                    <display/>
+                </parameter>
+                <parameter ID="SCRIPT" value="calc_power_flow"/>
+            </model>
         </modelClass>
     </model-db>
 </power_flow_case>
