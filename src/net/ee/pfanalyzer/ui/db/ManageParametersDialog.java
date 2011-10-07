@@ -18,6 +18,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -209,6 +210,8 @@ public class ManageParametersDialog extends BaseDialog {
 			commonPanel.add(new DescriptionField());
 			commonPanel.add(new JLabel("Purpose: "));
 			commonPanel.add(new PurposeField());
+			commonPanel.add(new JLabel("Inherit to children: "));
+			commonPanel.add(new InheritField());
 			commonPanel.add(new JLabel("Restriction: "));
 			restriction = new IntegerRestrictionField();
 			commonPanel.add(restriction);
@@ -318,6 +321,27 @@ public class ManageParametersDialog extends BaseDialog {
 			public void keyTyped(KeyEvent e) {}
 			@Override
 			public void keyPressed(KeyEvent e) {}
+		}
+		
+		abstract class BooleanField extends JCheckBox implements ActionListener {
+			
+			protected abstract boolean getValue();
+			
+			protected abstract void setValue(boolean value);
+			
+			BooleanField() {
+				setSelected(getValue());
+				addActionListener(this);
+			}
+			
+			public void writeData() {
+				setValue(isSelected());
+			}
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				writeData();
+			}
 		}
 		
 		abstract class ComboBoxField extends JComboBox implements ActionListener {
@@ -707,6 +731,18 @@ public class ManageParametersDialog extends BaseDialog {
 			@Override
 			protected void setValue(String value) {
 				property.setDescription(value);
+			}
+		}
+		
+		class InheritField extends BooleanField {
+			@Override
+			protected boolean getValue() {
+				return property.isInherit();
+			}
+
+			@Override
+			protected void setValue(boolean value) {
+				property.setInherit(value);
 			}
 		}
 		
