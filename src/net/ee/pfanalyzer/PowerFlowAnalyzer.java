@@ -37,6 +37,7 @@ import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
@@ -44,10 +45,11 @@ import net.ee.pfanalyzer.preferences.PreferencesInitializer;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
-import net.ee.pfanalyzer.ui.dialog.CaseCalculationDialog;
-import net.ee.pfanalyzer.ui.dialog.OpenCaseDialog;
 import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
+import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.NewCaseDialog;
+import net.ee.pfanalyzer.ui.dialog.OpenCaseDialog;
+import net.ee.pfanalyzer.ui.dialog.SelectScriptDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -79,7 +81,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //	private final static String ACTION_PANEL_PROPERTIES = "action.panel.properties";
 	private final static String ACTION_MODEL_DB_PROPERTIES = "action.model.db.properties";
 //	private final static String ACTION_APP_PROPERTIES = "action.app.properties";
-	private final static String ACTION_CASE_CALCULATE = "action.case.calculate";
+	private final static String ACTION_EXECUTE_SCRIPT = "action.case.calculate";
 	
 	private final static String ACTION_SELECT_PREVIOUS = "action.select.previous";
 	private final static String ACTION_SELECT_NEXT = "action.select.next";
@@ -161,7 +163,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.add(createToolbarButton(ACTION_CASE_SAVE, "Save this case", "save_as.png", "Save case"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_REMOVE, "Remove this case", "report_delete.png", "Remove Case"));
 		toolbar.addSeparator();
-		toolbar.add(createToolbarButton(ACTION_CASE_CALCULATE, "Calculate power flow", "calculator.png", "Calculate power flow"));
+		toolbar.add(createToolbarButton(ACTION_EXECUTE_SCRIPT, "Execute a script on this network", "calculator.png", "Execute script"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_NETWORK_ADD_ELEMENT, "Add a new network element", "plugin_add.png", "Add element"));
 		toolbar.add(createToolbarButton(ACTION_NETWORK_REMOVE_ELEMENT, "Remove the selected network element", "plugin_delete.png", "Remove element"));
@@ -237,8 +239,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //				getCurrentViewer().getPanelController().showPanelPropertiesDialog(this);
 			} else if(e.getActionCommand().equals(ACTION_MODEL_DB_PROPERTIES)) {
 				showModelDBDialog();
-			} else if(e.getActionCommand().equals(ACTION_CASE_CALCULATE)) {
-				calculatePowerFlow();
+			} else if(e.getActionCommand().equals(ACTION_EXECUTE_SCRIPT)) {
+				executeScript();
 			} else if(e.getActionCommand().equals(ACTION_NETWORK_ADD_ELEMENT)) {
 				createNewElement();
 			} else if(e.getActionCommand().equals(ACTION_NETWORK_REMOVE_ELEMENT)) {
@@ -330,6 +332,31 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		openProgressDialog(pfcase);
 	}
 	
+	private void executeScript() {
+		SelectScriptDialog dialog = new SelectScriptDialog(this, getCurrentCase());
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())
+			return;
+		executeScript(getCurrentNetwork(), dialog.getSelectedScript());
+	}
+	
+	public void executeScript(Network network, ModelData script) {
+		ExecuteScriptDialog dialog = new ExecuteScriptDialog(this, network, script);
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())// cancel pressed
+			return;
+		String pfcase = findName("Power Flow");
+		nextCase = pfcase;
+		// call matlab script
+		String scriptFile = network.getTextParameter("SCRIPT");
+		if(scriptFile == null || scriptFile.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "SCRIPT parameter must be set!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		callMatlabCommand(scriptFile, new Object[] { network }, 0, true);
+		openProgressDialog(pfcase);
+	}
+	
 	private void openCaseFile() {
 		caseDialog = new OpenCaseDialog(this);
 		caseDialog.showDialog(-1, -1);
@@ -406,20 +433,6 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //					selectedFile.getAbsolutePath(), getCurrentViewer().getPowerFlowData() },
 //					0, true);
 //		}
-	}
-	
-	private void calculatePowerFlow() {
-		CaseCalculationDialog dialog = new CaseCalculationDialog(this, getCurrentNetwork());
-		dialog.showDialog(-1, -1);
-		if(dialog.isCancelPressed())
-			return;
-		String pfcase = findName("Power Flow");
-		nextCase = pfcase;
-		// call matlab script
-		callMatlabCommand("calc_power_flow", new Object[] {
-				getCurrentNetwork() },
-				0, true);
-		openProgressDialog(pfcase);
 	}
 	
 	private void createNewElement() {
@@ -538,23 +551,40 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					createNewCase();
 					caze = getCurrentCase();
 				}
-				if(caze == null)
+				if(caze == null) {
+					success.put(nextCase, false);
 					return;
+				}
 			}
 			if(createNewNetwork) {
 				Network network = caze.addNetwork(networkData);
 				checkForMissingCoordinates(network);
 				caze.getViewer().updateActions();
 			} else {// update network
-				Network network = getCurrentNetwork();
-				if(network == null)
-					return;
-				caze.setNetworkData(network, networkData);
-				network.fireNetworkChanged();
-				caze.getViewer().getSelectionManager().clearHistory();
+				Network network = caze.getNetwork(networkData.getInternalID());
+//				Network network = getCurrentNetwork();
+				if(network == null) {
+					int action = JOptionPane.showConfirmDialog(this, 
+							"Do you want to import the network data as a new network?", "Create new network?", 
+							JOptionPane.YES_NO_OPTION);
+					if(action == JOptionPane.NO_OPTION) {
+						success.put(nextCase, false);
+						return;
+					} else {
+						network = caze.addNetwork(networkData);
+						checkForMissingCoordinates(network);
+						caze.getViewer().updateActions();
+					}
+				} else {
+					caze.setNetworkData(network, networkData);
+					network.fireNetworkChanged();
+					if(caze.getViewer().getViewer(network) != null)
+						caze.getViewer().getViewer(network).getSelectionManager().clearHistory();
+				}
 			}
 			success.put(nextCase, true);
 		} catch(Throwable t) {
+			success.put(nextCase, false);
 			JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Calculation caused an error: " + t, "Error", JOptionPane.ERROR_MESSAGE);
 			t.printStackTrace();
 		}
@@ -656,7 +686,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(getCurrentCase() != null);
 //		toolbarButtons.get(ACTION_DIAGRAM_EDIT).setEnabled(hasDiagrams);
 		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);
-		toolbarButtons.get(ACTION_CASE_CALCULATE).setEnabled(isMatlabEnv && hasViewer);
+		toolbarButtons.get(ACTION_EXECUTE_SCRIPT).setEnabled(isMatlabEnv && hasViewer);
 		toolbarButtons.get(ACTION_NETWORK_ADD_ELEMENT).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_NETWORK_REMOVE_ELEMENT).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().getSelection() != null);
