@@ -11,6 +11,7 @@
             <element name="display" type="mpui:NetworkParameterValueDisplay" minOccurs="0" maxOccurs="1"/>
         </sequence>
         <attribute name="purpose" type="mpui:NetworkParameterPurposeRestriction" default="parameter"/>
+        <attribute name="inherit" type="boolean" default="true"/>
         <attribute name="empty" type="boolean" default="false"/>
         <attribute name="value" type="string"/>
         <attribute name="defaultValue" type="string"/>
