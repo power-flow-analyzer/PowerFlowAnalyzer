@@ -53,14 +53,18 @@ public class NetworkElementSelectionManager implements INetworkElementSelectionL
 		int index;
 		while( ( index = ListUtils.getIndexOf(viewHistory, data)) > -1) {
 			viewHistory.remove(index);
-//			System.out.println("removed from history");
+			if(index <= currentView)
+				currentView--;
+//			System.out.println("removed from history, currentView is " + currentView);
 		}
+		oldSelection = viewHistory.get(currentView);
 		fireActionUpdate();
 	}
 	
 	private void selectionChanged(Object selection, boolean addToHistory) {
 		if(oldSelection == selection)
 			return;
+//		System.out.println("select " + selection);
 		oldSelection = selection;
 		if(addToHistory) {
 			for (int i = 0, count = viewHistory.size() - currentView - 1; i < count; i++) {
