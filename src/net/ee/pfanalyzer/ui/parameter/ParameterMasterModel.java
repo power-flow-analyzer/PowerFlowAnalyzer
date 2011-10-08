@@ -54,7 +54,7 @@ public class ParameterMasterModel implements IParameterMasterElement {
 	@Override
 	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
 		if(paramDB != null) {
-			DatabaseChangeEvent event = new DatabaseChangeEvent(parameterID, oldValue, newValue);
+			DatabaseChangeEvent event = new DatabaseChangeEvent(DatabaseChangeEvent.CHANGED, parameterID, oldValue, newValue);
 			event.setElementData(getMasterElement());
 			paramDB.fireParameterChanged(event);
 		}

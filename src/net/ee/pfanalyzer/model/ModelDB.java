@@ -86,6 +86,12 @@ public class ModelDB {
 		return scriptClass;
 	}
 	
+	public void fireElementChanged(DatabaseChangeEvent event) {
+		for (IDatabaseChangeListener listener : listeners) {
+			listener.elementChanged(event);
+		}
+	}
+	
 	public void fireParameterChanged(DatabaseChangeEvent event) {
 		for (IDatabaseChangeListener listener : listeners) {
 			listener.parameterChanged(event);

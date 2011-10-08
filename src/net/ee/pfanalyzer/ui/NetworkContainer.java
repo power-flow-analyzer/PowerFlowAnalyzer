@@ -25,9 +25,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
@@ -37,7 +40,7 @@ import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
-public class NetworkContainer extends JPanel implements IActionUpdater {
+public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener {
 
 	private PowerFlowCase powerFlowCase;
 
@@ -54,12 +57,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		overviewPane = new NetworkOverviewPane();
 		networkTabs = new NetworkTabbedPane();
 		modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(this), 
-				getPowerFlowCase().getModelDB().getData());
+				getPowerFlowCase().getModelDB());
 		
-//		for (int i = 0; i < caze.getNetworks().size(); i++) {
-//			Network scenario = caze.getNetworks().get(i);
-//			addNetwork(scenario);
-//		}
 		networkTabs.setTabListener(new TabListener() {
 			PowerFlowViewer lastViewer;
 			@Override
@@ -92,6 +91,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		overviewPane.updateScriptActions();
+		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
 	}
 	
 	private int getNetworkTabIndex(Network network) {
@@ -239,8 +239,24 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		}
 	}
 	
+	@Override
+	public void elementChanged(DatabaseChangeEvent event) {
+		updateScriptsFromDB(event);
+	}
+	
+	@Override
+	public void parameterChanged(DatabaseChangeEvent event) {
+	}
+	
+	private void updateScriptsFromDB(DatabaseChangeEvent event) {
+		// update scripts from DB
+		if(event.getElementData() != null && ModelDBUtils.isScriptClass(event.getElementData()))
+			overviewPane.updateScriptActions();
+	}
+
 	public void dispose() {
 		modelDBDialog.setVisible(false);
+		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
 	}
 	
 	class NetworkOverviewPane extends JPanel {
@@ -414,7 +430,10 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 		private void updateScriptActions() {
 			scriptActionPane.removeAll();
 			for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
-				HyperLinkAction action = new HyperLinkAction(script.getLabel()) {
+				String label = script.getLabel();
+				if(label == null || label.isEmpty())
+					label = "Untitled Script";
+				HyperLinkAction action = new HyperLinkAction(label) {
 					@Override
 					protected void actionPerformed() {
 						Network network = getSelectedNetwork();
@@ -425,6 +444,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater {
 				};
 				scriptActionPane.add(action);
 			}
+			scriptActionPane.revalidate();
+			scriptActionPane.repaint();
 		}
 		
 		class NetworkListModel extends AbstractListModel {

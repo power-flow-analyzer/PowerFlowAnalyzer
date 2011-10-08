@@ -9,7 +9,7 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 
-public class PowerFlowCase {
+public class PowerFlowCase implements IDatabaseChangeListener {
 
 	private File caseFile;
 	private CaseData pfCase;
@@ -23,6 +23,7 @@ public class PowerFlowCase {
 		this.modelDB = modelDB;
 		pfCase.setModelDb(modelDB.getData());
 		updateAllNetworkData();
+		modelDB.addDatabaseChangeListener(this);
 	}
 	
 	public PowerFlowCase(File caseFile) {
@@ -34,6 +35,7 @@ public class PowerFlowCase {
 			for (NetworkData netData : pfCase.getNetwork()) {
 				addNetworkInternal(netData);
 			}
+			modelDB.addDatabaseChangeListener(this);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -154,6 +156,23 @@ public class PowerFlowCase {
 //		if(model != null)
 //			System.out.println("    setting model: " + element.getModelID());
 		element.setModel(model);
+	}
+
+	@Override
+	public void elementChanged(DatabaseChangeEvent event) {
+//		System.out.println("elementChanged: " + event.getParameterID());
+//		System.out.println("  old: " + event.getOldValue());
+//		System.out.println("  new: " + event.getNewValue());
+	}
+
+	@Override
+	public void parameterChanged(DatabaseChangeEvent event) {
+//		System.out.println("parameterChanged: " + event.getParameterID());
+//		System.out.println("  old: " + event.getOldValue());
+//		System.out.println("  new: " + event.getNewValue());
+		for (Network network : getNetworks()) {
+			network.fireNetworkChanged();
+		}
 	}
 
 	public Network createNetworkCopy(Network network) throws Exception {

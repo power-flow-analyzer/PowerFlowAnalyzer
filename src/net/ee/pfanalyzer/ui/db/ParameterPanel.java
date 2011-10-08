@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
@@ -21,12 +23,14 @@ public class ParameterPanel extends ParameterContainer {
 
 	private DefaultMutableTreeNode node;
 	private AbstractModelElementData master;
+	private ModelDB paramDB;
 	private JLabel referenceLabel;
 	
-	public ParameterPanel(DefaultMutableTreeNode treeNode, AbstractModelElementData element, boolean devMode) {
-		super(new ParameterMasterModel(element), false);
+	public ParameterPanel(DefaultMutableTreeNode treeNode, AbstractModelElementData element, ModelDB paramDB) {
+		super(new ParameterMasterModel(element, paramDB), false);
 		node = treeNode;
 		master = element;
+		this.paramDB = paramDB;
 		if(master.getParent() == null)
 			setShowNetworkParameters(true);
 		referenceLabel = new JLabel(ModelDBUtils.getParameterID(master));
@@ -50,6 +54,11 @@ public class ParameterPanel extends ParameterContainer {
 		referenceLabel.setText(ModelDBUtils.getParameterID(master));
 	}
 	
+	private void fireElementChanged() {
+		if(paramDB != null)
+			paramDB.fireElementChanged(new DatabaseChangeEvent(DatabaseChangeEvent.CHANGED, master));
+	}
+	
 	class ParameterIDBox extends ParameterTextBox implements ActionListener, KeyListener {
 		ParameterIDBox() {
 			super("ID");
@@ -71,6 +80,7 @@ public class ParameterPanel extends ParameterContainer {
 		@Override
 		protected void updateView() {
 			refreshID();
+			fireElementChanged();
 		}
 	}
 	
@@ -92,6 +102,7 @@ public class ParameterPanel extends ParameterContainer {
 		@Override
 		protected void updateView() {
 			refresh();
+			fireElementChanged();
 		}
 	}
 	
@@ -106,6 +117,11 @@ public class ParameterPanel extends ParameterContainer {
 		
 		protected void setParameterValue(String text) {
 			master.setDescription(text);
+		}
+		
+		@Override
+		protected void updateView() {
+			fireElementChanged();
 		}
 	}
 	

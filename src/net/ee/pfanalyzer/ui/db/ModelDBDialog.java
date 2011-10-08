@@ -41,6 +41,8 @@ import javax.swing.tree.TreeSelectionModel;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CaseSerializer;
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
@@ -62,7 +64,8 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 //	private ElementPanelController controller;
 	
 //	private CaseData pfCase;
-	private ModelDBData db;
+	private ModelDB db;
+	private ModelDBData dbData;
 	private Network network;
 	private JComponent propPanel;
 	private JLabel elementTitleLabel;
@@ -71,28 +74,23 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 //	private ManageParametersDialog manageParametersDialog;
 	private DefaultMutableTreeNode currentNode;
 	private AbstractNetworkElement selectedElement;
-	private final boolean devMode;
+//	private final boolean devMode;
 	private JButton addClassButton, addModelButton, removeButton, managePropsButton, performActionButton;
 	
-	public ModelDBDialog(Frame frame, ModelDBData modelDB) {
-		this(frame, modelDB, false);
+	public ModelDBDialog(Frame frame, ModelDB modelDB) {
+		this(frame, modelDB, modelDB.getData(), null, false);
 	}
 	
-	private ModelDBDialog(Frame frame, ModelDBData modelDB, boolean devMode) {
-		this(frame, modelDB, null, devMode);
+	public ModelDBDialog(Frame frame, ModelDB modelDB, Network network) {
+		this(frame, modelDB, modelDB.getData(), network, false);
 	}
 	
-	public ModelDBDialog(Frame frame, ModelDBData modelDB, Network network) {
-		this(frame, modelDB, network, false);
-	}
-	
-	private ModelDBDialog(Frame frame, ModelDBData modelDB, Network net, boolean devMode) {
+	private ModelDBDialog(Frame frame, ModelDB db, ModelDBData dbData, Network net, boolean devMode) {
 		super(frame, "Parameter Database", net != null);
 		this.network = net;
-		this.devMode = devMode;
-//		this.controller = controller;
-//		setText("The following options apply directly to all views.");
-		db = modelDB;
+//		this.devMode = devMode;
+		this.db = db;
+		this.dbData = dbData;
 		
 		treeModel = new DefaultTreeModel(createTreeData());
 		modelTree = new JTree(treeModel);
@@ -309,7 +307,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		propPanel.removeAll();
 		if(treeNode != null) {
 			AbstractModelElementData element = (AbstractModelElementData) treeNode.getUserObject();
-			ParameterPanel paramPanel = new ParameterPanel(treeNode, element, devMode);
+			ParameterPanel paramPanel = new ParameterPanel(treeNode, element, db);
 			paramPanel.addPropertyChangeListener(this);
 			String typeText = (element instanceof ModelClassData ? "Class" : "Model") + " Parameters";
 			elementTitleLabel.setText(typeText);
@@ -414,11 +412,13 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			else if(element instanceof ModelData)
 				parent.getModel().add((ModelData) element);
 		} else if(element instanceof ModelClassData)
-			db.getModelClass().add((ModelClassData) element);
+			dbData.getModelClass().add((ModelClassData) element);
 		DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(element);
 		treeModel.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
 		modelTree.scrollPathToVisible(new TreePath(newNode.getPath()));
 		modelTree.setSelectionPath(new TreePath(newNode.getPath()));
+		if(db != null)
+			db.fireElementChanged(new DatabaseChangeEvent(DatabaseChangeEvent.ADDED, element));
 	}
 	
 	private void removeElement() {
@@ -435,16 +435,18 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 				else if(element instanceof ModelData)
 					parent.getModel().remove(element);
 			} else if(element instanceof ModelClassData)
-				db.getModelClass().remove(element);
+				dbData.getModelClass().remove(element);
 			treeModel.removeNodeFromParent(getSelectedNode());
 			modelTree.clearSelection();
 			showElementProperties(null);
+			if(db != null)
+				db.fireElementChanged(new DatabaseChangeEvent(DatabaseChangeEvent.REMOVED, element));
 		}
 	}
 	
 	private DefaultMutableTreeNode createTreeData() {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-		for (ModelClassData clazz : db.getModelClass()) {
+		for (ModelClassData clazz : dbData.getModelClass()) {
 			addTreeData(root, clazz);
 		}
 		return root;
@@ -501,7 +503,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			final CaseSerializer serializer = new CaseSerializer();
 			final CaseData pfCase = serializer.readCase(INPUT_FILE);
 			ModelDBData db = pfCase.getModelDb();
-			ModelDBDialog dialog = new ModelDBDialog(null, db) {
+			ModelDBDialog dialog = new ModelDBDialog(null, null, db, null, false) {
 				protected void okPressed() {
 					if(exitJava)
 						System.exit(0);
