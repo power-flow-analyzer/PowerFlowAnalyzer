@@ -87,7 +87,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 	}
 	
 	private ModelDBDialog(Frame frame, ModelDBData modelDB, Network net, boolean devMode) {
-		super(frame, "Model Database", net != null);
+		super(frame, "Parameter Database", net != null);
 		this.network = net;
 		this.devMode = devMode;
 //		this.controller = controller;
