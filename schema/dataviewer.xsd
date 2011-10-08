@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:mpui="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        targetNamespace="http://www.mehg.net/schema/PowerFlowAnalyzer"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+
+    <include schemaLocation="parameter.xsd"/>
+    
+    <complexType name="DataViewerData">
+        <sequence>
+            <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="elementFilter" type="string"/>
+        <attribute name="title" type="string"/>
+        <attribute name="type" type="mpui:DataViewerType"/>
+    </complexType>
+    
+    <simpleType name="DataViewerType">
+        <restriction base="string">
+            <enumeration value="table"/>
+            <enumeration value="diagram"/>
+        </restriction>
+    </simpleType>
+    
+</schema>

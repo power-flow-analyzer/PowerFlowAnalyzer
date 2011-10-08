@@ -7,13 +7,15 @@
 
     <include schemaLocation="model_db.xsd"/>
     <include schemaLocation="network.xsd"/>
+    <include schemaLocation="dataviewer.xsd"/>
     
     <element name="power_flow_case" type="mpui:CaseData"/>
     
     <complexType name="CaseData">
         <sequence>
             <element name="model-db" type="mpui:ModelDBData" minOccurs="1" maxOccurs="1"/>
-            <element name="network" type="mpui:NetworkData" minOccurs="1" maxOccurs="unbounded"/>
+            <element name="network" type="mpui:NetworkData" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="dataViewer" type="mpui:DataViewerData" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="version" type="string" default="1.0.0"/>
     </complexType>
