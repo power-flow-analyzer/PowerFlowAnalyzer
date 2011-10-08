@@ -1,5 +1,7 @@
 package net.ee.pfanalyzer.ui.parameter;
 
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
@@ -8,9 +10,11 @@ import net.ee.pfanalyzer.model.util.ParameterSupport;
 public class ParameterMasterModel implements IParameterMasterElement {
 
 	private AbstractModelElementData master;
+	private ModelDB paramDB;
 	
-	public ParameterMasterModel(AbstractModelElementData element) {
+	public ParameterMasterModel(AbstractModelElementData element, ModelDB paramDB) {
 		this.master = element;
+		this.paramDB = paramDB;
 	}
 	
 	protected AbstractModelElementData getMasterElement() {
@@ -49,7 +53,11 @@ public class ParameterMasterModel implements IParameterMasterElement {
 	
 	@Override
 	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
-		// empty implementation
+		if(paramDB != null) {
+			DatabaseChangeEvent event = new DatabaseChangeEvent(parameterID, oldValue, newValue);
+			event.setElementData(getMasterElement());
+			paramDB.fireParameterChanged(event);
+		}
 	}
 
 	@Override
