@@ -9,17 +9,20 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
-import net.ee.pfanalyzer.ui.util.SwingUtils;
+import net.ee.pfanalyzer.model.PowerFlowCase;
 
 public class DataViewerContainer extends JPanel {
 	
 	private INetworkDataViewer viewer;
+	private PowerFlowCase powerFlowCase;
 
-	public DataViewerContainer(INetworkDataViewer viewer) {
+	public DataViewerContainer(INetworkDataViewer viewer, PowerFlowCase caze) {
 		super(new BorderLayout());
 		this.viewer = viewer;
+		this.powerFlowCase = caze;
 		
 		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
@@ -39,8 +42,8 @@ public class DataViewerContainer extends JPanel {
 	}
 	
 	private void showPropertiesDialog() {
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtils.getTopLevelFrame(this), 
-				"Viewer Properties", getViewer().getViewerData());
+		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+				"Viewer Properties", getViewer().getViewerData(), powerFlowCase);
 		dialog.showDialog(-1, -1);
 		if(dialog.isOkPressed())
 			getViewer().refresh();

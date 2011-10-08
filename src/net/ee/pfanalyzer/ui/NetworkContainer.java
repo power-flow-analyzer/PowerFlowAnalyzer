@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -36,7 +37,6 @@ import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
-import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
 public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener {
@@ -55,8 +55,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		
 		overviewPane = new NetworkOverviewPane();
 		networkTabs = new NetworkTabbedPane();
-		modelDBDialog = new ModelDBDialog(SwingUtils.getTopLevelFrame(this), 
-				getPowerFlowCase().getModelDB());
+		modelDBDialog = new ModelDBDialog(SwingUtilities.getWindowAncestor(this), ModelDBDialog.SET_MODEL_MODE, 
+				getPowerFlowCase().getModelDB(), false, "Set Model");
 		
 		networkTabs.setTabListener(new TabListener() {
 			PowerFlowViewer lastViewer;
@@ -312,7 +312,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 				@Override
 				protected void actionPerformed() {
 					ImportMatpowerDialog dialog = new ImportMatpowerDialog(
-							SwingUtils.getTopLevelFrame(NetworkContainer.this));
+							SwingUtilities.getWindowAncestor(NetworkContainer.this));
 					dialog.showDialog(-1, -1);
 					if(dialog.isCancelPressed())// cancel pressed
 						return;

@@ -37,12 +37,15 @@ import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
 import net.ee.pfanalyzer.ui.NetworkContainer;
+import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.PowerFlowViewer;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
@@ -443,9 +446,17 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private void createNewElement() {
 		if(getCurrentCase() == null || getCurrentNetwork() == null)
 			return;
-		ModelDBDialog dialog = new ModelDBDialog(this, 
-				getCurrentCase().getModelDB(), getCurrentNetwork());
+		ModelDBDialog dialog = new ModelDBDialog(this, ModelDBDialog.GET_MODEL_MODE, 
+				getCurrentCase().getModelDB(), true, "Create new element");
 		dialog.showDialog(900, 500);
+		AbstractModelElementData selected = dialog.getSelectedElement();
+		if(selected instanceof ModelData) {
+			String modelID = ModelDBUtils.getParameterID(selected);
+			AbstractNetworkElement element = getCurrentNetwork().createElement(modelID);
+			getCurrentNetwork().addElement(element);
+			getCurrentNetwork().fireNetworkElementAdded(element);
+			NetworkElementSelectionManager.selectionChanged(getCurrentViewer(), element);
+		}
 	}
 	
 	private void removeElement() {

@@ -1,7 +1,7 @@
 package net.ee.pfanalyzer.ui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
+import java.awt.Window;
 import java.io.File;
 
 import javax.swing.JComponent;
@@ -33,7 +33,7 @@ public class ImportMatpowerDialog extends BaseDialog implements IPreferenceConst
 	private JLabel workingDirLabel;
 	private FileSelectionPanel matpowerCaseInputPanel;
 	
-	public ImportMatpowerDialog(Frame frame) {
+	public ImportMatpowerDialog(Window frame) {
 		super(frame, "Open Matpower case");
 		setText("Select a Matpower case and press OK.");
 

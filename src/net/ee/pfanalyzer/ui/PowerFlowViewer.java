@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Network;
@@ -25,7 +26,6 @@ import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.table.DataTable;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
-import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
 public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
@@ -126,8 +126,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	public void addTable() {
 		DataViewerData viewerData = new DataViewerData();
 		viewerData.setType(DataViewerType.TABLE);
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtils.getTopLevelFrame(this), 
-				"Create Table", viewerData);
+		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+				"Create Table", viewerData, getPowerFlowCase());
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())
 			return;
@@ -139,8 +139,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	public void addDiagram() {
 		DataViewerData viewerData = new DataViewerData();
 		viewerData.setType(DataViewerType.DIAGRAM);
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtils.getTopLevelFrame(this), 
-				"Create Diagram", viewerData);
+		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+				"Create Diagram", viewerData, getPowerFlowCase());
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())
 			return;
@@ -160,7 +160,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		viewer.setData(getNetwork());
 		viewer.refresh();
 		viewers.add(viewer);
-		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer));
+		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer, getPowerFlowCase()));
 		addNetworkElementSelectionListener(viewer);
 		getNetwork().addNetworkChangeListener(viewer);
 	}

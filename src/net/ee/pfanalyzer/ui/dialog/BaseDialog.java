@@ -5,8 +5,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,17 +19,17 @@ import javax.swing.border.EmptyBorder;
 
 public class BaseDialog extends JDialog {
 
-	private Frame parentFrame;
+	private Window parentFrame;
 	private JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
 	private JPanel titlePane = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	protected boolean okPressed = false;
 	
-	protected BaseDialog(Frame frame, String title) {
+	protected BaseDialog(Window frame, String title) {
 		this(frame, title, true);
 	}
 	
-	protected BaseDialog(Frame frame, String title, boolean modal) {
-		super(frame, title, modal);
+	protected BaseDialog(Window frame, String title, boolean modal) {
+		super(frame, title, modal ? DEFAULT_MODALITY_TYPE : ModalityType.MODELESS);
 		parentFrame = frame;
 		
 		buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
