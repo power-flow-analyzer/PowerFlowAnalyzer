@@ -1,6 +1,8 @@
 package net.ee.pfanalyzer.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
@@ -23,6 +25,8 @@ public class ModelDB {
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
 	private ModelClassData networkClass;
 	private ModelClassData scriptClass;
+	
+	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	
 	public ModelDB() {
 		this.db = CaseSerializer.readInternalModelDB();
@@ -80,5 +84,19 @@ public class ModelDB {
 	
 	public ModelClassData getScriptClass() {
 		return scriptClass;
+	}
+	
+	public void fireParameterChanged(DatabaseChangeEvent event) {
+		for (IDatabaseChangeListener listener : listeners) {
+			listener.parameterChanged(event);
+		}
+	}
+	
+	public void addDatabaseChangeListener(IDatabaseChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removeDatabaseChangeListener(IDatabaseChangeListener listener) {
+		listeners.remove(listener);
 	}
 }
