@@ -157,16 +157,16 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		
 		JToolBar toolbar = new JToolBar();
 		getContentPane().add(toolbar, BorderLayout.NORTH);
-		toolbar.add(createToolbarButton(ACTION_CASE_NEW, "Create a new case", "page_add.png", "Create case"));
-		toolbar.add(createToolbarButton(ACTION_CASE_OPEN, "Open an existing case", "folder.png", "Open case"));
+		toolbar.add(createToolbarButton(ACTION_CASE_NEW, "Create a new power flow case", "page_add.png", "Create case"));
+		toolbar.add(createToolbarButton(ACTION_CASE_OPEN, "Open an existing power flow case", "folder.png", "Open case"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_EDIT, "Edit this case", "report_edit.png", "Edit case"));
-		toolbar.add(createToolbarButton(ACTION_CASE_SAVE, "Save this case", "save_as.png", "Save case"));
+		toolbar.add(createToolbarButton(ACTION_CASE_SAVE, "Save this power flow case", "save_as.png", "Save case"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_REMOVE, "Remove this case", "report_delete.png", "Remove Case"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_EXECUTE_SCRIPT, "Execute a script on this network", "calculator.png", "Execute script"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_NETWORK_ADD_ELEMENT, "Add a new network element", "plugin_add.png", "Add element"));
-		toolbar.add(createToolbarButton(ACTION_NETWORK_REMOVE_ELEMENT, "Remove the selected network element", "plugin_delete.png", "Remove element"));
+		toolbar.add(createToolbarButton(ACTION_NETWORK_REMOVE_ELEMENT, "Remove the selected network element(s)", "plugin_delete.png", "Remove element"));
 		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_DIAGRAM_ADD, "Create a new diagram sheet", "chart_bar_add.png", "New Diagram"));
 //		toolbar.add(createToolbarButton(ACTION_DIAGRAM_EDIT, "Edit diagram sheet", "chart_bar_edit.png", "Edit Diagram"));
@@ -175,7 +175,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbar.add(createToolbarButton(ACTION_CASE_LAYOUT, "Change layout", "grid.png", "Change layout"));
 //		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_APP_PROPERTIES, "Edit program settings", "widgets.png", "App settings"));
-		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open Model Database", "database.png", "Model DB"));
+		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open parameter database containing network and script parameters", "database.png", "Parameter DB"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
@@ -439,7 +439,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		if(getCurrentCase() == null || getCurrentNetwork() == null)
 			return;
 		ModelDBDialog dialog = new ModelDBDialog(this, 
-				getCurrentCase().getModelDB().getData(), getCurrentNetwork());
+				getCurrentCase().getModelDB(), getCurrentNetwork());
 		dialog.showDialog(900, 500);
 	}
 	
@@ -463,7 +463,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			getCurrentViewer().getSelectionManager().removeFromHistory(selection);
 			for (AbstractNetworkElement element : dialog.getSelectedElements()) {
 				getCurrentNetwork().removeElement(element);
-//				getCurrentNetwork().fireNetworkElementRemoved(element);
+				getCurrentNetwork().fireNetworkElementRemoved(element);
 				getCurrentViewer().getSelectionManager().removeFromHistory(element);
 			}
 			getCurrentNetwork().fireNetworkChanged();
