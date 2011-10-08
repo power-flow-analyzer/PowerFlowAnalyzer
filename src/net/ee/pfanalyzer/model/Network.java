@@ -226,6 +226,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public void fireNetworkChanged() {
+//		System.out.println("fireNetworkChanged");
 //		updateNetworkData();
 //		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
@@ -235,6 +236,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public void fireNetworkElementAdded(AbstractNetworkElement element) {
+//		System.out.println("fireNetworkElementAdded");
 		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
 		event.setNetworkElement(element);
@@ -244,12 +246,13 @@ public class Network extends ParameterSupport {
 	}
 	
 	public void fireNetworkElementRemoved(AbstractNetworkElement element) {
+//		System.out.println("fireNetworkElementRemoved");
 //		updateNetworkData();
 		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
 		event.setNetworkElement(element);
 		for (INetworkChangeListener listener : listeners) {
-			listener.networkElementAdded(event);
+			listener.networkElementRemoved(event);
 		}
 	}
 	
