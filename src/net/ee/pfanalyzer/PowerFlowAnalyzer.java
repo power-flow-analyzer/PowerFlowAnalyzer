@@ -71,6 +71,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //	private final static String ACTION_CASE_LAYOUT = "action.case.layout";
 	
 //	private final static String ACTION_DIAGRAM_ADD = "action.diagram.add";
+	private final static String ACTION_TABLE_ADD = "action.table.add";
 //	private final static String ACTION_DIAGRAM_EDIT = "action.diagram.edit";
 //	private final static String ACTION_DIAGRAM_REMOVE = "action.diagram.remove";
 
@@ -163,6 +164,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.add(createToolbarButton(ACTION_CASE_SAVE, "Save this power flow case", "save_as.png", "Save case"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_REMOVE, "Remove this case", "report_delete.png", "Remove Case"));
 		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open parameter database defining parameters for networks and scripts", "database.png", "Parameter DB"));
+		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_EXECUTE_SCRIPT, "Execute a script on this network", "calculator.png", "Execute script"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_NETWORK_ADD_ELEMENT, "Add a new network element", "plugin_add.png", "Add element"));
@@ -175,8 +178,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbar.add(createToolbarButton(ACTION_CASE_LAYOUT, "Change layout", "grid.png", "Change layout"));
 //		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_APP_PROPERTIES, "Edit program settings", "widgets.png", "App settings"));
-		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open parameter database containing network and script parameters", "database.png", "Parameter DB"));
-		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data table for a filtered set of elements", "table_add.png", "New Table"));
 		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
@@ -223,10 +225,13 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_CASE_SAVE)) {
 				saveCaseFile();
 //			} else if(e.getActionCommand().equals(ACTION_DIAGRAM_ADD)) {
-//				DiagramSheetPropertiesDialog dialog = new DiagramSheetPropertiesDialog(this);
-//				if(dialog.isCancelPressed())
+//				if(getCurrentViewer() == null)
 //					return;
-//				getCurrentViewer().addDiagramSheet(dialog.getDiagramSheetProperties());
+//				getCurrentViewer().addDiagram();
+			} else if(e.getActionCommand().equals(ACTION_TABLE_ADD)) {
+				if(getCurrentViewer() == null)
+					return;
+				getCurrentViewer().addTable();
 //			} else if(e.getActionCommand().equals(ACTION_DIAGRAM_EDIT)) {
 //				DiagramSheetPropertiesDialog dialog = new DiagramSheetPropertiesDialog(this, 
 //						getCurrentViewer().getCurrentDiagramSheetProperties());
@@ -350,7 +355,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		// call matlab script
 		String scriptFile = network.getTextParameter("SCRIPT");
 		if(scriptFile == null || scriptFile.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "SCRIPT parameter must be set!", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "The SCRIPT parameter must be set for this script in the parameter database!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		callMatlabCommand(scriptFile, new Object[] { network }, 0, true);
@@ -683,6 +688,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		boolean hasDiagrams = hasViewer && getCurrentViewer().hasDiagramSheet();
 		boolean isMatlabEnv = environment == MATLAB_ENVIRONMENT;
 //		toolbarButtons.get(ACTION_DIAGRAM_ADD).setEnabled(hasViewer);
+		toolbarButtons.get(ACTION_TABLE_ADD).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(getCurrentCase() != null);
 //		toolbarButtons.get(ACTION_DIAGRAM_EDIT).setEnabled(hasDiagrams);
 		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);

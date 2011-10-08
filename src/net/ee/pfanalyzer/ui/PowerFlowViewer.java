@@ -9,21 +9,23 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.ee.pfanalyzer.model.Branch;
-import net.ee.pfanalyzer.model.Bus;
-import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.model.data.DataViewerData;
+import net.ee.pfanalyzer.model.data.DataViewerType;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
+import net.ee.pfanalyzer.ui.dataviewer.DataViewerContainer;
+import net.ee.pfanalyzer.ui.dataviewer.DataViewerDialog;
+import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.table.DataTable;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
-import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
 public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
@@ -31,16 +33,14 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private PowerFlowCase powerFlowCase;
 	private Network network;
 	
-	private NetworkViewer viewer;
+	private NetworkViewer networkViewer;
 	private NetworkElementSelectionManager selectionManager;
 	private ClosableTabbedPane dataTabs;
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	private NetworkViewerController viewerController;
 	private ElementPanelController panelController;
-	private ClosableTabbedPane diagramTabs = new ClosableTabbedPane();
 
-	private List<DiagramSheet> diagrams = new ArrayList<DiagramSheet>();
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private List<INetworkDataViewer> viewers = new ArrayList<INetworkDataViewer>();
 	private JLabel networkDescriptionLabel = new JLabel();
@@ -50,9 +50,9 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		this.powerFlowCase = caze;
 		this.network = network;
 		selectionManager = new NetworkElementSelectionManager();
-		viewer = new NetworkViewer(getNetwork());
-		viewerController = new NetworkViewerController(viewer);
-		viewer.setController(viewerController);
+		networkViewer = new NetworkViewer(getNetwork());
+		viewerController = new NetworkViewerController(networkViewer);
+		networkViewer.setController(viewerController);
 		panelController = new ElementPanelController(getNetwork());
 		JPanel dataPanel = new JPanel(new BorderLayout());
 		dataPanel.add(panelController, BorderLayout.CENTER);
@@ -74,30 +74,30 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		
 		networkDescriptionLabel.setText(network.getDescription());
 		networkDescriptionLabel.setFont(networkDescriptionLabel.getFont().deriveFont(14f));
-//		dataPanel.add(diagramTabs.getComponent(), BorderLayout.CENTER);
 		
-		addTable("Bus Data", "bus");
-		addTable("Branch Data", "branch");
-		addTable("Generator Data", "generator");
+		// add data viewers
+		for (DataViewerData viewerData : getPowerFlowCase().getDataViewerData()) {
+			addDataViewer(viewerData);
+		}
 
-		addDiagram("Voltage Magnitude", "bus", "VM");
-
-		getNetwork().addNetworkChangeListener(viewer);
+		getNetwork().addNetworkChangeListener(networkViewer);
 		getNetwork().addNetworkChangeListener(panelController);
-		addNetworkElementSelectionListener(viewer);
+		addNetworkElementSelectionListener(networkViewer);
 		addNetworkElementSelectionListener(panelController);
 		addNetworkElementSelectionListener(this);
 		
-		diagramTabs.setTabListener(new TabListener() {
+		dataTabs.setTabListener(new TabListener() {
 			@Override
 			public boolean tabClosing(int tabIndex) {
 				int choice = JOptionPane.showConfirmDialog(PowerFlowViewer.this, 
-						"Do you want to close this diagram?", "Close diagram", JOptionPane.YES_NO_OPTION);
+						"Do you want to remove this viewer?", "Close viewer", JOptionPane.YES_NO_OPTION);
 				return choice == JOptionPane.YES_OPTION;
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
-				diagrams.remove(tabIndex);
+				INetworkDataViewer viewer = viewers.get(tabIndex);
+				viewers.remove(tabIndex);
+				removeViewer(viewer);
 				fireActionUpdate();
 			}
 			@Override
@@ -106,55 +106,104 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		});
 	}
 	
-	private void addTable(String label, String elementID) {
-		INetworkDataViewer table = new DataTable(elementID);
-		table.setData(getNetwork());
-		table.refresh();
-		viewers.add(table);
-		dataTabs.addTab(label, new JScrollPane(table.getComponent()));
-		addNetworkElementSelectionListener(table);
-		getNetwork().addNetworkChangeListener(table);
+	private void removeViewer(INetworkDataViewer viewer) {
+		removeNetworkElementSelectionListener(viewer);
+		getNetwork().removeNetworkChangeListener(viewer);
+		getPowerFlowCase().getDataViewerData().remove(viewer.getViewerData());
 	}
 	
-	private void addDiagram(String label, String elementID, String parameterID) {
-		PowerFlowDiagram diagram = new PowerFlowDiagram(elementID, parameterID);
-		diagram.setTitle(label);
-		diagram.setData(getNetwork());
-		diagram.refresh();
-		viewers.add(diagram);
-		dataTabs.addTab(label, new JScrollPane(diagram.getComponent()));
-		getNetwork().addNetworkChangeListener(diagram);
+	public void dispose() {
+		getNetwork().removeNetworkChangeListener(networkViewer);
+		getNetwork().removeNetworkChangeListener(panelController);
+		removeNetworkElementSelectionListener(networkViewer);
+		removeNetworkElementSelectionListener(panelController);
+		removeNetworkElementSelectionListener(this);
+		for (INetworkDataViewer viewer : viewers) {
+			removeViewer(viewer);
+		}
 	}
 	
-	public void addDiagramSheet(DiagramSheetProperties props) {
-		DiagramSheet sheet = new DiagramSheet(props);
-		diagrams.add(sheet);
-		diagramTabs.addTab(props.getTitle(), new JScrollPane(sheet));
-		diagramTabs.selectLastTab();
-	}
-	
-	public void setCurrentDiagramSheet(DiagramSheetProperties props) {
-		if(getCurrentSheet() == null)
+	public void addTable() {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setType(DataViewerType.TABLE);
+		DataViewerDialog dialog = new DataViewerDialog(SwingUtils.getTopLevelFrame(this), 
+				"Create Table", viewerData);
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())
 			return;
-		getCurrentSheet().setProperties(props);
-		diagramTabs.setTitleAt(diagramTabs.getSelectedIndex(), props.getTitle());
+		addDataViewer(viewerData);
+		dataTabs.selectLastTab();
+		getPowerFlowCase().getDataViewerData().add(viewerData);
 	}
 	
-	public DiagramSheetProperties getCurrentDiagramSheetProperties() {
-		if(getCurrentSheet() == null)
-			return null;
-		return getCurrentSheet().getProperties();
+	public void addDiagram() {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setType(DataViewerType.DIAGRAM);
+		DataViewerDialog dialog = new DataViewerDialog(SwingUtils.getTopLevelFrame(this), 
+				"Create Diagram", viewerData);
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())
+			return;
+		addDataViewer(viewerData);
+		dataTabs.selectLastTab();
+		getPowerFlowCase().getDataViewerData().add(viewerData);
 	}
 	
-	private DiagramSheet getCurrentSheet() {
-		if(diagramTabs.getSelectedIndex() == -1)
-			return null;
-		return diagrams.get(diagramTabs.getSelectedIndex());
+	private void addDataViewer(DataViewerData viewerData) {
+		INetworkDataViewer viewer = null;
+		if(DataViewerType.TABLE.equals(viewerData.getType()))
+			viewer = new DataTable(viewerData);
+		else if(DataViewerType.DIAGRAM.equals(viewerData.getType()))
+			viewer = new PowerFlowDiagram(viewerData);
+		if(viewer == null)
+			return;
+		viewer.setData(getNetwork());
+		viewer.refresh();
+		viewers.add(viewer);
+		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer));
+		addNetworkElementSelectionListener(viewer);
+		getNetwork().addNetworkChangeListener(viewer);
 	}
 	
-	public boolean hasDiagramSheet() {
-		return diagramTabs.hasTabs();
-	}
+//	private void addDiagram(String label, String elementID, String parameterID) {
+//		PowerFlowDiagram diagram = new PowerFlowDiagram(elementID, parameterID);
+//		diagram.setTitle(label);
+//		diagram.setData(getNetwork());
+//		diagram.refresh();
+//		viewers.add(diagram);
+//		dataTabs.addTab(label, new JScrollPane(diagram.getComponent()));
+//		getNetwork().addNetworkChangeListener(diagram);
+//	}
+	
+//	public void addDiagramSheet(DiagramSheetProperties props) {
+//		DiagramSheet sheet = new DiagramSheet(props);
+//		diagrams.add(sheet);
+//		diagramTabs.addTab(props.getTitle(), new JScrollPane(sheet));
+//		diagramTabs.selectLastTab();
+//	}
+	
+//	public void setCurrentDiagramSheet(DiagramSheetProperties props) {
+//		if(getCurrentSheet() == null)
+//			return;
+//		getCurrentSheet().setProperties(props);
+//		diagramTabs.setTitleAt(diagramTabs.getSelectedIndex(), props.getTitle());
+//	}
+//	
+//	public DiagramSheetProperties getCurrentDiagramSheetProperties() {
+//		if(getCurrentSheet() == null)
+//			return null;
+//		return getCurrentSheet().getProperties();
+//	}
+	
+//	private DiagramSheet getCurrentSheet() {
+//		if(diagramTabs.getSelectedIndex() == -1)
+//			return null;
+//		return diagrams.get(diagramTabs.getSelectedIndex());
+//	}
+//	
+//	public boolean hasDiagramSheet() {
+//		return diagramTabs.hasTabs();
+//	}
 	
 	public PowerFlowCase getPowerFlowCase() {
 		return powerFlowCase;
@@ -184,12 +233,18 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	public void selectionChanged(Object data) {
 		if(data == null)
 			return;
-		if(data instanceof Bus)
-			dataTabs.setSelectedIndex(0);
-		else if(data instanceof Branch)
-			dataTabs.setSelectedIndex(1);
-		else if(data instanceof Generator)
-			dataTabs.setSelectedIndex(2);
+		// show tab which contains the new selection
+		if(data instanceof AbstractNetworkElement) {
+			String modelID = ((AbstractNetworkElement) data).getModelID();
+			if(modelID == null || modelID.isEmpty())
+				return;
+			for (int i = 0; i < getPowerFlowCase().getDataViewerData().size(); i++) {
+				if(modelID.startsWith(getPowerFlowCase().getDataViewerData().get(i).getElementFilter())) {
+					dataTabs.setSelectedIndex(i);
+					break;
+				}
+			}
+		}
 	}
 	
 	public void addNetworkElementSelectionListener(INetworkElementSelectionListener listener) {

@@ -22,19 +22,20 @@ import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.IDerivedElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
+import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
-import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
 public class DataTable extends JTable implements INetworkDataViewer {
 
+	private DataViewerData viewerData;
 	private Network network;
-	private String elementID;
 	private DataTableModel model;
 	private boolean selfSelection = false;
 	
-	public DataTable(String elementID) {
+	public DataTable(DataViewerData viewerData) {
 		super();
-		this.elementID = elementID;
+		this.viewerData = viewerData;
 		model = new DataTableModel();
 		setModel(model);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -74,6 +75,11 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	}
 	
 	@Override
+	public DataViewerData getViewerData() {
+		return viewerData;
+	}
+
+	@Override
 	public JComponent getComponent() {
 		return this;
 	}
@@ -86,13 +92,19 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	@Override
 	public void setData(Network network) {
 		this.network = network;
-		model.setData(getNetwork().getElements(elementID));
+		filterElements();
+		refresh();
+	}
+	
+	private void filterElements() {
+//		model.setData(getNetwork().getElements(elementID));
 	}
 
 	@Override
 	public void refresh() {
 		selfSelection = true;
-		model.reloadTableData();
+		model.setData(getNetwork().getElements(viewerData.getElementFilter()));
+//		model.reloadTableData();
 		resizeAndRepaint();
 		selfSelection = false;
 	}
@@ -125,14 +137,14 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	@Override
 	public void networkChanged(NetworkChangeEvent event) {
 //		System.out.println("table: networkChanged");
-		model.setData(getNetwork().getElements(elementID));
-//		refresh();
+//		filterElements();
+		refresh();
 	}
 
 	@Override
 	public void networkElementAdded(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkElementAdded");
-		model.setData(getNetwork().getElements(elementID));
+//		filterElements();
 		refresh();
 	}
 
@@ -149,7 +161,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 
 	@Override
 	public void networkElementRemoved(NetworkChangeEvent event) {
-		model.setData(getNetwork().getElements(elementID));
+//		filterElements();
 		refresh();
 	}
 

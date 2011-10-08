@@ -2,7 +2,6 @@ package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,7 +18,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -38,6 +36,7 @@ import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
 public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener {
@@ -56,7 +55,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		
 		overviewPane = new NetworkOverviewPane();
 		networkTabs = new NetworkTabbedPane();
-		modelDBDialog = new ModelDBDialog((Frame) SwingUtilities.getWindowAncestor(this), 
+		modelDBDialog = new ModelDBDialog(SwingUtils.getTopLevelFrame(this), 
 				getPowerFlowCase().getModelDB());
 		
 		networkTabs.setTabListener(new TabListener() {
@@ -76,6 +75,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			public void tabClosed(int tabIndex) {
 				lastViewer.removeActionUpdateListener(NetworkContainer.this);
 				lastViewer.removeNetworkElementSelectionListener(modelDBDialog);
+				lastViewer.dispose();
 //				getPowerFlowCase().removeNetwork(lastViewer.getNetwork());
 //				if(networkTabs.getSelectedIndex() == networkTabs.getTabCount() - 1)
 //					networkTabs.setSelectedIndex(0);
@@ -90,7 +90,6 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		});
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
-		overviewPane.updateScriptActions();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
 	}
 	
@@ -257,6 +256,9 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	public void dispose() {
 		modelDBDialog.setVisible(false);
 		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
+		for (int i = 0; i < getViewerCount(); i++) {
+			getViewer(i + 1).dispose();
+		}
 	}
 	
 	class NetworkOverviewPane extends JPanel {
@@ -310,7 +312,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 				@Override
 				protected void actionPerformed() {
 					ImportMatpowerDialog dialog = new ImportMatpowerDialog(
-							(Frame) SwingUtilities.getWindowAncestor(NetworkContainer.this));
+							SwingUtils.getTopLevelFrame(NetworkContainer.this));
 					dialog.showDialog(-1, -1);
 					if(dialog.isCancelPressed())// cancel pressed
 						return;
@@ -425,24 +427,29 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			importFromScriptAction.setEnabled(isMatlabEnv);
 			duplicateNetworkAction.setEnabled(singleSelection);
 			deleteNetworkAction.setEnabled( ! emptySelection);
+			updateScriptActions();
 		}
 		
 		private void updateScriptActions() {
 			scriptActionPane.removeAll();
-			for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
-				String label = script.getLabel();
-				if(label == null || label.isEmpty())
-					label = "Untitled Script";
-				HyperLinkAction action = new HyperLinkAction(label) {
-					@Override
-					protected void actionPerformed() {
-						Network network = getSelectedNetwork();
-						if(network == null)
-							return;
-						PowerFlowAnalyzer.getInstance().executeScript(network, script);
-					}
-				};
-				scriptActionPane.add(action);
+			if(selectedNetworks.size() == 0) {
+				scriptActionPane.add(new JLabel("<No network selected>"));
+			} else {
+				for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
+					String label = script.getLabel();
+					if(label == null || label.isEmpty())
+						label = "Untitled Script";
+					HyperLinkAction action = new HyperLinkAction(label) {
+						@Override
+						protected void actionPerformed() {
+							Network network = getSelectedNetwork();
+							if(network == null)
+								return;
+							PowerFlowAnalyzer.getInstance().executeScript(network, script);
+						}
+					};
+					scriptActionPane.add(action);
+				}
 			}
 			scriptActionPane.revalidate();
 			scriptActionPane.repaint();

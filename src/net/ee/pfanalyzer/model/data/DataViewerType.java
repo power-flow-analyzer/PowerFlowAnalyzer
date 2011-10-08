@@ -14,40 +14,31 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for NetworkParameterValueRestriction.
+ * <p>Java class for DataViewerType.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="NetworkParameterValueRestriction">
+ * &lt;simpleType name="DataViewerType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="none"/>
- *     &lt;enumeration value="bus-number"/>
- *     &lt;enumeration value="list"/>
- *     &lt;enumeration value="unique parameter value"/>
- *     &lt;enumeration value="existing parameter value"/>
+ *     &lt;enumeration value="table"/>
+ *     &lt;enumeration value="diagram"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "NetworkParameterValueRestriction")
+@XmlType(name = "DataViewerType")
 @XmlEnum
-public enum NetworkParameterValueRestriction {
+public enum DataViewerType {
 
-    @XmlEnumValue("none")
-    NONE("none"),
-    @XmlEnumValue("bus-number")
-    BUS_NUMBER("bus-number"),
-    @XmlEnumValue("list")
-    LIST("list"),
-    @XmlEnumValue("unique parameter value")
-    UNIQUE_PARAMETER_VALUE("unique parameter value"),
-    @XmlEnumValue("existing parameter value")
-    EXISTING_PARAMETER_VALUE("existing parameter value");
+    @XmlEnumValue("table")
+    TABLE("table"),
+    @XmlEnumValue("diagram")
+    DIAGRAM("diagram");
     private final String value;
 
-    NetworkParameterValueRestriction(String v) {
+    DataViewerType(String v) {
         value = v;
     }
 
@@ -55,8 +46,8 @@ public enum NetworkParameterValueRestriction {
         return value;
     }
 
-    public static NetworkParameterValueRestriction fromValue(String v) {
-        for (NetworkParameterValueRestriction c: NetworkParameterValueRestriction.values()) {
+    public static DataViewerType fromValue(String v) {
+        for (DataViewerType c: DataViewerType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

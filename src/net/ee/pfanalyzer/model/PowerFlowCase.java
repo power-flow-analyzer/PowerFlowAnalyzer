@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.ee.pfanalyzer.model.data.CaseData;
+import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.ui.NetworkContainer;
@@ -59,6 +60,10 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	
 	public NetworkContainer getViewer() {
 		return viewer;
+	}
+	
+	public List<DataViewerData> getDataViewerData() {
+		return pfCase.getDataViewer();
 	}
 
 	public void setViewer(NetworkContainer viewer) {

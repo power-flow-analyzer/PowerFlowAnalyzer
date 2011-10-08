@@ -18,14 +18,16 @@ import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkFlag;
+import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
-import net.ee.pfanalyzer.ui.util.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
 public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 
 	private final static Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 	private final static Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 	
+	private DataViewerData viewerData;
 	private Network network;
 	private String elementID, parameterID;
 	private List<AbstractNetworkElement> elements;
@@ -45,9 +47,12 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	private Object selection, hover;
 	DecimalFormat format = new DecimalFormat("#.###");
 	
-	public PowerFlowDiagram(String elementID, String parameterID) {
-		this.elementID = elementID;
-		this.parameterID = parameterID;
+	public PowerFlowDiagram(DataViewerData viewerData) {
+		this.viewerData = viewerData;
+		this.elementID = viewerData.getElementFilter();
+		if(true)
+			throw new RuntimeException("TODO: Parameter-ID setzen");//TODO
+//		this.parameterID = viewerData.get;
 		MouseInputListener mouseListener = new MouseInputAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -87,6 +92,11 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		revalidate();
+	}
+	
+	@Override
+	public DataViewerData getViewerData() {
+		return viewerData;
 	}
 	
 	@Override
