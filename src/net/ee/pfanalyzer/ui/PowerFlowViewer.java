@@ -64,10 +64,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		horizontalSplitPane.setDividerLocation(300);
 		horizontalSplitPane.setDividerSize(10);
 		verticalSplitPane.setTopComponent(horizontalSplitPane);
-		verticalSplitPane.setBottomComponent(dataTabs.getComponent());
 		verticalSplitPane.setContinuousLayout(true);
 		verticalSplitPane.setOneTouchExpandable(true);
-		verticalSplitPane.setDividerLocation(450);
 		verticalSplitPane.setDividerSize(10);
 		add(networkDescriptionLabel, BorderLayout.NORTH);
 		add(verticalSplitPane, BorderLayout.CENTER);
@@ -163,6 +161,11 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer, getPowerFlowCase()));
 		addNetworkElementSelectionListener(viewer);
 		getNetwork().addNetworkChangeListener(viewer);
+		if(verticalSplitPane.getBottomComponent() == null)
+			verticalSplitPane.setBottomComponent(dataTabs.getComponent());
+		if(dataTabs.getComponent().getHeight() == 0) {
+			verticalSplitPane.setDividerLocation(400);
+		}
 	}
 	
 //	private void addDiagram(String label, String elementID, String parameterID) {
