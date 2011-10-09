@@ -110,10 +110,10 @@ public class ParameterContainer extends JPanel {
 					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
 					panel.add(box);
 				} else if(NetworkParameterType.DOUBLE.equals(propertyDefinition.getType())) {
-					ParameterDoubleField box = new ParameterDoubleField(parameterMaster, propertyDefinition, propertyValue);
+					ParameterNumberSpinnerField box = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, false);
 					panel.add(box);
 				} else if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType())) {
-					ParameterIntField box = new ParameterIntField(parameterMaster, propertyDefinition, propertyValue);
+					ParameterNumberSpinnerField box = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, true);
 					panel.add(box);
 				} else { //if(NetworkParameterType.TEXT.equals(propertyDefinition.getType())) {
 					ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
