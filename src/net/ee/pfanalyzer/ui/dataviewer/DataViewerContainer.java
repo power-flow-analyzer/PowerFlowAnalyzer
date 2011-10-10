@@ -13,16 +13,19 @@ import javax.swing.SwingUtilities;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.ui.PowerFlowViewer;
 
 public class DataViewerContainer extends JPanel {
 	
 	private INetworkDataViewer viewer;
 	private PowerFlowCase powerFlowCase;
+	private PowerFlowViewer powerFlowviewer;
 
-	public DataViewerContainer(INetworkDataViewer viewer, PowerFlowCase caze) {
+	public DataViewerContainer(INetworkDataViewer viewer, PowerFlowViewer powerFlowviewer) {
 		super(new BorderLayout());
 		this.viewer = viewer;
-		this.powerFlowCase = caze;
+		this.powerFlowCase = powerFlowviewer.getPowerFlowCase();
+		this.powerFlowviewer = powerFlowviewer;
 		
 		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
@@ -45,8 +48,10 @@ public class DataViewerContainer extends JPanel {
 		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
 				"Viewer Properties", getViewer().getViewerData(), powerFlowCase);
 		dialog.showDialog(-1, -1);
-		if(dialog.isOkPressed())
+		if(dialog.isOkPressed()) {
 			getViewer().refresh();
+			powerFlowviewer.updateTabTitles();
+		}
 	}
 
 	public INetworkDataViewer getViewer() {

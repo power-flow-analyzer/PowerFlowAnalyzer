@@ -158,7 +158,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		viewer.setData(getNetwork());
 		viewer.refresh();
 		viewers.add(viewer);
-		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer, getPowerFlowCase()));
+		dataTabs.addTab(viewerData.getTitle(), new DataViewerContainer(viewer, this));
 		addNetworkElementSelectionListener(viewer);
 		getNetwork().addNetworkChangeListener(viewer);
 		if(verticalSplitPane.getBottomComponent() == null)
@@ -271,6 +271,14 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private void fireActionUpdate() {
 		for (IActionUpdater listener : actionUpdater) {
 			listener.updateActions();
+		}
+	}
+
+	
+	public void updateTabTitles() {
+		// update tab titles for viewers
+		for (int i = 0; i < viewers.size(); i++) {
+			dataTabs.setTitleAt(i, viewers.get(i).getViewerData().getTitle());
 		}
 	}
 	
