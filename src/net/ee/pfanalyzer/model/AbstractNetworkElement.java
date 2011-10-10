@@ -105,6 +105,10 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 			getElementData().setModelID(id);
 	}
 	
+	public boolean isModel(String modelIDPrefix) {
+		return getModelID() != null && getModelID().startsWith(modelIDPrefix);
+	}
+	
 	public String getDefaultModelID() {
 		return "";
 	}
