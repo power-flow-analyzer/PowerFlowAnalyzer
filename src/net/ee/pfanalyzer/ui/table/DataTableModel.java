@@ -16,6 +16,7 @@ public class DataTableModel extends AbstractTableModel {
 	private List<String> parameters = new ArrayList<String>();
 	private List<String> columnNames = new ArrayList<String>();
 	private List<String> columnDescriptions = new ArrayList<String>();
+	private boolean emptyParameters = false;
 	
 	public DataTableModel() {
 		data = new ArrayList<AbstractNetworkElement>();
@@ -34,6 +35,7 @@ public class DataTableModel extends AbstractTableModel {
 		parameters.clear();
 		columnNames.clear();
 		columnDescriptions.clear();
+		emptyParameters = false;
 		for (AbstractNetworkElement element : data) {
 			for (NetworkParameter parameter : element.getParameterList()) {
 				if(parameters.contains(parameter.getID()) == false) {
@@ -56,6 +58,12 @@ public class DataTableModel extends AbstractTableModel {
 					columnDescriptions.add(description);
 				}
 			}
+		}
+		if(parameters.isEmpty()) {
+			emptyParameters = true;
+			parameters.add("EMPTY");
+			columnNames.add(" ");
+			columnDescriptions.add("This network element has no parameters.");
 		}
 		fireTableStructureChanged();
 	}
@@ -84,9 +92,13 @@ public class DataTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		String parameterID = parameters.get(columnIndex);
 		AbstractNetworkElement element = data.get(rowIndex);
-		return element.getParameterDisplayValue(parameterID);
+		if(emptyParameters) {
+			return element.getDisplayName(AbstractNetworkElement.DISPLAY_NAME);
+		} else {
+			String parameterID = parameters.get(columnIndex);
+			return element.getParameterDisplayValue(parameterID);
+		}
 	}
 	
 	protected boolean isValueCorrect(int row, int column) {
