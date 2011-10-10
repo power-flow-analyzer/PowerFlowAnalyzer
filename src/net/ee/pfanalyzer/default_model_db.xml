@@ -245,6 +245,11 @@
                 </parameter>
                 <model ID="unknown" label="Unknown Generator"/>
             </modelClass>
+            <model ID="unknown" label="Unknown Element">
+                <parameter ID="NAME" type="text" label="Name" empty="true">
+                    <display/>
+                </parameter>
+            </model>
         </modelClass>
         <modelClass ID="script" label="Scripts">
             <parameter ID="SCRIPT" type="text" label="Script" empty="true">
