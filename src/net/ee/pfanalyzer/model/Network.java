@@ -189,6 +189,9 @@ public class Network extends ParameterSupport {
 			} else if(element.getModelID().startsWith("generator.")) {
 				addElementInternal(new Generator(this, element, getGenerators().size()));
 //				System.out.println("    adding generator: " + element.getModelID());
+			} else {
+				addElementInternal(new NetworkElement(this, element, getElements().size()));
+//				System.out.println("    adding element: " + element.getModelID());
 			}
 		}
 //		System.out.println("    " + getElements().size() + " elements added");
@@ -291,6 +294,9 @@ public class Network extends ParameterSupport {
 		} else if(modelID.startsWith("generator.")) {
 			element = new Generator(this, getGenerators().size());
 //			System.out.println("    adding generator: " + modelID);
+		} else {
+			element = new NetworkElement(this, getElements().size());
+//			System.out.println("    adding element: " + element.getModelID());
 		}
 		element.setModelID(modelID);
 		if(getPowerFlowCase() != null)
@@ -420,10 +426,10 @@ public class Network extends ParameterSupport {
 			CombinedBus cToBus = getCombinedBus(toBus);
 			if(cFromBus == null || cToBus == null)
 				continue;
-			if(cFromBus == cToBus) {// combined start and end busses are the same -> branch is a transformer!
-				cFromBus.addTransformer(new Transformer(branch));
-				continue;
-			}
+//			if(cFromBus == cToBus) {// combined start and end busses are the same -> branch is a transformer!
+//				cFromBus.addTransformer(new Transformer(branch));// TODO Transformers raus?
+//				continue;
+//			}
 //			System.out.println("Branch " + i);
 //			System.out.println("  from bus: " + fromBus.getIndex() + "(" + fromBusIndex + ")");
 //			System.out.println("    combined bus: " + cFromBus.getIndex());
@@ -491,6 +497,12 @@ public class Network extends ParameterSupport {
 				return bus;
 		}
 		return null;
+	}
+	
+	public int getNextBusNumber(int busNumber) {
+		while(getBus(busNumber) != null)
+			busNumber++;
+		return busNumber;
 	}
 	
 	public List<Generator> getGenerators() {

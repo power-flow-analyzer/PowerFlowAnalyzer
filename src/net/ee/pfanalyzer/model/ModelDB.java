@@ -13,6 +13,7 @@ import net.ee.pfanalyzer.model.util.ModelDBUtils;
 
 public class ModelDB {
 
+	public final static String DEFAULT_MODEL = "unknown";
 	public final static String DEFAULT_BUS_MODEL = "bus.unknown";
 	public final static String DEFAULT_BRANCH_MODEL = "branch.unknown";
 	public final static String DEFAULT_GENERATOR_MODEL = "generator.unknown";
