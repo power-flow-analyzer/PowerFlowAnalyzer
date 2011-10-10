@@ -6,11 +6,9 @@ import java.awt.Frame;
 
 import javax.swing.JPanel;
 
-import net.ee.pfanalyzer.model.Branch;
-import net.ee.pfanalyzer.model.Bus;
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
-import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
@@ -23,9 +21,7 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 	private final static String NETWORK_CARD = "network";
 	private final static String COMBINED_BUS_CARD = "combined-bus";
 	private final static String COMBINED_BRANCH_CARD = "combined-branch";
-	private final static String SINGLE_BUS_CARD = "single-bus";
-	private final static String SINGLE_BRANCH_CARD = "single-branch";
-	private final static String GENERATOR_CARD = "generator";
+	private final static String ELEMENT_CARD = "element";
 	
 	private Network data;
 	
@@ -35,9 +31,7 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 	private NetworkPanel networkPanel;
 	private CombinedBusPanel cBusPanel;
 	private CombinedBranchPanel cBranchPanel;
-	private BusPanel busPanel;
-	private BranchPanel branchPanel;
-	private GeneratorPanel generatorPanel;
+	private ModelElementPanel elementPanel;
 	private Object oldSelection;
 	
 	public ElementPanelController(Network data) {
@@ -53,15 +47,9 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 		add(cBusPanel, COMBINED_BUS_CARD);
 		cBranchPanel = new CombinedBranchPanel(this, data);
 		add(cBranchPanel, COMBINED_BRANCH_CARD);
-		busPanel = new BusPanel(this);
-		busPanel.setShowResultsWhenEditing(false);
-		add(busPanel, SINGLE_BUS_CARD);
-		branchPanel = new BranchPanel(this);
-		branchPanel.setShowResultsWhenEditing(false);
-		add(branchPanel, SINGLE_BRANCH_CARD);
-		generatorPanel = new GeneratorPanel(this);
-		generatorPanel.setShowResultsWhenEditing(false);
-		add(generatorPanel, GENERATOR_CARD);
+		elementPanel = new ModelElementPanel(this);
+		elementPanel.setShowResultsWhenEditing(false);
+		add(elementPanel, ELEMENT_CARD);
 		
 		cardLayout.show(this, NETWORK_CARD);
 	}
@@ -84,16 +72,10 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 		} else if(selection instanceof CombinedBranch) {
 			cBranchPanel.setCombinedBranch((CombinedBranch) selection);
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
-		} else if(selection instanceof Bus) {
-			busPanel.setNetworkElement((Bus) selection);
-			cardLayout.show(this, SINGLE_BUS_CARD);
-		} else if(selection instanceof Branch) {
-			branchPanel.setNetworkElement((Branch) selection);
-			cardLayout.show(this, SINGLE_BRANCH_CARD);
-		} else if(selection instanceof Generator) {
-			generatorPanel.setNetworkElement((Generator) selection);
-			cardLayout.show(this, GENERATOR_CARD);
-		}
+		} else if(selection instanceof AbstractNetworkElement) {
+			elementPanel.setNetworkElement((AbstractNetworkElement) selection);
+			cardLayout.show(this, ELEMENT_CARD);
+		} 
 		doLayout();
 		revalidate();
 		repaint();
