@@ -759,12 +759,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		private JProgressBar progressBar;
 		
 		ProgressDialog() {
-			super(PowerFlowAnalyzer.this, "Calculating", false);
+			super(PowerFlowAnalyzer.this, "Please wait...", false);
 			progressBar = new JProgressBar();
 			progressBar.setIndeterminate(true);
 			JPanel contentPane = new JPanel(new BorderLayout());
 			contentPane.setBorder(new EmptyBorder(10, 50, 20, 50));
-			JLabel l = new JLabel("<html><b>Please wait while calculating power flow...");
+			JLabel l = new JLabel("<html><b>Please wait while the requested operations are executed...");
 			l.setBorder(new EmptyBorder(20, 10, 30, 10));
 			contentPane.add(l, BorderLayout.CENTER);
 			contentPane.add(progressBar, BorderLayout.SOUTH);
