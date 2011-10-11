@@ -122,7 +122,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //			}
 //		}
 		PowerFlowViewer viewer = new PowerFlowViewer(powerFlowCase, network);
-		networkTabs.addNetworkTab(getScenarioName(network), viewer, true);
+		networkTabs.addNetworkTab(getNetworkName(network), viewer, true);
 		viewer.addActionUpdateListener(this);
 		viewer.addNetworkElementSelectionListener(modelDBDialog);
 		overviewPane.refreshList();
@@ -181,26 +181,33 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		return viewer.getSelectionManager();
 	}
 	
-	private String getScenarioName(Network scenario) {
-		String name = scenario.getName();
-		if(name.isEmpty()) {
-			int i = 1;
-			name = "Untitled ";
-			while(containsNetworkName(name + i))
-				i++;
-			
-			return name + i;
-		}
+//	private String getScenarioName(Network scenario) {
+//		String name = scenario.getName();
+//		if(name.isEmpty()) {
+//			int i = 1;
+//			name = "Untitled ";
+//			while(containsNetworkName(name + i))
+//				i++;
+//			
+//			return name + i;
+//		}
+//		return name;
+//	}
+	
+	private String getNetworkName(Network network) {
+		String name = network.getName();
+		if(name.isEmpty())
+			return "Untitled " + network.getInternalID();
 		return name;
 	}
 	
-	private boolean containsNetworkName(String name) {
-		for (Network network : getPowerFlowCase().getNetworks()) {
-			if(network.getName().equals(name))
-				return true;
-		}
-		return false;
-	}
+//	private boolean containsNetworkName(String name) {
+//		for (Network network : getPowerFlowCase().getNetworks()) {
+//			if(network.getName().equals(name))
+//				return true;
+//		}
+//		return false;
+//	}
 	
 	@Override
 	public void updateActions() {
@@ -219,7 +226,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			Component comp = networkTabs.getTabComponent(i);
 			if(comp instanceof PowerFlowViewer) {
 				Network n = ((PowerFlowViewer) comp).getNetwork();
-				networkTabs.setTitleAt(i, getScenarioName(n));
+				networkTabs.setTitleAt(i, getNetworkName(n));
 			}
 		}
 	}
@@ -288,7 +295,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 				public Component getListCellRendererComponent(JList list, Object value, int index,
 				        boolean isSelected, boolean cellHasFocus) {
 						Network network = (Network) value;
-						String text = getScenarioName(network);
+						String text = getNetworkName(network);
 						return super.getListCellRendererComponent(list, text, 
 								index, isSelected, cellHasFocus);
 				    }
@@ -357,7 +364,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 					Network[] selection = selectedNetworks.toArray(new Network[selectedNetworks.size()]);
 					for (Network network : selection) {
 						if(network != null) {
-							String name = getScenarioName(network);
+							String name = getNetworkName(network);
 							int choice = JOptionPane.showConfirmDialog(NetworkContainer.this, 
 									"Do you want to delete the network \"" + name + "\"?", "Delete network", JOptionPane.YES_NO_OPTION);
 							if(choice == JOptionPane.YES_OPTION) {
