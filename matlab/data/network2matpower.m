@@ -11,10 +11,10 @@ mpc.version = '2';
 % collect data from network
 mpc.baseMVA = parameter_int(jnetwork, 'BASE_MVA');
 
-mpc.bus    = create_bus_matrix(jnetwork.getBusses());
-mpc.branch = create_branch_matrix(jnetwork.getBranches());
+mpc.bus    = create_matpower_bus_matrix(jnetwork.getBusses());
+mpc.branch = create_matpower_branch_matrix(jnetwork.getBranches());
 
-[gen, gencost] = create_generator_matrices(jnetwork.getGenerators());
+[gen, gencost] = create_matpower_generator_matrices(jnetwork.getGenerators());
 mpc.gen = gen;
 mpc.gencost = gencost;
 
