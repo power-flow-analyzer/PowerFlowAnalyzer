@@ -54,10 +54,10 @@ for i=1:bus_list.size()
         busData(i, BUS_AREA) = parameter_int(jbus, 'BUS_AREA');
     end
     if length(busData) >= VM 
-        busData(i, VM) = 1; %parameter_double(jbus, 'VM');
+        busData(i, VM) = parameter_double(jbus, 'VM');
     end
     if length(busData) >= VA 
-        busData(i, VA) = 0; %parameter_double(jbus, 'VA');
+        busData(i, VA) = parameter_double(jbus, 'VA');
     end
     if length(busData) >= BASE_KV 
         busData(i, BASE_KV) = parameter_double(jbus, 'BASE_KV');
