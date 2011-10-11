@@ -18,8 +18,11 @@ public class ExecuteScriptDialog extends BaseDialog {
 	private final static String DEFAULT_TEXT = "Select the desired script parameters and press OK.";
 	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.";
 	
+	public final static String SCRIPT_PARAMETER = "SCRIPT";
+	
 	private Network network;
 	private ModelData script;
+	private boolean showDialog = true;
 	
 	public ExecuteScriptDialog(Frame frame, Network network, ModelData script) {
 		super(frame, "Script parameters", true);
@@ -34,6 +37,14 @@ public class ExecuteScriptDialog extends BaseDialog {
 		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network));//(new ParameterMasterModel(script));
 		Group paramPanel = new Group("Script Parameters");
 		for (NetworkParameter parameter : script.getParameter()) {
+			if(isInternalScriptParameter(parameter.getID())) {
+				NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
+				if(propertyValue != null && propertyValue.getValue() != null && propertyValue.getValue().trim().length() > 0) {
+					network.setParameter(parameter.getID(), propertyValue.getValue());
+					// only save the value in the network, do not show the property
+					continue;
+				}
+			}
 			NetworkParameter paramDef = ModelDBUtils.getParameterDefinition(script, parameter.getID());
 			NetworkParameter propertyValue = network.getParameterValue(parameter.getID());
 			if(propertyValue == null || propertyValue.getValue() == null) {
@@ -44,11 +55,20 @@ public class ExecuteScriptDialog extends BaseDialog {
 			parameterPanel.addParameter(paramDef, propertyValue, paramPanel);
 		}
 		
+		showDialog = parameterPanel.getParameterCount() > 0;
 		addOKButton();
 		addCancelButton();
 		
 		contentPane.add(paramPanel, BorderLayout.CENTER);
 		setCenterComponent(contentPane);
+	}
+	
+	public boolean shouldShowDialog() {
+		return showDialog;
+	}
+	
+	private boolean isInternalScriptParameter(String parameterName) {
+		return SCRIPT_PARAMETER.equals(parameterName);
 	}
 
 	@Override
