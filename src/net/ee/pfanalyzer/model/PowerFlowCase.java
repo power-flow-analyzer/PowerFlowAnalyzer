@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.DataViewerData;
-import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 
@@ -85,7 +84,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 			network.setInternalID(maxNetworkID);
 		} else
 			maxNetworkID = Math.max(maxNetworkID, network.getInternalID());
-		updateNetworkData(network);
+		network.updateModels();
 		return network;
 	}
 	
@@ -132,37 +131,15 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		removeNetwork(networkData);
 		pfCase.getNetwork().add(networkData);
 		network.setData(networkData);
-		updateNetworkData(network);
+		network.updateModels();
 //		getNetwork().fireNetworkChanged();
 	}
 	
 	private void updateAllNetworkData() {
 		for (Network net : getNetworks())
-			updateNetworkData(net);
+			net.updateModels();
 	}
 	
-	private void updateNetworkData(Network network) {
-//		System.out.println("case: setting network data with " + network.getElements().size() + " elements");
-		// setting network class containing global parameters
-		network.setGlobalParameterClass(getModelDB().getNetworkClass());
-		network.setScriptParameterClass(getModelDB().getScriptClass());
-		// setting model references in network elements
-		for (AbstractNetworkElement element : network.getElements()) {
-			updateNetworkElement(element);
-		}
-		for (Network scenario : network.getScenarios()) {
-			updateNetworkData(scenario);
-		}
-	}
-	
-	void updateNetworkElement(AbstractNetworkElement element) {
-		ModelData model = getModelDB().getModel(element.getModelID());
-//		System.out.println("    model id: " + element.getModelID());
-//		if(model != null)
-//			System.out.println("    setting model: " + element.getModelID());
-		element.setModel(model);
-	}
-
 	@Override
 	public void elementChanged(DatabaseChangeEvent event) {
 //		System.out.println("elementChanged: " + event.getParameterID());
@@ -182,7 +159,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 
 	public Network createNetworkCopy(Network network) throws Exception {
 		Network newNet = network.copy();
-		updateNetworkData(newNet);
+		newNet.updateModels();
 		return newNet;
 	}
 	

@@ -6,6 +6,7 @@ import java.util.List;
 import net.ee.pfanalyzer.io.IllegalDataException;
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 import net.ee.pfanalyzer.model.data.ModelClassData;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
@@ -60,6 +61,12 @@ public class Network extends ParameterSupport {
 
 	void setPowerFlowCase(PowerFlowCase caze) {
 		this.caze = caze;
+	}
+	
+	public ModelDB getModelDB() {
+		if(getPowerFlowCase() != null)
+			return getPowerFlowCase().getModelDB();
+		return null;
 	}
 
 	Network copy() throws Exception {
@@ -203,11 +210,38 @@ public class Network extends ParameterSupport {
 		for (Generator generator : getGenerators()) {
 			updateElement(generator);
 		}
-		for (NetworkData data : networkData.getScenario()) {
-			Network scenario = new Network(data);
-			getScenarios().add(scenario);
-		}
+//		for (NetworkData data : networkData.getScenario()) {
+//			Network scenario = new Network(data);
+//			getScenarios().add(scenario);
+//		}
 	}
+	
+	void updateModels() {
+		if(getModelDB() == null)
+			return;
+//		System.out.println("case: setting network data with " + network.getElements().size() + " elements");
+		// setting network class containing global parameters
+		setGlobalParameterClass(getModelDB().getNetworkClass());
+		setScriptParameterClass(getModelDB().getScriptClass());
+		// setting model references in network elements
+		for (AbstractNetworkElement element : getElements()) {
+			updateModel(element);
+		}
+//		for (Network scenario : network.getScenarios()) {
+//			updateModels(scenario);
+//		}
+	}
+	
+	private void updateModel(AbstractNetworkElement element) {
+		if(getModelDB() == null)
+			return;
+		ModelData model = getModelDB().getModel(element.getModelID());
+//		System.out.println("    model id: " + element.getModelID());
+//		if(model != null)
+//			System.out.println("    setting model: " + element.getModelID());
+		element.setModel(model);
+	}
+
 	
 	private void updateElement(AbstractNetworkElement element) {
 		if(element instanceof Branch) {
@@ -299,14 +333,15 @@ public class Network extends ParameterSupport {
 //			System.out.println("    adding element: " + element.getModelID());
 		}
 		element.setModelID(modelID);
-		if(getPowerFlowCase() != null)
-			getPowerFlowCase().updateNetworkElement(element);
+		if(getModelDB() != null)
+			updateModel(element);
 		return element;
 	}
 	
 	public void addElement(AbstractNetworkElement element) {
 		networkData.getElement().add(element.getElementData());
 		addElementInternal(element);
+		updateModel(element);
 	}
 	
 	private void addElementInternal(AbstractNetworkElement element) {
