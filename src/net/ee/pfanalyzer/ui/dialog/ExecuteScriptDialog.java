@@ -19,6 +19,7 @@ public class ExecuteScriptDialog extends BaseDialog {
 	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.";
 	
 	public final static String SCRIPT_PARAMETER = "SCRIPT";
+	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
 	
 	private Network network;
 	private ModelData script;
@@ -68,7 +69,7 @@ public class ExecuteScriptDialog extends BaseDialog {
 	}
 	
 	private boolean isInternalScriptParameter(String parameterName) {
-		return SCRIPT_PARAMETER.equals(parameterName);
+		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
 	}
 
 	@Override
