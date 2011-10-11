@@ -19,6 +19,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -29,8 +31,10 @@ import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
+import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
@@ -275,7 +279,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		private List<Network> selectedNetworks = new ArrayList<Network>();
 		private NetworkName networkLabel = new NetworkName();
 		private NetworkDescription networkDescription = new NetworkDescription();
-		private HyperLinkAction createEmptyNetworkAction, importMatpowerNetworkAction, importFromScriptAction,
+		private HyperLinkAction createEmptyNetworkAction, importMatpowerNetworkAction, //importFromScriptAction,
 				duplicateNetworkAction, deleteNetworkAction;
 		private JPanel scriptActionPane;
 		private ImportFromScriptDialog importFromScriptDialg;
@@ -326,20 +330,20 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 					PowerFlowAnalyzer.getInstance().importMatpowerCase(dialog.getSelectedInputFile());
 				}
 			};
-			importFromScriptAction = new HyperLinkAction("Import from script") {
-				@Override
-				protected void actionPerformed() {
-					PowerFlowAnalyzer frame = PowerFlowAnalyzer.getInstance();
-					importFromScriptDialg = new ImportFromScriptDialog(frame, frame.getWorkingDirectory());
-					importFromScriptDialg.showDialog(-1, -1);
-					if(importFromScriptDialg.isCancelPressed()) { // cancel pressed
-						importFromScriptDialg = null;
-						return;
-					}
-					PowerFlowAnalyzer.getInstance().importFromScript(importFromScriptDialg.getSelectedInputFile());
-					importFromScriptDialg = null;
-				}
-			};
+//			importFromScriptAction = new HyperLinkAction("Import from script") {
+//				@Override
+//				protected void actionPerformed() {
+//					PowerFlowAnalyzer frame = PowerFlowAnalyzer.getInstance();
+//					importFromScriptDialg = new ImportFromScriptDialog(frame, frame.getWorkingDirectory());
+//					importFromScriptDialg.showDialog(-1, -1);
+//					if(importFromScriptDialg.isCancelPressed()) { // cancel pressed
+//						importFromScriptDialg = null;
+//						return;
+//					}
+//					PowerFlowAnalyzer.getInstance().importFromScript(importFromScriptDialg.getSelectedInputFile());
+//					importFromScriptDialg = null;
+//				}
+//			};
 			duplicateNetworkAction = new HyperLinkAction("Duplicate") {
 				@Override
 				protected void actionPerformed() {
@@ -384,7 +388,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			networkActionPane.setBorder(new TitledBorder("Add / Remove Network"));
 			networkActionPane.add(createEmptyNetworkAction);
 			networkActionPane.add(importMatpowerNetworkAction);
-			networkActionPane.add(importFromScriptAction);
+//			networkActionPane.add(importFromScriptAction);
 			networkActionPane.add(duplicateNetworkAction);
 			networkActionPane.add(deleteNetworkAction);
 			
@@ -392,11 +396,17 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			scriptActionPane.setBorder(new TitledBorder("Execute Script"));
 			
 			JPanel actionGroupPanel = new JPanel();
+			actionGroupPanel.setBorder(new CompoundBorder(
+					new EmptyBorder(5, 5, 5, 5),
+					new TitledBorder("Actions")));
 			actionGroupPanel.add(networkActionPane);
 			actionGroupPanel.add(scriptActionPane);
 			
 			JPanel actionContainer = new JPanel(new BorderLayout());
 			JPanel networkDataPane = new JPanel(new GridLayout(0, 2));
+			networkDataPane.setBorder(new CompoundBorder(
+					new EmptyBorder(5, 5, 5, 5),
+					new TitledBorder("Network Information")));
 			networkDataPane.add(new JLabel("Name: "));
 			networkDataPane.add(networkLabel);
 			networkDataPane.add(new JLabel("Description: "));
@@ -431,7 +441,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			networkDescription.setEnabled(singleSelection);
 			networkDescription.updateView();
 			importMatpowerNetworkAction.setEnabled(isMatlabEnv);
-			importFromScriptAction.setEnabled(isMatlabEnv);
+//			importFromScriptAction.setEnabled(isMatlabEnv);
 			duplicateNetworkAction.setEnabled(singleSelection);
 			deleteNetworkAction.setEnabled( ! emptySelection);
 			updateScriptActions();
@@ -439,17 +449,26 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		
 		private void updateScriptActions() {
 			scriptActionPane.removeAll();
-			if(selectedNetworks.size() == 0) {
-				scriptActionPane.add(new JLabel("<No network selected>"));
-			} else {
+//			if(selectedNetworks.size() == 0) {
+//				scriptActionPane.add(new JLabel("<No network selected>"));
+//			} else {
 				for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
+					if(selectedNetworks.size() == 0 && isNetworkCreatingScript(script) == false)
+						continue;
 					String label = script.getLabel();
 					if(label == null || label.isEmpty())
 						label = "Untitled Script";
 					HyperLinkAction action = new HyperLinkAction(label) {
 						@Override
 						protected void actionPerformed() {
+							
 							Network network = getSelectedNetwork();
+							if(isNetworkCreatingScript(script)) {
+								network = new Network();
+								getPowerFlowCase().addNetwork(network);
+								refreshList();
+								networkList.setSelectedIndex(listModel.getSize() - 1);
+							}
 							if(network == null)
 								return;
 							PowerFlowAnalyzer.getInstance().executeScript(network, script);
@@ -457,9 +476,22 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 					};
 					scriptActionPane.add(action);
 				}
-			}
+//			}
+			if(scriptActionPane.getComponentCount() == 0)
+				scriptActionPane.add(new JLabel("<No network selected>"));
 			scriptActionPane.revalidate();
 			scriptActionPane.repaint();
+		}
+		
+		private boolean isNetworkCreatingScript(ModelData script) {
+			for (NetworkParameter parameter : script.getParameter()) {
+				if(ExecuteScriptDialog.CREATE_NETWORK_PARAMETER.equals(parameter.getID())) {
+					NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
+					if(propertyValue != null)
+						return Boolean.valueOf(propertyValue.getValue());
+				}
+			}
+			return false;
 		}
 		
 		class NetworkListModel extends AbstractListModel {
