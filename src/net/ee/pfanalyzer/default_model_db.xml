@@ -255,6 +255,9 @@
             <parameter ID="SCRIPT" type="text" label="Script" empty="true">
                 <display/>
             </parameter>
+            <parameter ID="CREATE_NETWORK" type="boolean" label="Create a new network" value="false">
+                <display/>
+            </parameter>
             <model ID="calc_power_flow" label="Calculate Power Flow">
                 <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="scenario">
                     <option value="PF" label="AC Standard" ID="PF"/>
