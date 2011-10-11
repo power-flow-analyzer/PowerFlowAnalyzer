@@ -350,9 +350,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	public void executeScript(Network network, ModelData script) {
 		ExecuteScriptDialog dialog = new ExecuteScriptDialog(this, network, script);
-		dialog.showDialog(-1, -1);
-		if(dialog.isCancelPressed())// cancel pressed
-			return;
+		// only show this dialog if it is necessary
+		if(dialog.shouldShowDialog()) {
+			dialog.showDialog(-1, -1);
+			if(dialog.isCancelPressed())// cancel pressed
+				return;
+		}
 		String pfcase = findName("Power Flow");
 		nextCase = pfcase;
 		// call matlab script
