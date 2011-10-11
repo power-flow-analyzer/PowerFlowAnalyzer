@@ -17,9 +17,9 @@ end
 define_constants;
     
 % collect data for visualisation
-if exist('mpc.success', 'var')
+%if exist('mpc.success', 'var')
     jnetwork.setParameter('SUCCESS', mpc.success);
-end
+%end
 
 % update busses
 for i=1:length(mpc.bus(:,1))
