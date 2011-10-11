@@ -134,6 +134,10 @@ public class ParameterContainer extends JPanel {
 		return properties.get(parameter.getID()) != null;
 	}
 	
+	public int getParameterCount() {
+		return properties.size();
+	}
+	
 	protected JLabel createLabel(NetworkParameter parameter) {
 		JLabel label = new JLabel(getLabel(parameter) + ": ");
 		if(parameter.getDescription() != null && parameter.getDescription().length() > 0)
