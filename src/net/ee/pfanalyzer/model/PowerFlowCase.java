@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.DataViewerData;
+import net.ee.pfanalyzer.model.data.DataViewerType;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 
@@ -22,8 +23,19 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		pfCase = new CaseData();
 		this.modelDB = modelDB;
 		pfCase.setModelDb(modelDB.getData());
+		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
+		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
+		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
 		updateAllNetworkData();
 		modelDB.addDatabaseChangeListener(this);
+	}
+	
+	private DataViewerData createTableViewerData(String title, String filter) {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setType(DataViewerType.TABLE);
+		viewerData.setTitle(title);
+		viewerData.setElementFilter(filter);
+		return viewerData;
 	}
 	
 	public PowerFlowCase(File caseFile) {
