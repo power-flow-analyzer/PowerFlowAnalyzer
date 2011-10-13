@@ -95,7 +95,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			public void tabClosed(int tabIndex) {
 				INetworkDataViewer viewer = viewers.get(tabIndex);
 				viewers.remove(tabIndex);
-				removeViewer(viewer);
+				removeViewer(viewer, true);
 				fireActionUpdate();
 			}
 			@Override
@@ -104,10 +104,11 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		});
 	}
 	
-	private void removeViewer(INetworkDataViewer viewer) {
+	private void removeViewer(INetworkDataViewer viewer, boolean removeFromCase) {
 		removeNetworkElementSelectionListener(viewer);
 		getNetwork().removeNetworkChangeListener(viewer);
-		getPowerFlowCase().getDataViewerData().remove(viewer.getViewerData());
+		if(removeFromCase)
+			getPowerFlowCase().getDataViewerData().remove(viewer.getViewerData());
 	}
 	
 	public void dispose() {
@@ -117,7 +118,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		removeNetworkElementSelectionListener(panelController);
 		removeNetworkElementSelectionListener(this);
 		for (INetworkDataViewer viewer : viewers) {
-			removeViewer(viewer);
+			removeViewer(viewer, false);
 		}
 	}
 	
