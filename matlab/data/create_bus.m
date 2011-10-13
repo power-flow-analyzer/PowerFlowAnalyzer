@@ -9,12 +9,15 @@ define_constants;
 jbus = net.ee.pfanalyzer.model.Bus(jnetwork, 0);
 
 %% add parameters to bus object
-if length(busData) >= BUS_I 
-    jbus.setParameter('BUS_I', busData(BUS_I));
-end
+if exist('busData', 'var')
+    % add bus number parameter
+    if length(busData) >= BUS_I 
+        jbus.setParameter('BUS_I', busData(BUS_I));
+    end
 
-% add all other parameters and flags
-update_bus(jbus, busData);
+    % add all other parameters and flags
+    update_bus(jbus, busData);
+end
 
 end
 
