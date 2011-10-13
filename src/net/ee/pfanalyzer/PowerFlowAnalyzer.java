@@ -364,6 +364,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			JOptionPane.showMessageDialog(this, "The SCRIPT parameter must be set for this script in the parameter database!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		// remove file ending ".m" if necessary
+		if(scriptFile.endsWith(".m"))
+			scriptFile = scriptFile.substring(0, scriptFile.lastIndexOf(".m"));
 		callMatlabCommand(scriptFile, new Object[] { network }, 0, true);
 		openProgressDialog(pfcase);
 	}
