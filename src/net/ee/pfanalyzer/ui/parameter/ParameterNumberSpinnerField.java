@@ -57,15 +57,16 @@ public class ParameterNumberSpinnerField extends ParameterValuePanel {
 	}
 	
 	protected String getNumberDecimalFormatPattern() {
-		String pattern = "";
-		for (int i = 0; i < getDecimalFormatPattern().length(); i++) {
-			char c = getDecimalFormatPattern().charAt(i);
-			if(c == '%') {
-				pattern += "##";
-			} else
-				pattern += c;
-		}
-		return pattern;
+		return "#.###############";
+//		String pattern = ""; // TODO entfernen?
+//		for (int i = 0; i < getDecimalFormatPattern().length(); i++) {
+//			char c = getDecimalFormatPattern().charAt(i);
+//			if(c == '%') {
+//				pattern += "##";
+//			} else
+//				pattern += c;
+//		}
+//		return pattern;
 	}
 	
 	protected JComponent getValuePanel() {
