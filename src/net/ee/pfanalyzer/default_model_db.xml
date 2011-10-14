@@ -257,6 +257,9 @@
             <parameter ID="CREATE_NETWORK" type="boolean" label="Create a new network" description="&lt;html&gt;Controls whether a new network will be created before executing this script.&lt;br&gt;Disabling this option will execute this script on a selected network" value="false">
                 <display/>
             </parameter>
+            <parameter ID="CHANGE_PATH" type="boolean" label="Change Matlab's path" description="&lt;html&gt;Change Matlab's path to the directory of the&lt;br&gt;current case file before executing this script." value="true">
+                <display/>
+            </parameter>
             <model ID="calc_power_flow" label="Calculate Power Flow">
                 <parameter ID="POWER_FLOW_ALGO" type="text" label="Power flow algorithm" restriction="list" empty="true" purpose="scenario">
                     <option value="PF" label="AC Standard" ID="PF"/>
