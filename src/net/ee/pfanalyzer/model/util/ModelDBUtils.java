@@ -15,6 +15,7 @@ public class ModelDBUtils {
 
 	public final static String SCRIPT_PARAMETER = "SCRIPT";
 	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
+	public final static String CHANGE_PATH_PARAMETER = "CHANGE_PATH";
 	
 	public static String getParameterID(AbstractModelElementData element) {
 		String id = element.getID();
@@ -173,7 +174,9 @@ public class ModelDBUtils {
 	}
 	
 	public static boolean isInternalScriptParameter(String parameterName) {
-		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
+		return SCRIPT_PARAMETER.equals(parameterName) 
+				|| CREATE_NETWORK_PARAMETER.equals(parameterName)
+				|| CHANGE_PATH_PARAMETER.equals(parameterName);
 	}
 	
 	public static boolean isNetworkCreatingScript(ModelData script) {
