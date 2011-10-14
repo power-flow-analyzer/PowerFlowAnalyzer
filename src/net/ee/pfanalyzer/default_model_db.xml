@@ -271,6 +271,7 @@
                     <display/>
                 </parameter>
                 <parameter ID="SCRIPT" value="calc_power_flow"/>
+                <parameter ID="CHANGE_PATH" value="false"/>
             </model>
         </modelClass>
     </model-db>
