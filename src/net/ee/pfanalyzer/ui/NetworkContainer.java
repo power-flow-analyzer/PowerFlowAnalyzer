@@ -256,6 +256,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	
 	@Override
 	public void parameterChanged(DatabaseChangeEvent event) {
+		updateScriptsFromDB(event);
 	}
 	
 	private void updateScriptsFromDB(DatabaseChangeEvent event) {
