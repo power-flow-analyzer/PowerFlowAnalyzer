@@ -374,8 +374,6 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			if(dialog.isCancelPressed())// cancel pressed
 				return;
 		}
-		String pfcase = findName("Power Flow");
-		nextCase = pfcase;
 		// call matlab script
 		String scriptFile = network.getTextParameter("SCRIPT");
 		if(scriptFile == null || scriptFile.isEmpty()) {
@@ -385,9 +383,53 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		// remove file ending ".m" if necessary
 		if(scriptFile.endsWith(".m"))
 			scriptFile = scriptFile.substring(0, scriptFile.lastIndexOf(".m"));
+//		executeScriptInternal(network, scriptFile);
+		final boolean changeMatlabPath = network.getBooleanParameter(ModelDBUtils.CHANGE_PATH_PARAMETER, true);
+		File caseFile = getCurrentCase().getCaseFile();
+		if(changeMatlabPath && caseFile != null)
+			setMatlabCurrentFolder(caseFile.getParent());
+		// call script
+		String pfcase = findName("Power Flow");
+		nextCase = pfcase;
 		callMatlabCommand(scriptFile, new Object[] { network }, 0, true);
 		openProgressDialog(pfcase);
 	}
+	
+//	private void executeScriptInternal(final Network network, final String scriptFile) {
+//		final boolean changeMatlabPath = true;
+//		workingDirectoryChanged = false;
+//		File caseFile = getCurrentCase().getCaseFile();
+//		if(changeMatlabPath && caseFile != null)
+//			updateWorkingDirectory();
+//		new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				int count = 0;
+//				try {
+//					File caseFile = getCurrentCase().getCaseFile();
+//					if(changeMatlabPath && caseFile != null) {
+//						while(count <= 1000 && workingDirectoryChanged == false) {
+//							Thread.sleep(200);
+//							count += 200;
+//						}
+//						if(workingDirectoryChanged == false)
+//							JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, 
+//									"Could not change Matlab's current path.");
+//						else if(caseFile.getParent().equals(getWorkingDirectory()));
+//					}
+//				} catch (InterruptedException e) {
+//					// do nothing
+//				}
+//				// call script
+//				String pfcase = findName("Power Flow");
+//				nextCase = pfcase;
+//				callMatlabCommand(scriptFile, new Object[] { network }, 0, true);
+//				openProgressDialog(pfcase);
+//			}
+//		}).start();
+//	}
+	
+//	private boolean workingDirectoryChanged = false;
 	
 	private void openCaseFile() {
 		caseDialog = new OpenCaseDialog(this);
@@ -669,6 +711,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			return System.getProperty("user.home");
 		return workingDirectory;
 	}
+	
+	public void updateWorkingDirectory() {
+		callMatlabCommand("update_working_directory", new Object[] { }, 0, true);
+	}
 
 	public void setWorkingDirectory(String workingDirectory) {
 		setWorkingDirectory(workingDirectory, false);
@@ -680,6 +726,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			getCurrentContainer().setWorkingDirectory(workingDirectory);
 //		else if(signalToUser)
 //			JOptionPane.showMessageDialog(this, "Matlab current folder changed to:\n" + workingDirectory);
+//		workingDirectoryChanged = true;
 	}
 	
 	public void setMatlabCurrentFolder(String workingDirectory) {
