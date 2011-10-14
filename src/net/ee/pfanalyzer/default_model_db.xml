@@ -79,7 +79,6 @@
                 <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
                     <display/>
                 </parameter>
-                <modelClass label="Cable"/>
                 <model ID="unknown" label="Unknown Branch"/>
             </modelClass>
             <modelClass ID="bus" label="Bus">
@@ -252,10 +251,10 @@
             </model>
         </modelClass>
         <modelClass ID="script" label="Scripts">
-            <parameter ID="SCRIPT" type="text" label="Script" empty="true">
+            <parameter ID="SCRIPT" type="text" label="Matlab Script" description="File name of Matlab script to be executed" empty="true">
                 <display/>
             </parameter>
-            <parameter ID="CREATE_NETWORK" type="boolean" label="Create a new network" value="false">
+            <parameter ID="CREATE_NETWORK" type="boolean" label="Create a new network" description="&lt;html&gt;Controls whether a new network will be created before executing this script.&lt;br&gt;Disabling this option will execute this script on a selected network" value="false">
                 <display/>
             </parameter>
             <model ID="calc_power_flow" label="Calculate Power Flow">
