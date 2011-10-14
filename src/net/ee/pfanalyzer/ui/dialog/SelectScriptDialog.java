@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -21,6 +22,7 @@ public class SelectScriptDialog extends BaseDialog {
 		setText("<html><center><b>Select a script to be executed and press OK.");
 		
 		Box contentPane = Box.createVerticalBox();
+		ButtonGroup bg = new ButtonGroup();
 		for (final ModelData script : caze.getModelDB().getScriptClass().getModel()) {
 			JRadioButton button = new JRadioButton(script.getLabel());
 			button.addActionListener(new ActionListener() {
@@ -32,6 +34,7 @@ public class SelectScriptDialog extends BaseDialog {
 			if(caze.getModelDB().getScriptClass().getModel().size() == 1)
 				button.doClick();
 			contentPane.add(button);
+			bg.add(button);
 		}
 		addOKButton();
 		addCancelButton();
