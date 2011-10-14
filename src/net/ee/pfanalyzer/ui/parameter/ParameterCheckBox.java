@@ -22,37 +22,12 @@ public class ParameterCheckBox extends ParameterValuePanel implements ActionList
 		if(ignoreAction())
 			return;
 		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);
-		property.setValue(Boolean.toString(checkBox.isSelected()));
+		String value = Boolean.toString(checkBox.isSelected());
+		String oldValue = property.getValue();
+		property.setValue(value);
+		fireValueChanged(oldValue, value);
 		refresh();
-//		int option = -1;
-//		for (int i = 0; i < labels.length; i++) {
-//			if(isSelected()) {
-//				if(isSelectedText(labels[i])) {
-//					option = i;
-//					break;
-//				}
-//			} else {
-//				if(isDeselectedText(labels[i])) {
-//					option = i;
-//					break;
-//				}
-//			}
-//		}
-//		if(option > -1)
-//			getScenario().getParameter(parameterID).setSelectedOption(option);
 	}
-//	
-//	private boolean isSelectedText(String text) {
-//		return text.equalsIgnoreCase("yes") 
-//				|| text.equalsIgnoreCase("true")
-//					|| text.equalsIgnoreCase("1");
-//	}
-//	
-//	private boolean isDeselectedText(String text) {
-//		return text.equalsIgnoreCase("no") 
-//				|| text.equalsIgnoreCase("false")
-//					|| text.equalsIgnoreCase("0");
-//	}
 	
 	@Override
 	protected void createValuePanel() {
