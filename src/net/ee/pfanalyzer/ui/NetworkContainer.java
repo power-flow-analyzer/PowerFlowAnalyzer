@@ -34,7 +34,6 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
-import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
@@ -450,43 +449,65 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		
 		private void updateScriptActions() {
 			scriptActionPane.removeAll();
-//			if(selectedNetworks.size() == 0) {
-//				scriptActionPane.add(new JLabel("<No network selected>"));
-//			} else {
-				for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
-					if(selectedNetworks.size() == 0 && isNetworkCreatingScript(script) == false)
-						continue;
-					String label = script.getLabel();
-					if(label == null || label.isEmpty())
-						label = "Untitled Script";
-					HyperLinkAction action = new HyperLinkAction(label) {
-						@Override
-						protected void actionPerformed() {
-							
-							Network network = getSelectedNetwork();
-							if(isNetworkCreatingScript(script)) {
-								network = new Network();
-								getPowerFlowCase().addNetwork(network);
-								refreshList();
-								networkList.setSelectedIndex(listModel.getSize() - 1);
-							}
-							if(network == null)
-								return;
-							PowerFlowAnalyzer.getInstance().executeScript(network, script);
-						}
-					};
-					scriptActionPane.add(action);
-				}
-//			}
+			for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
+				if(selectedNetworks.size() == 0 && isNetworkCreatingScript(script) == false)
+					continue;
+				String label = script.getLabel();
+				if(label == null || label.isEmpty())
+					label = "Untitled Script";
+				HyperLinkAction action = new HyperLinkAction(label) {
+					@Override
+					protected void actionPerformed() {
+						executeScript(script);
+					}
+				};
+				scriptActionPane.add(action);
+			}
 			if(scriptActionPane.getComponentCount() == 0)
 				scriptActionPane.add(new JLabel("<No network selected>"));
 			scriptActionPane.revalidate();
 			scriptActionPane.repaint();
 		}
 		
+		private void executeScript(ModelData script) {
+			Network network = getSelectedNetwork();
+			if(network == null) {
+				if(isNetworkCreatingScript(script)) {
+					network = new Network();
+					getPowerFlowCase().addNetwork(network);
+					refreshList();
+					networkList.setSelectedIndex(listModel.getSize() - 1);
+				} else
+					return;
+			} else if(network.isEmpty() == false && isNetworkCreatingScript(script)) {
+				int action = JOptionPane.showOptionDialog(this, 
+						"<html>This script will create a new network but the selected " +
+						"network is not empty.<br>Do you want to overwrite " +
+						"the selected network or create a new network instead?", "Question", 
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
+						null, new String[] {
+								"Overwrite network", "Create new network", "Cancel"
+						}, null);
+				if(action == JOptionPane.YES_OPTION) {
+					network.removeAllElements();
+					network.getParameterList().clear();
+					network.fireNetworkChanged();
+				} else if(action == JOptionPane.NO_OPTION) {
+					network = new Network();
+					getPowerFlowCase().addNetwork(network);
+					refreshList();
+					networkList.setSelectedIndex(listModel.getSize() - 1);
+				} else if(action == JOptionPane.CANCEL_OPTION)
+					return;
+			}
+			if(network == null)
+				return;
+			PowerFlowAnalyzer.getInstance().executeScript(network, script);
+		}
+		
 		private boolean isNetworkCreatingScript(ModelData script) {
 			for (NetworkParameter parameter : script.getParameter()) {
-				if(ExecuteScriptDialog.CREATE_NETWORK_PARAMETER.equals(parameter.getID())) {
+				if(ModelDBUtils.CREATE_NETWORK_PARAMETER.equals(parameter.getID())) {
 					NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
 					if(propertyValue != null)
 						return Boolean.valueOf(propertyValue.getValue());

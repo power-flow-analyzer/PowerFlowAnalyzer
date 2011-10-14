@@ -25,19 +25,21 @@ public class NetworkPanel extends ModelElementPanel {
 	
 	public void updateNetwork() {
 		removeAllElements();
-		if(data.getParameterList().size() > 0) {
-			Group globalParameters = addElementGroup("Global Network Parameters");
-			for (NetworkParameter parameter : data.getParameterList()) {
-				NetworkParameter paramDef = ModelDBUtils.getParameterDefinition(
-						data.getGlobalParameterClass(), parameter.getID());
-				if(paramDef == null)
-					paramDef = ModelDBUtils.findChildParameterDefinition(
-							data.getScriptParameterClass(), parameter.getID());
-				if(paramDef == null)
-					paramDef = parameter; // fallback if parameter not defined in db
-				addParameter(paramDef, parameter, globalParameters);
-			}
+		Group globalParameters = new Group("Global Network Parameters");
+		for (NetworkParameter parameter : data.getParameterList()) {
+			if(ModelDBUtils.isInternalScriptParameter(parameter.getID()))
+				continue;
+			NetworkParameter paramDef = ModelDBUtils.getParameterDefinition(
+					data.getGlobalParameterClass(), parameter.getID());
+			if(paramDef == null)
+				paramDef = ModelDBUtils.findChildParameterDefinition(
+						data.getScriptParameterClass(), parameter.getID());
+			if(paramDef == null)
+				paramDef = parameter; // fallback if parameter not defined in db
+			addParameter(paramDef, parameter, globalParameters);
 		}
+		if(globalParameters.getComponentCount() > 0)
+			addElementGroup(globalParameters);
 		if(data.getCombinedBusCount() > 0) { // show combined elements
 			addElementGroup("Areas");
 			for (int i = 0; i < data.getCombinedBusCount(); i++) {

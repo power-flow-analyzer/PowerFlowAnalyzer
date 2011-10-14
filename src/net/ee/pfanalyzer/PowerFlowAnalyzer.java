@@ -345,7 +345,24 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())
 			return;
-		executeScript(getCurrentNetwork(), dialog.getSelectedScript());
+		Network network = getCurrentNetwork();
+		if(network.isEmpty() == false) {
+			int action = JOptionPane.showOptionDialog(this, 
+					"<html>This script will create a new network but the selected " +
+					"network is not empty.<br>Do you want to overwrite " +
+					"the selected network?", "Question", 
+					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
+					null, new String[] {
+							"Overwrite network", "Cancel"
+					}, null);
+			if(action == JOptionPane.YES_OPTION) {
+				network.removeAllElements();
+				network.getParameterList().clear();
+				network.fireNetworkChanged();
+			} else
+				return;
+		}
+		executeScript(network, dialog.getSelectedScript());
 	}
 	
 	public void executeScript(Network network, ModelData script) {
@@ -599,6 +616,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					}
 				} else {
 					caze.setNetworkData(network, networkData);
+					checkForMissingCoordinates(network);
 					network.fireNetworkChanged();
 					if(caze.getViewer().getViewer(network) != null)
 						caze.getViewer().getViewer(network).getSelectionManager().clearHistory();
@@ -620,6 +638,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			success.put(nextCase, true);
 			NetworkContainer viewer = new NetworkContainer(caze);
+			viewer.setWorkingDirectory(getWorkingDirectory());
 			viewer.addActionUpdateListener(this);
 			caze.setViewer(viewer);
 			cases.add(caze);

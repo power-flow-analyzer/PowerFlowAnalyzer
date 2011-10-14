@@ -366,6 +366,18 @@ public class Network extends ParameterSupport {
 			getGenerators().remove(ListUtils.getIndexOf(getGenerators(), (Generator) element));
 	}
 	
+	public void removeAllElements() {
+		networkData.getElement().clear();
+		getElements().clear();
+		getBusses().clear();
+		getBranches().clear();
+		getGenerators().clear();
+	}
+	
+	public boolean isEmpty() {
+		return getElements().isEmpty();
+	}
+	
 	public List<AbstractNetworkElement> getElements() {
 		return elements;
 	}

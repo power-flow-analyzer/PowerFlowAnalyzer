@@ -18,9 +18,6 @@ public class ExecuteScriptDialog extends BaseDialog {
 	private final static String DEFAULT_TEXT = "Select the desired script parameters and press OK.";
 	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.";
 	
-	public final static String SCRIPT_PARAMETER = "SCRIPT";
-	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
-	
 	private Network network;
 	private ModelData script;
 	private boolean showDialog = true;
@@ -38,7 +35,7 @@ public class ExecuteScriptDialog extends BaseDialog {
 		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network));//(new ParameterMasterModel(script));
 		Group paramPanel = new Group("Script Parameters");
 		for (NetworkParameter parameter : script.getParameter()) {
-			if(isInternalScriptParameter(parameter.getID())) {
+			if(ModelDBUtils.isInternalScriptParameter(parameter.getID())) {
 				NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
 				if(propertyValue != null && propertyValue.getValue() != null && propertyValue.getValue().trim().length() > 0) {
 					network.setParameter(parameter.getID(), propertyValue.getValue());
@@ -66,10 +63,6 @@ public class ExecuteScriptDialog extends BaseDialog {
 	
 	public boolean shouldShowDialog() {
 		return showDialog;
-	}
-	
-	private boolean isInternalScriptParameter(String parameterName) {
-		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
 	}
 
 	@Override

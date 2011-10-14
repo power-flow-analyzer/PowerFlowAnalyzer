@@ -13,6 +13,12 @@ import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
 
 public class ModelDBUtils {
 
+	public final static String SCRIPT_PARAMETER = "SCRIPT";
+	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
+	
+	public static boolean isInternalScriptParameter(String parameterName) {
+		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
+	}
 	public static String getParameterID(AbstractModelElementData element) {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
