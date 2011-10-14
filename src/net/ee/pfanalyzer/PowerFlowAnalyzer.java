@@ -346,7 +346,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		if(dialog.isCancelPressed())
 			return;
 		Network network = getCurrentNetwork();
-		if(network.isEmpty() == false) {
+		ModelData script = dialog.getSelectedScript();
+		if(ModelDBUtils.isNetworkCreatingScript(script) && network.isEmpty() == false) {
 			int action = JOptionPane.showOptionDialog(this, 
 					"<html>This script will create a new network but the selected " +
 					"network is not empty.<br>Do you want to overwrite " +
@@ -362,7 +363,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else
 				return;
 		}
-		executeScript(network, dialog.getSelectedScript());
+		executeScript(network, script);
 	}
 	
 	public void executeScript(Network network, ModelData script) {

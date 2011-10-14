@@ -16,9 +16,6 @@ public class ModelDBUtils {
 	public final static String SCRIPT_PARAMETER = "SCRIPT";
 	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
 	
-	public static boolean isInternalScriptParameter(String parameterName) {
-		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
-	}
 	public static String getParameterID(AbstractModelElementData element) {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
@@ -173,6 +170,21 @@ public class ModelDBUtils {
 	
 	public static boolean isScriptClass(AbstractModelElementData element) {
 		return ModelDB.ROOT_SCRIPT_CLASS.equals(getRootClass(element).getID());
+	}
+	
+	public static boolean isInternalScriptParameter(String parameterName) {
+		return SCRIPT_PARAMETER.equals(parameterName) || CREATE_NETWORK_PARAMETER.equals(parameterName);
+	}
+	
+	public static boolean isNetworkCreatingScript(ModelData script) {
+		for (NetworkParameter parameter : script.getParameter()) {
+			if(ModelDBUtils.CREATE_NETWORK_PARAMETER.equals(parameter.getID())) {
+				NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
+				if(propertyValue != null)
+					return Boolean.valueOf(propertyValue.getValue());
+			}
+		}
+		return false;
 	}
 	
 	public static boolean isRootClass(AbstractModelElementData element) {

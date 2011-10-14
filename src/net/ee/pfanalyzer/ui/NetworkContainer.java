@@ -31,7 +31,6 @@ import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
-import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
@@ -450,7 +449,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		private void updateScriptActions() {
 			scriptActionPane.removeAll();
 			for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
-				if(selectedNetworks.size() == 0 && isNetworkCreatingScript(script) == false)
+				if(selectedNetworks.size() == 0 && ModelDBUtils.isNetworkCreatingScript(script) == false)
 					continue;
 				String label = script.getLabel();
 				if(label == null || label.isEmpty())
@@ -472,14 +471,14 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		private void executeScript(ModelData script) {
 			Network network = getSelectedNetwork();
 			if(network == null) {
-				if(isNetworkCreatingScript(script)) {
+				if(ModelDBUtils.isNetworkCreatingScript(script)) {
 					network = new Network();
 					getPowerFlowCase().addNetwork(network);
 					refreshList();
 					networkList.setSelectedIndex(listModel.getSize() - 1);
 				} else
 					return;
-			} else if(network.isEmpty() == false && isNetworkCreatingScript(script)) {
+			} else if(network.isEmpty() == false && ModelDBUtils.isNetworkCreatingScript(script)) {
 				int action = JOptionPane.showOptionDialog(this, 
 						"<html>This script will create a new network but the selected " +
 						"network is not empty.<br>Do you want to overwrite " +
@@ -503,17 +502,6 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			if(network == null)
 				return;
 			PowerFlowAnalyzer.getInstance().executeScript(network, script);
-		}
-		
-		private boolean isNetworkCreatingScript(ModelData script) {
-			for (NetworkParameter parameter : script.getParameter()) {
-				if(ModelDBUtils.CREATE_NETWORK_PARAMETER.equals(parameter.getID())) {
-					NetworkParameter propertyValue = ModelDBUtils.getParameterValue(script, parameter.getID());
-					if(propertyValue != null)
-						return Boolean.valueOf(propertyValue.getValue());
-				}
-			}
-			return false;
 		}
 		
 		class NetworkListModel extends AbstractListModel {
