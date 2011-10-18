@@ -33,6 +33,7 @@ import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
@@ -42,15 +43,14 @@ import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 public class NetworkOverviewPane extends JPanel {
 	
 	private NetworkContainer parent;
-//	private JList networkList;
 	private JTree networkTree;
 	private NetworkTreeModel treeModel;
-//	private NetworkListModel listModel;
 	private List<Network> selectedNetworks = new ArrayList<Network>();
 	private NetworkName networkLabel = new NetworkName();
 	private NetworkDescription networkDescription = new NetworkDescription();
 	private HyperLinkAction createEmptyNetworkAction, importMatpowerNetworkAction, //importFromScriptAction,
 			duplicateNetworkAction, deleteNetworkAction;
+	private HyperLinkAction createScenarioAction;
 	private JPanel scriptActionPane;
 	private ImportFromScriptDialog importFromScriptDialg;
 	
@@ -63,6 +63,8 @@ public class NetworkOverviewPane extends JPanel {
 		networkTree.setCellRenderer(new NetworkCellRenderer());
 		networkTree.setExpandsSelectedPaths(true);
 		networkTree.setRootVisible(false);
+		networkTree.setShowsRootHandles(true);
+		networkTree.setToggleClickCount(3);
 		networkTree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getClickCount() == 2) {
@@ -79,38 +81,13 @@ public class NetworkOverviewPane extends JPanel {
 			}
 		});
 		
-//		listModel = new NetworkListModel();
-//		networkList = new JList(listModel);
-//		networkList.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent e) {
-//				if(e.getClickCount() == 2)
-//					parent.openNetwork(getPowerFlowCase().getNetworks().get(networkList.getSelectedIndex()));
-//			}
-//		});
-//		networkList.setCellRenderer(new DefaultListCellRenderer() {
-//			public Component getListCellRendererComponent(JList list, Object value, int index,
-//			        boolean isSelected, boolean cellHasFocus) {
-//					Network network = (Network) value;
-//					String text = parent.getNetworkName(network);
-//					return super.getListCellRendererComponent(list, text, 
-//							index, isSelected, cellHasFocus);
-//			    }
-//		});
-//		networkList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				networkSelectionChanged();
-//			}
-//		});
-		
 		createEmptyNetworkAction = new HyperLinkAction("Create empty network") {
 			@Override
 			protected void actionPerformed() {
 				Network network = new Network();
 				getPowerFlowCase().addNetwork(network);
-				refreshList();
+				refreshTree();
 				selectNetwork(network);
-//				networkList.setSelectedIndex(listModel.getSize() - 1);
 			}
 		};
 		importMatpowerNetworkAction = new HyperLinkAction("Import Matpower case") {
@@ -148,9 +125,8 @@ public class NetworkOverviewPane extends JPanel {
 						network = getPowerFlowCase().createNetworkCopy(network);
 						network.setName(newName);
 						getPowerFlowCase().addNetwork(network);
-						refreshList();
+						refreshTree();
 						selectNetwork(network);
-//						networkList.setSelectedIndex(listModel.getSize() - 1);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -171,7 +147,7 @@ public class NetworkOverviewPane extends JPanel {
 							int tabIndex = parent.getNetworkTabIndex(network);
 							if(tabIndex != -1)
 								parent.closeTab(tabIndex);
-							refreshList();
+							refreshTree();
 							networkTree.clearSelection();
 						} else
 							return;
@@ -187,6 +163,28 @@ public class NetworkOverviewPane extends JPanel {
 		networkActionPane.add(duplicateNetworkAction);
 		networkActionPane.add(deleteNetworkAction);
 		
+		createScenarioAction = new HyperLinkAction("Add scenario") {
+			@Override
+			protected void actionPerformed() {
+				Network network = getSelectedNetwork();
+				if(network != null) {
+					try {
+						String newName = "Scenario of " + network.getName();
+						Network scenario = getPowerFlowCase().createNetworkCopy(network);
+						scenario.setName(newName);
+						getPowerFlowCase().addScenario(network, scenario);
+						refreshTree();
+						selectNetwork(scenario);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		JPanel scenarioActionPane = new JPanel(new GridLayout(0, 1));
+		scenarioActionPane.setBorder(new TitledBorder("Manage Scenarios"));
+		scenarioActionPane.add(createScenarioAction);
+		
 		scriptActionPane = new JPanel(new GridLayout(0, 1));
 		scriptActionPane.setBorder(new TitledBorder("Execute Script"));
 		
@@ -195,6 +193,7 @@ public class NetworkOverviewPane extends JPanel {
 				new EmptyBorder(5, 5, 5, 5),
 				new TitledBorder("Actions")));
 		actionGroupPanel.add(networkActionPane);
+//		actionGroupPanel.add(scenarioActionPane);
 		actionGroupPanel.add(scriptActionPane);
 		
 		JPanel actionContainer = new JPanel(new BorderLayout());
@@ -234,13 +233,21 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	private void selectNetwork(Network network) {
-		networkTree.setSelectionPath(new TreePath(new Object[] { treeModel.getRoot(), network}));
+		List<Object> list = new ArrayList<Object>();
+		list.add(treeModel.getRoot());
+		getNetworkPath(list, network);
+		networkTree.setSelectionPath(new TreePath(list.toArray(new Object[list.size()])));
+	}
+	
+	private void getNetworkPath(List<Object> list, Network network) {
+		if(network.getParentNetwork() != null)
+			getNetworkPath(list, network.getParentNetwork());
+		list.add(network);
 	}
 	
 	void networkSelectionChanged() {
 		selectedNetworks.clear();
 		TreePath[] selection = networkTree.getSelectionPaths();
-//		Object[] selection = networkList.getSelectedValues();
 		if(selection != null) {
 			for (int i = 0; i < selection.length; i++) {
 				Object node = selection[i].getLastPathComponent();
@@ -259,6 +266,7 @@ public class NetworkOverviewPane extends JPanel {
 //		importFromScriptAction.setEnabled(isMatlabEnv);
 		duplicateNetworkAction.setEnabled(singleSelection);
 		deleteNetworkAction.setEnabled( ! emptySelection);
+		createScenarioAction.setEnabled(singleSelection);
 		updateScriptActions();
 	}
 	
@@ -295,9 +303,8 @@ public class NetworkOverviewPane extends JPanel {
 			if(ModelDBUtils.isNetworkCreatingScript(script)) {
 				network = new Network();
 				getPowerFlowCase().addNetwork(network);
-				refreshList();
+				refreshTree();
 				selectNetwork(network);
-//				networkList.setSelectedIndex(listModel.getSize() - 1);
 			} else
 				return;
 		} else if(network.isEmpty() == false && ModelDBUtils.isNetworkCreatingScript(script)) {
@@ -316,9 +323,8 @@ public class NetworkOverviewPane extends JPanel {
 			} else if(action == JOptionPane.NO_OPTION) {
 				network = new Network();
 				getPowerFlowCase().addNetwork(network);
-				refreshList();
+				refreshTree();
 				selectNetwork(network);
-//				networkList.setSelectedIndex(listModel.getSize() - 1);
 			} else if(action == JOptionPane.CANCEL_OPTION)
 				return;
 		}
@@ -327,22 +333,7 @@ public class NetworkOverviewPane extends JPanel {
 		PowerFlowAnalyzer.getInstance().executeScript(network, script);
 	}
 	
-//	class NetworkListModel extends AbstractListModel {
-//		@Override
-//		public Object getElementAt(int index) {
-//			return getPowerFlowCase().getNetworks().get(index);
-//		}
-//		@Override
-//		public int getSize() {
-//			return getPowerFlowCase().getNetworks().size();
-//		}
-//		private void refreshList() {
-//			fireContentsChanged(this, 0, getSize());
-//		}
-//	};
-	
-	void refreshList() {
-//		listModel.refreshList();
+	void refreshTree() {
 		treeModel.refreshModel();
 		networkTree.revalidate();
 	}
@@ -352,32 +343,37 @@ public class NetworkOverviewPane extends JPanel {
 		private Vector<TreeModelListener> treeModelListeners = new Vector<TreeModelListener>();
 
 		NetworkTreeModel() {
-			
 		}
 		
 		@Override
 		public Object getRoot() {
-			return getPowerFlowCase().getNetworks();
+			return getPowerFlowCase().getNetworks(false);
 		}
 		
 		@Override
 		public Object getChild(Object parent, int index) {
 			if(parent instanceof List)
-				return getPowerFlowCase().getNetworks().get(index);
-			return null;
+				return getPowerFlowCase().getNetworks(false).get(index);
+			if(parent instanceof Network)
+				return ((Network) parent).getScenarios().get(index);
+			throw new IllegalArgumentException("Parent must be a list or a network but is " + parent);
 		}
 
 		@Override
 		public int getChildCount(Object parent) {
 			if(parent instanceof List)
-				return getPowerFlowCase().getNetworks().size();
+				return getPowerFlowCase().getNetworks(false).size();
+			if(parent instanceof Network)
+				return ((Network) parent).getScenarios().size();
 			return 0;
 		}
 
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
 			if(parent instanceof List)
-				return getPowerFlowCase().getNetworks().indexOf(child);
+				return ListUtils.getIndexOf(getPowerFlowCase().getNetworks(false), (Network) child);
+			if(parent instanceof Network)
+				return ListUtils.getIndexOf(((Network) parent).getScenarios(), (Network) child);
 			return -1;
 		}
 
@@ -385,6 +381,8 @@ public class NetworkOverviewPane extends JPanel {
 		public boolean isLeaf(Object node) {
 			if(node instanceof List)
 				return false;
+			if(node instanceof Network)
+				return ((Network) node).getScenarios().isEmpty();
 			return true;
 		}
 
@@ -415,12 +413,16 @@ public class NetworkOverviewPane extends JPanel {
 	class NetworkCellRenderer extends DefaultTreeCellRenderer {
 		public Component getTreeCellRendererComponent(JTree tree, Object value,
 				boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-			if(value instanceof Network) {
-				Network network = (Network) value;
-				setText(parent.getNetworkName(network));
-			} else
-				setText("");
+			try {
+				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+				if(value instanceof Network) {
+					Network network = (Network) value;
+					setText(parent.getNetworkName(network));
+				} else
+					setText("");
+			} catch(Exception e) {
+				System.err.println(e);
+			}
 			return this;
 		}
 	}
