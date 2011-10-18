@@ -108,7 +108,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		networkTabs.addNetworkTab(getNetworkName(network), viewer, true);
 		viewer.addActionUpdateListener(this);
 		viewer.addNetworkElementSelectionListener(modelDBDialog);
-		overviewPane.refreshList();
+		overviewPane.refreshTree();
 	}
 	
 	public void showModelDBDialog() {
@@ -201,7 +201,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	public void updateActions() {
 		// forward request to own listeners
 		fireActionUpdate();
-		overviewPane.refreshList();
+		overviewPane.refreshTree();
 		overviewPane.updateScriptActions();
 	}
 	
