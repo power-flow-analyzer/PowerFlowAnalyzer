@@ -4,6 +4,8 @@ import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 
 public class NetworkElement extends AbstractNetworkElement implements ICommonParameters {
 
+	private Bus parentBus;
+	
 	public NetworkElement(Network data) {
 		this(data, 0);
 	}
@@ -35,5 +37,17 @@ public class NetworkElement extends AbstractNetworkElement implements ICommonPar
 	
 	public String getName() {
 		return getTextParameter(PROPERTY_NAME);
+	}
+	
+	public int getParentBusNumber() {
+		return getIntParameter(PROPERTY_PARENT_BUS, -1);
+	}
+
+	public Bus getParentBus() {
+		return parentBus;
+	}
+
+	public void setParentBus(Bus parentBus) {
+		this.parentBus = parentBus;
 	}
 }

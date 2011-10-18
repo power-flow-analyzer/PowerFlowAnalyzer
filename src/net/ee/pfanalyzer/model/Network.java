@@ -202,13 +202,9 @@ public class Network extends ParameterSupport {
 			}
 		}
 //		System.out.println("    " + getElements().size() + " elements added");
-		// set bus references in branches
-		for (Branch branch : getBranches()) {
-			updateElement(branch);
-		}
-		// set bus references in generators
-		for (Generator generator : getGenerators()) {
-			updateElement(generator);
+		// set bus references in elements
+		for (AbstractNetworkElement element : getElements()) {
+			updateElement(element);
 		}
 //		for (NetworkData data : networkData.getScenario()) {
 //			Network scenario = new Network(data);
@@ -251,6 +247,9 @@ public class Network extends ParameterSupport {
 		} else if(element instanceof Generator) {
 			Generator generator = (Generator) element;
 			generator.setBus(getBus(generator.getBusNumber()));
+		} else if(element instanceof NetworkElement) {
+			NetworkElement ne = (NetworkElement) element;
+			ne.setParentBus(getBus(ne.getParentBusNumber()));
 		}
 	}
 	
