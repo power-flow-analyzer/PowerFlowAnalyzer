@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -38,6 +40,7 @@ import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
+import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
@@ -90,6 +93,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private final static String ACTION_SELECT_PREVIOUS = "action.select.previous";
 	private final static String ACTION_SELECT_NEXT = "action.select.next";
 	
+	private final static String ACTION_IMPORT_DB = "action.model.db.import";
+	private final static String ACTION_EXPORT_DB = "action.model.db.export";
+	
 	private static PowerFlowAnalyzer INSTANCE;
 	
 	private MatpowerGUIServer server;
@@ -100,6 +106,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	String nextCase;
 	private List<PowerFlowCase> cases = new ArrayList<PowerFlowCase>();
 	private Map<String, JButton> toolbarButtons = new HashMap<String, JButton>();
+	private Map<String, Action> actions = new HashMap<String, Action>();
 	private String workingDirectory;
 
 	private boolean largeIcons = Preferences.getBooleanProperty(PROPERTY_UI_LARGE_ICONS);
@@ -186,12 +193,15 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
-
-		updateToolbarButtons();
 		
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(new JMenu("File"));
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.add(createAction(ACTION_IMPORT_DB, "Import parameter database...", ""));
+		fileMenu.add(createAction(ACTION_EXPORT_DB, "Export parameter database...", ""));
+		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
+
+		updateToolbarButtons();
 		
 		pack();
 		setSize(1024, 700);
@@ -259,6 +269,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_SELECT_NEXT)) {
 				if(getCurrentViewer() != null)
 					getCurrentViewer().getSelectionManager().showNextElement();
+			} else if(e.getActionCommand().equals(ACTION_IMPORT_DB)) {
+				if(getCurrentCase() != null)
+					importParameterDB();
+			} else if(e.getActionCommand().equals(ACTION_EXPORT_DB)) {
+				if(getCurrentCase() != null)
+					exportParameterDB();
 			}
 		} catch(Exception error) {
 			error.printStackTrace();
@@ -299,8 +315,76 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		return button;
 	}
 	
+	private Action createAction(final String actionCommand, String text, String tooltipText) {
+		AbstractAction action = new AbstractAction(text) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// delegate to action listener
+				PowerFlowAnalyzer.this.actionPerformed(new ActionEvent(e.getSource(), e.getID(), actionCommand));
+			}
+		};
+		actions.put(actionCommand, action);
+		return action;
+	}
+	
+	private void importParameterDB() {
+		NewCaseDialog dialog = new NewCaseDialog(this, "Import parameter database");
+		dialog.showDialog(-1, -1);
+		if(dialog.isCancelPressed())// cancel pressed
+			return;
+		int inputSource = dialog.getSelectedParameterSource();
+		ModelDB database = null;
+		if(inputSource == 0)
+			database = new ModelDB();
+		else if(inputSource == 1)
+			database = new ModelDB(CaseSerializer.readModelDB(new File(dialog.getSelectedParameterFile())));
+		if(database == null)
+			return;
+		getCurrentCase().changeModelDB(database);
+		for (Network net : getCurrentCase().getNetworks())
+			net.fireNetworkChanged();
+		getCurrentContainer().reloadModelDBDialog();
+	}
+	
+	private void exportParameterDB() {
+		JFileChooser fileChooser = new JFileChooser(getWorkingDirectory());
+		fileChooser.setAcceptAllFileFilterUsed(true);
+		fileChooser.setFileFilter(NewCaseDialog.PARAMETER_FILE_FILTER);
+		int action = fileChooser.showSaveDialog(this);
+		if(action == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fileChooser.getSelectedFile();
+			String fileName = selectedFile.getName();
+			// append file ending if necessary
+			if( ! fileName.endsWith(".xml")) {
+				fileName += ".xml";
+				selectedFile = new File(selectedFile.getParentFile(), fileName);
+			}
+			// check if file exists
+			if(selectedFile.exists()) {
+				action = JOptionPane.showConfirmDialog(this, 
+						"The file\n\t\t" + selectedFile.getAbsolutePath() + "\nalready exists. " +
+								"Do you want to overwrite it?", "Overwrite?", JOptionPane.YES_NO_OPTION);
+				if(action == JOptionPane.YES_OPTION) {
+					// do nothing, catch YES directly
+				} else {//if(action == JOptionPane.NO_OPTION) {
+					exportParameterDB();
+					return;
+				}
+			}
+			CaseSerializer serializer = new CaseSerializer();
+			CaseData pfCase = new CaseData();
+			pfCase.setModelDb(getCurrentCase().getModelDB().getData());
+			try {
+				serializer.writeCase(pfCase, selectedFile);
+			} catch (Exception e) {
+				System.err.println("Cannot write file: " + selectedFile);
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private boolean createNewCase() {
-		NewCaseDialog dialog = new NewCaseDialog(this);
+		NewCaseDialog dialog = new NewCaseDialog(this, "Create new case");
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())// cancel pressed
 			return false;
@@ -769,11 +853,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 
 	private void updateToolbarButtons() {
 		boolean hasViewer = getCurrentViewer() != null;
-//		boolean hasDiagrams = hasViewer && getCurrentViewer().hasDiagramSheet();
+		boolean hasCase = getCurrentCase() != null;
 		boolean isMatlabEnv = environment == MATLAB_ENVIRONMENT;
 //		toolbarButtons.get(ACTION_DIAGRAM_ADD).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_TABLE_ADD).setEnabled(hasViewer);
-		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(getCurrentCase() != null);
+		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(hasCase);
 //		toolbarButtons.get(ACTION_DIAGRAM_EDIT).setEnabled(hasDiagrams);
 		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_EXECUTE_SCRIPT).setEnabled(isMatlabEnv && hasViewer);
@@ -781,12 +865,14 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbarButtons.get(ACTION_NETWORK_REMOVE_ELEMENT).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().getSelection() != null);
 //		toolbarButtons.get(ACTION_CASE_LAYOUT).setEnabled(hasViewer);
-		toolbarButtons.get(ACTION_MODEL_DB_PROPERTIES).setEnabled(getCurrentCase() != null);
+		toolbarButtons.get(ACTION_MODEL_DB_PROPERTIES).setEnabled(hasCase);
 //		toolbarButtons.get(ACTION_PANEL_PROPERTIES).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_SELECT_PREVIOUS).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().hasPreviousElement());
 		toolbarButtons.get(ACTION_SELECT_NEXT).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().hasNextElement());
+		actions.get(ACTION_IMPORT_DB).setEnabled(hasCase);
+		actions.get(ACTION_EXPORT_DB).setEnabled(hasCase);
 		setTitle(getWindowTitle());
 	}
 	

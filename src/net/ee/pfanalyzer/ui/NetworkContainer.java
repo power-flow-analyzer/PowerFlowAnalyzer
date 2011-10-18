@@ -139,6 +139,12 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		}
 	}
 	
+	public void reloadModelDBDialog() {
+		modelDBDialog.dispose();
+		modelDBDialog = new ModelDBDialog(SwingUtilities.getWindowAncestor(this), ModelDBDialog.SET_MODEL_MODE, 
+				getPowerFlowCase().getModelDB(), false, "Set Model");
+	}
+	
 	public void setWorkingDirectory(String workingDirectory) {
 		if(overviewPane.importFromScriptDialg != null)
 			overviewPane.importFromScriptDialg.setWorkingDirectory(workingDirectory);
