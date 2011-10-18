@@ -76,7 +76,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private final static String ACTION_CASE_SAVE = "action.case.save";
 	private final static String ACTION_CASE_SAVE_AS = "action.case.saveas";
 //	private final static String ACTION_CASE_LAYOUT = "action.case.layout";
-	
+	 
 //	private final static String ACTION_DIAGRAM_ADD = "action.diagram.add";
 	private final static String ACTION_TABLE_ADD = "action.table.add";
 //	private final static String ACTION_DIAGRAM_EDIT = "action.diagram.edit";
