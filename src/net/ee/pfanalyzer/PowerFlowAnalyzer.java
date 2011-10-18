@@ -351,7 +351,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		if(database == null)
 			return;
 		getCurrentCase().changeModelDB(database);
-		for (Network net : getCurrentCase().getNetworks())
+		for (Network net : getCurrentCase().getNetworks(true))
 			net.fireNetworkChanged();
 		getCurrentContainer().reloadModelDBDialog();
 	}
@@ -779,7 +779,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	private void openCase(PowerFlowCase caze) {
 		try {
-			for (Network network : caze.getNetworks()) {
+			for (Network network : caze.getNetworks(true)) {
 				checkForMissingCoordinates(network);
 			}
 			success.put(nextCase, true);
