@@ -65,6 +65,14 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		return modelDB;
 	}
 	
+	public void changeModelDB(ModelDB modelDB) {
+		modelDB.removeDatabaseChangeListener(this);
+		this.modelDB = modelDB;
+		pfCase.setModelDb(modelDB.getData());
+		updateAllNetworkData();
+		modelDB.addDatabaseChangeListener(this);		
+	}
+	
 	public List<Network> getNetworks() {
 		return networks;
 	}
