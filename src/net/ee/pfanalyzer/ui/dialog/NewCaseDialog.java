@@ -45,8 +45,8 @@ public class NewCaseDialog extends BaseDialog implements IPreferenceConstants {
 	private FileSelectionPanel parameterFileInputPanel;
 	private JRadioButton matpowerParametersButton, customParametersButton;
 	
-	public NewCaseDialog(PowerFlowAnalyzer frame) {
-		super(frame, "Create new case");
+	public NewCaseDialog(PowerFlowAnalyzer frame, String title) {
+		super(frame, title);
 		setText("Select a parameter database and press OK.");
 		
 		parameterFileInputPanel = new FileSelectionPanel(PROPERTY_PARAMETERS_FILES, PARAMETER_FILE_FILTER, false);
