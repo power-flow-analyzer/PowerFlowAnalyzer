@@ -74,6 +74,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //	private final static String ACTION_CASE_EDIT = "action.case.edit";
 //	private final static String ACTION_CASE_REMOVE = "action.case.remove";
 	private final static String ACTION_CASE_SAVE = "action.case.save";
+	private final static String ACTION_CASE_SAVE_AS = "action.case.saveas";
 //	private final static String ACTION_CASE_LAYOUT = "action.case.layout";
 	
 //	private final static String ACTION_DIAGRAM_ADD = "action.diagram.add";
@@ -92,6 +93,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	private final static String ACTION_SELECT_PREVIOUS = "action.select.previous";
 	private final static String ACTION_SELECT_NEXT = "action.select.next";
+	
+	private final static String ACTION_CLOSE_PROGRAM = "action.program.close";
 	
 	private final static String ACTION_IMPORT_DB = "action.model.db.import";
 	private final static String ACTION_EXPORT_DB = "action.model.db.export";
@@ -131,12 +134,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		ToolTipManager.sharedInstance().setInitialDelay(100);// reduce delay in showing tooltips
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				if(JOptionPane.showConfirmDialog(PowerFlowAnalyzer.this, "Exit Power Flow Analyzer?", 
-						"Confirm Exit", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					closeViewer();
-					stopServer();
-					destroyViewer();
-				}
+				closeProgram();
 			}
 		});
 		
@@ -196,8 +194,16 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
+		fileMenu.add(createAction(ACTION_CASE_NEW, "New...", ""));
+		fileMenu.add(createAction(ACTION_CASE_OPEN, "Open...", ""));
+		fileMenu.addSeparator();
+		fileMenu.add(createAction(ACTION_CASE_SAVE, "Save", ""));
+		fileMenu.add(createAction(ACTION_CASE_SAVE_AS, "Save as...", ""));
+		fileMenu.addSeparator();
 		fileMenu.add(createAction(ACTION_IMPORT_DB, "Import parameter database...", ""));
 		fileMenu.add(createAction(ACTION_EXPORT_DB, "Export parameter database...", ""));
+		fileMenu.addSeparator();
+		fileMenu.add(createAction(ACTION_CLOSE_PROGRAM, "Exit program...", ""));
 		menuBar.add(fileMenu);
 		setJMenuBar(menuBar);
 
@@ -236,7 +242,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_CASE_OPEN)) {
 				openCaseFile();
 			} else if(e.getActionCommand().equals(ACTION_CASE_SAVE)) {
-				saveCaseFile();
+				saveCaseFile(false);
+			} else if(e.getActionCommand().equals(ACTION_CASE_SAVE_AS)) {
+				saveCaseFile(true);
 //			} else if(e.getActionCommand().equals(ACTION_DIAGRAM_ADD)) {
 //				if(getCurrentViewer() == null)
 //					return;
@@ -275,6 +283,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_EXPORT_DB)) {
 				if(getCurrentCase() != null)
 					exportParameterDB();
+			} else if(e.getActionCommand().equals(ACTION_CLOSE_PROGRAM)) {
+				closeProgram();
 			}
 		} catch(Exception error) {
 			error.printStackTrace();
@@ -531,8 +541,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		openProgressDialog(pfcase);
 	}
 	
-	private void saveCaseFile() {
-		if(getCurrentCase().getCaseFile() == null) {
+	private void saveCaseFile(boolean saveAs) {
+		if(saveAs || getCurrentCase().getCaseFile() == null) {
 			JFileChooser fileChooser = new JFileChooser(getWorkingDirectory());
 			fileChooser.setAcceptAllFileFilterUsed(true);
 			fileChooser.setFileFilter(OpenCaseDialog.CASE_FILE_FILTER);
@@ -553,7 +563,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					if(action == JOptionPane.YES_OPTION) {
 						// do nothing, catch YES directly
 					} else {//if(action == JOptionPane.NO_OPTION) {
-						saveCaseFile();
+						saveCaseFile(saveAs);
 						return;
 					}
 				}
@@ -659,6 +669,15 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				}
 			}
 		}).start();
+	}
+	
+	private void closeProgram() {
+		if(JOptionPane.showConfirmDialog(this, "Exit Power Flow Analyzer?", 
+				"Confirm Exit", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			closeViewer();
+			stopServer();
+			destroyViewer();
+		}
 	}
 	
 	private void stopServer() {
@@ -871,6 +890,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				&& getCurrentViewer().getSelectionManager().hasPreviousElement());
 		toolbarButtons.get(ACTION_SELECT_NEXT).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().hasNextElement());
+		actions.get(ACTION_CASE_SAVE).setEnabled(hasCase);
+		actions.get(ACTION_CASE_SAVE_AS).setEnabled(hasCase);
 		actions.get(ACTION_IMPORT_DB).setEnabled(hasCase);
 		actions.get(ACTION_EXPORT_DB).setEnabled(hasCase);
 		setTitle(getWindowTitle());
