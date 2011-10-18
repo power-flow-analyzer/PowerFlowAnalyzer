@@ -15,6 +15,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private File caseFile;
 	private CaseData pfCase;
 	private List<Network> networks = new ArrayList<Network>();
+	private List<Network> networksAndScenarios = new ArrayList<Network>();
 	private ModelDB modelDB;
 	private NetworkContainer viewer;
 	private long maxNetworkID = 0;
@@ -73,9 +74,13 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		modelDB.addDatabaseChangeListener(this);		
 	}
 	
-	public List<Network> getNetworks() {
-		return networks;
+	public List<Network> getNetworks(boolean includeScenarios) {
+		return includeScenarios ? networksAndScenarios : networks;
 	}
+	
+//	public List<Network> getAllNetworks() {
+//		return networksAndScenarios;
+//	}
 	
 	public NetworkContainer getViewer() {
 		return viewer;
@@ -90,12 +95,14 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	}
 	
 	private Network addNetworkInternal(NetworkData netData) {
-		return addNetworkInternal(new Network(netData));
+		return addNetworkInternal(new Network(netData), false);
 	}
 	
-	private Network addNetworkInternal(Network network) {
+	private Network addNetworkInternal(Network network, boolean isScenario) {
 		network.setPowerFlowCase(this);
-		networks.add(network);
+		if(isScenario == false)
+			getNetworks(false).add(network);
+		getNetworks(true).add(network);
 		if(network.getInternalID() == -1) {
 			maxNetworkID++;
 			while(getNetwork(maxNetworkID) != null) {
@@ -109,7 +116,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	}
 	
 	public Network addNetwork(Network network) {
-		addNetworkInternal(network);
+		addNetworkInternal(network, false);
 		pfCase.getNetwork().add(network.getData());
 		return network;
 	}
@@ -121,9 +128,18 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	}
 	
 	public void removeNetwork(Network network) {
-		for (int i = 0; i < getNetworks().size(); i++) {
-			if(getNetworks().get(i).getInternalID() == network.getInternalID()) {
-				getNetworks().remove(i);
+		if(network.getParentNetwork() == null) {
+			for (int i = 0; i < getNetworks(false).size(); i++) {
+				if(getNetworks(false).get(i).getInternalID() == network.getInternalID()) {
+					getNetworks(false).remove(i);
+					break;
+				}
+			}
+		} else
+			network.getParentNetwork().removeScenario(network);
+		for (int i = 0; i < getNetworks(true).size(); i++) {
+			if(getNetworks(true).get(i).getInternalID() == network.getInternalID()) {
+				getNetworks(true).remove(i);
 				break;
 			}
 		}
@@ -139,8 +155,15 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		}
 	}
 	
+	public void addScenario(Network parent, Network scenario) {
+		addNetworkInternal(scenario, true);
+		scenario.setPowerFlowCase(this);
+		parent.addScenario(scenario);
+		scenario.updateModels();
+	}
+	
 	public Network getNetwork(long networkID) {
-		for (Network network : getNetworks()) {
+		for (Network network : getNetworks(true)) {
 			if(network.getInternalID() == networkID)
 				return network;
 		}
@@ -156,7 +179,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	}
 	
 	private void updateAllNetworkData() {
-		for (Network net : getNetworks())
+		for (Network net : getNetworks(true))
 			net.updateModels();
 	}
 	
@@ -172,7 +195,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 //		System.out.println("parameterChanged: " + event.getParameterID());
 //		System.out.println("  old: " + event.getOldValue());
 //		System.out.println("  new: " + event.getNewValue());
-		for (Network network : getNetworks()) {
+		for (Network network : getNetworks(true)) {
 			network.fireNetworkChanged();
 		}
 	}

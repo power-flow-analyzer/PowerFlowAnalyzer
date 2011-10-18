@@ -24,6 +24,7 @@ public class Network extends ParameterSupport {
 	
 	private NetworkData networkData;
 	private PowerFlowCase caze;
+	private Network parentNetwork;
 	private ModelClassData globalParameterClass, scriptParameterClass;
 	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
@@ -85,12 +86,20 @@ public class Network extends ParameterSupport {
 		getData().setInternalID(id);
 	}
 	
-	public void addScenario(Network scenario) {
+	void addScenario(Network scenario) {
 		getData().getScenario().add(scenario.getData());
 		getScenarios().add(scenario);
+		scenario.setParentNetwork(this);
 	}
 	
-//	public void removeScenario(Network scenario) {
+	public void removeScenario(Network scenario) {
+		for (int i = 0; i < getScenarios().size(); i++) {
+			if(getScenarios().get(i).getInternalID() == scenario.getInternalID()) {
+				getScenarios().remove(i);
+				break;
+			}
+		}
+		removeScenario(scenario.getData());
 //		Object removed = null;
 //		for (int i = 0; i < getScenarios().size(); i++) {
 //			if(getScenarios().get(i).getData() == scenario.getData()) {
@@ -109,8 +118,25 @@ public class Network extends ParameterSupport {
 //		}
 //		if(removed == null)
 //			throw new RuntimeException("Scenario could not be deleted from network");
-//	}
+	}
 	
+	public void removeScenario(NetworkData scenario) {
+		for (int i = 0; i < getData().getScenario().size(); i++) {
+			if(getData().getScenario().get(i).getInternalID() == scenario.getInternalID()) {
+				getData().getScenario().remove(i);
+				break;
+			}
+		}
+	}
+	
+	public Network getParentNetwork() {
+		return parentNetwork;
+	}
+
+	public void setParentNetwork(Network parentNetwork) {
+		this.parentNetwork = parentNetwork;
+	}
+
 	public ModelClassData getGlobalParameterClass() {
 		return globalParameterClass;
 	}
@@ -183,7 +209,7 @@ public class Network extends ParameterSupport {
 		getBusses().clear();
 		getBranches().clear();
 		getGenerators().clear();
-		getScenarios().clear();
+//		getScenarios().clear();
 //		System.out.println("network: update data");
 		for (int i = 0; i < networkData.getElement().size(); i++) {
 			AbstractNetworkElementData element = networkData.getElement().get(i);
