@@ -9,6 +9,7 @@ import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.ModelDBData;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 
 public class ModelDB {
@@ -77,6 +78,23 @@ public class ModelDB {
 	
 	public ModelData getModel(String modelID) {
 		return models.get(modelID);
+	}
+	
+	public List<ModelData> getModels(String modelIDPrefix) {
+		List<ModelData> list = new ArrayList<ModelData>();
+		for (String modelID : models.keySet()) {
+			if(modelID.startsWith(modelIDPrefix))
+				list.add(models.get(modelID));
+		}
+		return list;
+	}
+	
+	public NetworkParameter getParameterValue(ModelData model, String parameterID) {
+		return ModelDBUtils.getParameterValue(model, parameterID);
+	}
+	
+	public String getModelID(ModelData model) {
+		return ModelDBUtils.getParameterID(model);
 	}
 	
 	public ModelClassData getNetworkClass() {
