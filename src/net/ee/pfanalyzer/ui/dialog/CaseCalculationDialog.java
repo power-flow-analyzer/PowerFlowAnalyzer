@@ -31,7 +31,7 @@ public class CaseCalculationDialog extends BaseDialog {
 		
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
 		parameterPanel.setEditable(true);// default setting
-		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network));
+		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network, true));
 		ModelClassData clazz = network.getGlobalParameterClass();
 		Group paramPanel = new Group("Scenario Parameters");
 		for (NetworkParameter parameter : clazz.getParameter()) {

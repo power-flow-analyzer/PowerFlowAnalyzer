@@ -8,9 +8,11 @@ import net.ee.pfanalyzer.model.util.ParameterSupport;
 public class ParameterMasterNetwork implements IParameterMasterElement {
 
 	private Network network;
+	private boolean parametersAreRequired;
 	
-	public ParameterMasterNetwork(Network network) {
+	public ParameterMasterNetwork(Network network, boolean parametersAreRequired) {
 		this.network = network;
+		this.parametersAreRequired = parametersAreRequired;
 	}
 	
 	public Network getNetwork() {
@@ -19,7 +21,7 @@ public class ParameterMasterNetwork implements IParameterMasterElement {
 	
 	@Override
 	public boolean isRequired(String parameterID) {
-		return false;
+		return parametersAreRequired;
 	}
 	
 	@Override
