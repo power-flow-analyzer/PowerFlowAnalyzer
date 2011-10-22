@@ -226,6 +226,8 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	private Network getSelectedNetwork2() {
+		if(networkTree.getSelectionModel() == null || networkTree.getSelectionModel().getSelectionPath() == null)
+			return null;
 		Object selection = networkTree.getSelectionModel().getSelectionPath().getLastPathComponent();
 		if(selection instanceof Network)
 			return (Network) selection;
