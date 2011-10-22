@@ -172,10 +172,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.add(createToolbarButton(ACTION_CASE_SAVE, "Save this power flow case", "save_as.png", "Save case"));
 //		toolbar.add(createToolbarButton(ACTION_CASE_REMOVE, "Remove this case", "report_delete.png", "Remove Case"));
 		toolbar.addSeparator();
-		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open parameter database defining parameters for networks and scripts", "database.png", "Parameter DB"));
+		toolbar.add(createToolbarButton(ACTION_EXECUTE_SCRIPT, "Execute a script on this network", "script_gear.png", "Execute script"));
 		toolbar.addSeparator();
-		toolbar.add(createToolbarButton(ACTION_EXECUTE_SCRIPT, "Execute a script on this network", "calculator.png", "Execute script"));
-		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_MODEL_DB_PROPERTIES, "Open parameter database defining parameters for networks, elements and scripts", "database.png", "Parameter DB"));
 		toolbar.add(createToolbarButton(ACTION_NETWORK_ADD_ELEMENT, "Add a new network element", "plugin_add.png", "Add element"));
 		toolbar.add(createToolbarButton(ACTION_NETWORK_REMOVE_ELEMENT, "Remove the selected network element(s)", "plugin_delete.png", "Remove element"));
 		toolbar.addSeparator();
