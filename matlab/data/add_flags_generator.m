@@ -11,7 +11,7 @@ real_power_failure = genData(PG) > genData(PMAX) || genData(PG) < genData(PMIN);
 
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Real power Output');
 jflag.addParameter('PG');
-jflag.setWarning(real_power_percentage >= 90);
+jflag.setWarning(real_power_percentage >= 95);
 jflag.setFailure(real_power_failure);
 jflag.setPercentage(real_power_percentage);
 jgenerator.addFlag(jflag);
@@ -32,7 +32,7 @@ end
 
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Reactive power Output');
 jflag.addParameter('QG');
-jflag.setWarning(reactive_power_percentage >= 90);
+jflag.setWarning(reactive_power_percentage >= 95);
 jflag.setFailure(reactive_power_failure);
 jflag.setPercentage(reactive_power_percentage);
 jgenerator.addFlag(jflag);

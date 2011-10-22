@@ -18,7 +18,7 @@ if busData(VM) < busData(VMIN) || busData(VM) > busData(VMAX)
 end
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Voltage magnitude');
 jflag.addParameter('VM');
-jflag.setWarning(voltage_percentage > 90);
+jflag.setWarning(voltage_percentage >= 95);
 jflag.setFailure(voltage_failure);
 jflag.setPercentage(voltage_percentage);
 jbus.addFlag(jflag);
@@ -38,7 +38,7 @@ if busData(VA) < voltage_angle_min || busData(VA) > voltage_angle_max
 end
 jflag = net.ee.pfanalyzer.model.NetworkFlag('Voltage angle');
 jflag.addParameter('VA');
-jflag.setWarning(voltage_angle_percentage > 90);
+jflag.setWarning(voltage_angle_percentage >= 95);
 jflag.setFailure(voltage_angle_failure);
 jflag.setPercentage(voltage_angle_percentage);
 jbus.addFlag(jflag);

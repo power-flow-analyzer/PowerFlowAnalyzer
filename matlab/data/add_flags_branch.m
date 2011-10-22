@@ -18,7 +18,7 @@ if branchData(RATE_A) > 0
     jflag.addParameter('QF');
     jflag.addParameter('PT');
     jflag.addParameter('QT');
-    jflag.setWarning(rate_A_percentage >= 90);
+    jflag.setWarning(rate_A_percentage >= 95);
     jflag.setFailure(rate_A_failure);
     jflag.setPercentage(rate_A_percentage);
     jbranch.addFlag(jflag);
@@ -33,7 +33,7 @@ if branchData(RATE_A) ~= branchData(RATE_B) && ...
     jflag.addParameter('QF');
     jflag.addParameter('PT');
     jflag.addParameter('QT');
-    jflag.setWarning(rate_B_percentage >= 90);
+    jflag.setWarning(rate_B_percentage >= 95);
     jflag.setFailure(rate_B_failure);
     jflag.setPercentage(rate_B_percentage);
     jbranch.addFlag(jflag);
@@ -49,7 +49,7 @@ if branchData(RATE_A) ~= branchData(RATE_B) && ...
     jflag.addParameter('QF');
     jflag.addParameter('PT');
     jflag.addParameter('QT');
-    jflag.setWarning(rate_C_percentage >= 90);
+    jflag.setWarning(rate_C_percentage >= 95);
     jflag.setFailure(rate_C_failure);
     jflag.setPercentage(rate_C_percentage);
     jbranch.addFlag(jflag);
