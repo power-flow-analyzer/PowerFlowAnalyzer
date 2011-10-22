@@ -116,13 +116,18 @@ public abstract class ParameterValuePanel extends JPanel {
 		else if(p.getDefaultValue() != null)
 			value = p.getDefaultValue();
 		if(value != null) {
-			// convert double values to integers if necessary
-			// (otherwise option cannot be found by using equals)
-			if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType()) && value.endsWith(".0"))
-				value = value.substring(0, value.length() - 2);
+			value = getDisplayValue(value);
 			// set data in panel
 			setValue(value);
 		}
+	}
+	
+	protected String getDisplayValue(String value) {
+		// convert double values to integers if necessary
+		// (otherwise option cannot be found by using equals)
+		if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType()) && value.endsWith(".0"))
+			return value.substring(0, value.length() - 2);
+		return value;
 	}
 	
 	protected void fireValueChanged(String oldValue, String newValue) {
