@@ -17,7 +17,7 @@ public class ParameterRestrictionValueBox extends ParameterValuePanel implements
 	
 	private JComboBox box;
 	private String oldValue;
-	Vector<String> values;
+	Vector<String> values, labels;
 	
 	public ParameterRestrictionValueBox(ParameterMasterNetworkElement element, NetworkParameter property, NetworkParameter propertyValue) {
 		super(element, property, propertyValue);
@@ -30,18 +30,25 @@ public class ParameterRestrictionValueBox extends ParameterValuePanel implements
 	
 	protected void createValuePanel() {
 		values = new Vector<String>();
+		values.add(null);
+		labels = new Vector<String>();
+		labels.add("");
 		box = new JComboBox();
 		String parameterID = getDisplayOptions().getParameterID();
 		if(parameterID == null || parameterID.isEmpty())
 			return;
-		Vector<String> labels = new Vector<String>();
 		String elementRestriction = getDisplayOptions().getElementRestriction();
 		List<AbstractNetworkElement> elements = getNetwork().getElements(elementRestriction);
 		for (AbstractNetworkElement element : elements) {
 			NetworkParameter parameter = element.getParameterValue(parameterID);
 			if(parameter != null && parameter.getValue() != null) {
-				values.add(parameter.getValue());
-				labels.add(element.getParameterDisplayValue(parameterID));
+				if(parameter.getValue() != null)
+					values.add(getDisplayValue(parameter.getValue()));
+				else
+					values.add(null);
+				String label = element.getParameterDisplayValue(parameterID) 
+						+ " (" + element.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT) + ")";
+				labels.add(label);
 			}
 		}
 		box.setModel(new DefaultComboBoxModel(labels));
@@ -52,7 +59,11 @@ public class ParameterRestrictionValueBox extends ParameterValuePanel implements
 	}
 	
 	protected void setValue(String value) {
-		box.setSelectedItem(value);
+		int index = values.indexOf(value);
+		if(index > -1)
+			box.setSelectedIndex(index);
+		else
+			box.setSelectedIndex(0);
 		
 //		int optionIndex = getOptionIndexForValue(value);
 //		if(optionIndex > -1) {
