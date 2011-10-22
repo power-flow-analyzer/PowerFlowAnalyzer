@@ -43,7 +43,7 @@ public class ParameterRestrictionValueBox extends ParameterValuePanel implements
 			NetworkParameter parameter = element.getParameterValue(parameterID);
 			if(parameter != null && parameter.getValue() != null) {
 				if(parameter.getValue() != null)
-					values.add(getDisplayValue(parameter.getValue()));
+					values.add(getNormalizedParameterValue(parameter.getValue()));
 				else
 					values.add(null);
 				String label = element.getParameterDisplayValue(parameterID) 

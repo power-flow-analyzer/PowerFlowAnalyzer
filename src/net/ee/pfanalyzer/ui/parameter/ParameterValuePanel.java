@@ -11,9 +11,9 @@ import javax.swing.JPanel;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
-import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
+import net.ee.pfanalyzer.model.util.ParameterUtils;
 
 public abstract class ParameterValuePanel extends JPanel {
 	
@@ -116,18 +116,14 @@ public abstract class ParameterValuePanel extends JPanel {
 		else if(p.getDefaultValue() != null)
 			value = p.getDefaultValue();
 		if(value != null) {
-			value = getDisplayValue(value);
+			value = ParameterUtils.getNormalizedParameterValue(propertyDefinition, value);
 			// set data in panel
 			setValue(value);
 		}
 	}
 	
-	protected String getDisplayValue(String value) {
-		// convert double values to integers if necessary
-		// (otherwise option cannot be found by using equals)
-		if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType()) && value.endsWith(".0"))
-			return value.substring(0, value.length() - 2);
-		return value;
+	protected String getNormalizedParameterValue(String value) {
+		return ParameterUtils.getNormalizedParameterValue(propertyDefinition, value);
 	}
 	
 	protected void fireValueChanged(String oldValue, String newValue) {

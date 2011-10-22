@@ -13,6 +13,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
+import net.ee.pfanalyzer.model.util.ParameterUtils;
 
 public class Network extends ParameterSupport {
 
@@ -397,6 +398,12 @@ public class Network extends ParameterSupport {
 		}
 	}
 	
+	public void removeAllFlags() {
+		for (AbstractNetworkElement element : getElements()) {
+			element.clearFlags();
+		}
+	}
+	
 	public void removeAllElements() {
 		networkData.getElement().clear();
 		getElements().clear();
@@ -430,13 +437,26 @@ public class Network extends ParameterSupport {
 		return list;
 	}
 	
+	public List<AbstractNetworkElement> getElements(String idPrefix, String parameterID, int parameterValue) {
+		return getElements(idPrefix, parameterID, Integer.toString(parameterValue));
+	}
+	
 	public List<AbstractNetworkElement> getElements(String idPrefix, String parameterID, String parameterValue) {
 		List<AbstractNetworkElement> result = new ArrayList<AbstractNetworkElement>();
 		List<AbstractNetworkElement> list = getElements(idPrefix);
 		for (AbstractNetworkElement element : list) {
 			NetworkParameter parameter = element.getParameterValue(parameterID);
-			if(parameter != null && parameter.getValue() != null && parameter.getValue().equals(parameterValue))
-				result.add(element);
+			if(parameter != null && parameter.getValue() != null) {
+				String value1 = parameter.getValue();
+				String value2 = parameterValue;
+				NetworkParameter paramDef = element.getParameterDefinition(parameterID);
+				if(paramDef != null) {
+					value1 = ParameterUtils.getNormalizedParameterValue(paramDef, value1);
+					value2 = ParameterUtils.getNormalizedParameterValue(paramDef, value2);
+				}
+				if(value1.equals(value2))
+					result.add(element);
+			}
 		}
 		return result;
 	}
