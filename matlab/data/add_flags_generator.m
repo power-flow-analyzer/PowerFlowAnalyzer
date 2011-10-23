@@ -5,6 +5,12 @@ function [  ] = add_flags_generator( jgenerator, genData )
 % define Matpower constants
 define_constants;
 
+% do not show flags if generator is not running or if the network was not
+% calculated yet
+if abs(genData(PG)) < 1E-8 && abs(genData(QG)) < 1E-8
+    return;
+end
+
 %% real power output
 real_power_percentage = genData(PG) / genData(PMAX) * 100;
 real_power_failure = genData(PG) > genData(PMAX) || genData(PG) < genData(PMIN);
