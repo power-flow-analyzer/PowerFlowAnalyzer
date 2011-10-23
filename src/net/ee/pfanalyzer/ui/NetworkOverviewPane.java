@@ -1,11 +1,14 @@
 package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -35,6 +38,7 @@ import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
+import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
@@ -342,20 +346,36 @@ public class NetworkOverviewPane extends JPanel {
 	
 	class NetworkTreeModel implements TreeModel {
 		
+		private List<Network> sortedNetworks = new ArrayList<Network>();
 		private Vector<TreeModelListener> treeModelListeners = new Vector<TreeModelListener>();
 
 		NetworkTreeModel() {
+			sortNetworks();
+		}
+		
+		private void sortNetworks() {
+			sortedNetworks.clear();
+			for(Network network: getPowerFlowCase().getNetworks(false))
+				sortedNetworks.add(network);
+			Collections.sort(sortedNetworks, new Comparator<Network>() {
+				@Override
+				public int compare(Network n1, Network n2) {
+					if(n1.getName() == null)
+						return 0;
+					return n1.getName().compareTo(n2.getName());
+				}
+			});
 		}
 		
 		@Override
 		public Object getRoot() {
-			return getPowerFlowCase().getNetworks(false);
+			return sortedNetworks;
 		}
 		
 		@Override
 		public Object getChild(Object parent, int index) {
 			if(parent instanceof List)
-				return getPowerFlowCase().getNetworks(false).get(index);
+				return sortedNetworks.get(index);
 			if(parent instanceof Network)
 				return ((Network) parent).getScenarios().get(index);
 			throw new IllegalArgumentException("Parent must be a list or a network but is " + parent);
@@ -364,7 +384,7 @@ public class NetworkOverviewPane extends JPanel {
 		@Override
 		public int getChildCount(Object parent) {
 			if(parent instanceof List)
-				return getPowerFlowCase().getNetworks(false).size();
+				return sortedNetworks.size();
 			if(parent instanceof Network)
 				return ((Network) parent).getScenarios().size();
 			return 0;
@@ -373,7 +393,7 @@ public class NetworkOverviewPane extends JPanel {
 		@Override
 		public int getIndexOfChild(Object parent, Object child) {
 			if(parent instanceof List)
-				return ListUtils.getIndexOf(getPowerFlowCase().getNetworks(false), (Network) child);
+				return ListUtils.getIndexOf(sortedNetworks, (Network) child);
 			if(parent instanceof Network)
 				return ListUtils.getIndexOf(((Network) parent).getScenarios(), (Network) child);
 			return -1;
@@ -394,6 +414,7 @@ public class NetworkOverviewPane extends JPanel {
 		}
 		
 		public void refreshModel() {
+			sortNetworks();
 			fireTreeStructureChanged();
 		}
 		
@@ -420,6 +441,13 @@ public class NetworkOverviewPane extends JPanel {
 				if(value instanceof Network) {
 					Network network = (Network) value;
 					setText(parent.getNetworkName(network));
+					if(network.hasFailures())
+						setForeground(Preferences.getFlagFailureColor());
+					else 
+						if(network.wasCalculated())
+						setForeground(Preferences.getHyperlinkForeground());
+					else
+						setForeground(Color.BLACK);
 				} else
 					setText("");
 			} catch(Exception e) {
