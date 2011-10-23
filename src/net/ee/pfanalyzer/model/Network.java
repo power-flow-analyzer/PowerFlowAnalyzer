@@ -30,6 +30,8 @@ public class Network extends ParameterSupport {
 	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
+	private Boolean hasFailures = null;
+	private Boolean wasCalculated = null;
 	
 	private double time;
 	
@@ -237,6 +239,8 @@ public class Network extends ParameterSupport {
 //			Network scenario = new Network(data);
 //			getScenarios().add(scenario);
 //		}
+		hasFailures = null;
+		wasCalculated = null;
 	}
 	
 	void updateModels() {
@@ -402,6 +406,29 @@ public class Network extends ParameterSupport {
 		for (AbstractNetworkElement element : getElements()) {
 			element.clearFlags();
 		}
+	}
+		
+	public boolean hasFailures() {
+		if(hasFailures == null) {
+			// first check if calculation converged
+			hasFailures = getIntParameter("SUCCESS", 1) == 0;
+			if(hasFailures)
+				return hasFailures;// no need to check flags of elements
+			for (AbstractNetworkElement element : getElements()) {
+				if(element.hasFailures()) {
+					hasFailures = true;
+					break;
+				}
+			}
+		}
+		return hasFailures;
+	}
+	
+	public boolean wasCalculated() {
+		if(wasCalculated == null) {
+			wasCalculated = hasParameterValue("SUCCESS");
+		}
+		return wasCalculated;
 	}
 	
 	public void removeAllElements() {
