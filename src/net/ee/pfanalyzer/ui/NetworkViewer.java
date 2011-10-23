@@ -13,8 +13,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
@@ -227,14 +231,15 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					changeZoom();
 					// scale
 					double wheelRot = -e.getWheelRotation();
-					double scale = wheelRot * 0.3;
-					minLatitude += scale;
-					maxLatitude -= scale;
-					minLongitude += scale;
-					maxLongitude -= scale;
+					double scaleLatitude = wheelRot * (maxLatitude - minLatitude) / 10.0; 
+					double scaleLongitude = wheelRot * (maxLongitude - minLongitude) / 10.0; 
+					minLatitude += scaleLatitude;
+					maxLatitude -= scaleLatitude;
+					minLongitude += scaleLongitude;
+					maxLongitude -= scaleLongitude;
 					// translate
 					if(wheelRot > 0) {
-						double factor = 0.3;
+						double factor = 0.5;
 						int x = e.getX();
 						int y = e.getY();
 						int centerX = getWidth()/2;
@@ -735,6 +740,31 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		return selection != null && selection == object;
 	}
 	
+	private List<Integer> voltageLevels;
+	
+	List<Integer> getVoltageLevels() {
+		if(voltageLevels == null)
+			updateVoltageLevels();
+		return voltageLevels;
+	}
+	
+	private void updateVoltageLevels() {
+		voltageLevels = new ArrayList<Integer>();
+		for (int i = 0; i < data.getCombinedBranchCount(); i++) {
+			CombinedBranch cbranch = data.getCombinedBranch(i);
+			int voltage = getBaseVoltage(cbranch.getFirstBranch());
+			if(voltageLevels.contains(voltage) == false)
+				voltageLevels.add(voltage);
+		}
+		// sort voltage levels in descending order
+		Collections.sort(voltageLevels, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer int1, Integer int2) {
+				return int2.compareTo(int1);
+			}
+		});
+	}
+	
 	private String getTooltipText(AbstractNetworkElement dataElement) {
 		if(dataElement instanceof Branch) {
 			CombinedBranch cbranch = data.getCombinedBranch(dataElement);
@@ -786,17 +816,10 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	}
 	
 	Stroke getBranchStroke(int baseVoltage, boolean bold) {
-		switch(baseVoltage) {
-		case 380:
-		case 400:
-		case 420:
-			return bold ? strokesBold[VOLTAGE_LEVEL_380KV] : strokesNormal[VOLTAGE_LEVEL_380KV];
-		case 220:
-		case 245:
-			return bold ? strokesBold[VOLTAGE_LEVEL_220KV] : strokesNormal[VOLTAGE_LEVEL_220KV];
-		case 110:
-		case 115:
-			return bold ? strokesBold[VOLTAGE_LEVEL_110KV] : strokesNormal[VOLTAGE_LEVEL_110KV];
+		for (int i = 0; i < getVoltageLevels().size(); i++) {
+			Integer voltageLevel = getVoltageLevels().get(i);
+			if(voltageLevel.intValue() == baseVoltage)
+				return bold ? strokesBold[i] : strokesNormal[i];
 		}
 		return bold ? otherStrokeBold : otherStrokeNormal;
 	}
@@ -818,6 +841,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	public void networkChanged(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkChanged");
 		initializeInternalCoordinates();
+		updateVoltageLevels();
 		repaint();
 	}
 
@@ -825,6 +849,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	public void networkElementAdded(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkElementAdded");
 		initializeInternalCoordinates();
+		updateVoltageLevels();
 		repaint();
 	}
 
@@ -843,6 +868,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	@Override
 	public void networkElementRemoved(NetworkChangeEvent event) {
 		initializeInternalCoordinates();
+		updateVoltageLevels();
 		repaint();
 	}
 
