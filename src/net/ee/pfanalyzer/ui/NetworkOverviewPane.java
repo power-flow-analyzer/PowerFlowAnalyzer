@@ -239,10 +239,14 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	private void selectNetwork(Network network) {
+		networkTree.setSelectionPath(new TreePath(getNetworkPath(network)));
+	}
+	
+	private Object[] getNetworkPath(Network network) {
 		List<Object> list = new ArrayList<Object>();
 		list.add(treeModel.getRoot());
 		getNetworkPath(list, network);
-		networkTree.setSelectionPath(new TreePath(list.toArray(new Object[list.size()])));
+		return list.toArray(new Object[list.size()]);
 	}
 	
 	private void getNetworkPath(List<Object> list, Network network) {
@@ -418,6 +422,12 @@ public class NetworkOverviewPane extends JPanel {
 			fireTreeStructureChanged();
 		}
 		
+		protected void fireTreeNodeChanged(Network network) {
+	        TreeModelEvent e = new TreeModelEvent(this, getNetworkPath(network));
+	        for (TreeModelListener listener : treeModelListeners)
+	        	listener.treeNodesChanged(e);
+		}
+		
 		protected void fireTreeStructureChanged() {
 	        TreeModelEvent e = new TreeModelEvent(this, new Object[] { getRoot() });
 	        for (TreeModelListener listener : treeModelListeners)
@@ -479,6 +489,7 @@ public class NetworkOverviewPane extends JPanel {
 		protected void setTextValue(String text) {
 			if(selectedNetworks.size() == 1)
 				selectedNetworks.get(0).setName(text);
+			treeModel.fireTreeNodeChanged(selectedNetworks.get(0));
 			networkTree.repaint();
 			parent.updateTabTitles();
 		}
