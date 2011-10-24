@@ -30,7 +30,9 @@ public abstract class AbstractTextEditor extends JPanel implements ActionListene
 	}
 	
 	public void updateView() {
-		setText(getTextValue());
+		String newText = getTextValue();
+		if(getText().equals(newText) == false)
+			setText(newText);
 	}
 	
 	protected abstract String getText();
