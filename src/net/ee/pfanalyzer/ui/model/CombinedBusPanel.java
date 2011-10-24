@@ -10,12 +10,11 @@ import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.Network;
-import net.ee.pfanalyzer.model.Transformer;
 import net.ee.pfanalyzer.ui.util.Group;
 
 public class CombinedBusPanel extends ModelElementPanel {
 
-	private Group busGroup, generatorGroup, transformerGroup;
+	private Group busGroup, generatorGroup;//, transformerGroup;
 	private JLabel sumRealPowerDemandLabel, sumReactivePowerDemandLabel, sumRealPowerGenerationLabel, sumReactivePowerGenerationLabel;
 	private DecimalFormat format = new DecimalFormat("#.###");
 //	private Font labelFont;
@@ -26,7 +25,7 @@ public class CombinedBusPanel extends ModelElementPanel {
 //		summaryGroup = addElementGroup("Summary");
 		busGroup = addElementGroup("Bus Overview");
 		generatorGroup = addElementGroup("Generator Overview");
-		transformerGroup = addElementGroup("Transformer Overview");
+//		transformerGroup = addElementGroup("Transformer Overview");
 		
 		sumRealPowerDemandLabel = new JLabel();
 		sumReactivePowerDemandLabel = new JLabel();
@@ -38,7 +37,7 @@ public class CombinedBusPanel extends ModelElementPanel {
 		// remove old elements
 		busGroup.removeAll();
 		generatorGroup.removeAll();
-		transformerGroup.removeAll();
+//		transformerGroup.removeAll();
 		// set title
 		setTitle(data.getLabel());
 		
@@ -85,10 +84,10 @@ public class CombinedBusPanel extends ModelElementPanel {
 		sumRealPowerGenerationLabel.setText(format.format(realPowerSum) + " MW");
 		sumReactivePowerGenerationLabel.setText(format.format(reactivePowerSum) + " MVAr");
 		
-		// add transformers
-		for (Transformer t : data.getTransformers()) {
-			transformerGroup.addElementLink(t, AbstractNetworkElement.DISPLAY_DEFAULT);
-		}
+//		// add transformers
+//		for (Transformer t : data.getTransformers()) {
+//			transformerGroup.addElementLink(t, AbstractNetworkElement.DISPLAY_DEFAULT);
+//		}
 		
 		finishLayout();
 	}
