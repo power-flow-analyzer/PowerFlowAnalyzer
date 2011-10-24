@@ -71,6 +71,7 @@ public class ClosableTabbedPane {
 	
 	public void setTitleAt(int index, String title) {
 		getTabbedPane().setTitleAt(index, title);
+		getTabbedPane().getTabComponentAt(index).doLayout();
 	}
 	
 	public int getSelectedIndex() {
