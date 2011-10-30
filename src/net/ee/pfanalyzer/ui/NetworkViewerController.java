@@ -18,6 +18,7 @@ public class NetworkViewerController extends JPanel {
 	public final static String PROPERTY_RESPECT_ASPECT_RATIO = "property.viewer.respectAspectRatio";
 	public final static String PROPERTY_DRAW_BUSSES = "property.viewer.draw.bus";
 	public final static String PROPERTY_DRAW_BRANCHES = "property.viewer.draw.branch";
+	public final static String PROPERTY_DRAW_POWER_DIRECTION = "property.viewer.draw.power.direction";
 	public final static String PROPERTY_DRAW_GENERATORS = "property.viewer.draw.generator";
 	public final static String PROPERTY_DRAW_OUTLINE = "property.viewer.draw.outline";
 	public final static String PROPERTY_DRAW_LEGEND = "property.viewer.draw.legend";
@@ -58,6 +59,8 @@ public class NetworkViewerController extends JPanel {
 			viewer.setDrawBusNodes(value);
 		else if(property.equals(PROPERTY_DRAW_BRANCHES))
 			viewer.setDrawBranches(value);
+		else if(property.equals(PROPERTY_DRAW_POWER_DIRECTION))
+			viewer.setDrawPowerDirection(value);
 		else if(property.equals(PROPERTY_DRAW_GENERATORS))
 			viewer.setDrawGeneratorsNodes(value);
 		else if(property.equals(PROPERTY_DRAW_OUTLINE))
