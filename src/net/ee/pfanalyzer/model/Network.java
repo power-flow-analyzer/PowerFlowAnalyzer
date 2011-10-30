@@ -545,6 +545,7 @@ public class Network extends ParameterSupport {
 		// combine branches
 		for (int i = 0; i < getBranchesCount(); i++) {
 			Branch branch = branches.get(i);
+			branch.setInverted(false);
 			Bus fromBus = branch.getFromBus();
 			Bus toBus = branch.getToBus();
 			CombinedBus cFromBus = getCombinedBus(fromBus);
@@ -562,6 +563,14 @@ public class Network extends ParameterSupport {
 //			System.out.println("    combined bus: " + cToBus.getIndex());
 			boolean found = false;
 			for (CombinedBranch cbranch : combinedBranchList) {
+				// check if from and to bus are inverted
+				if(cbranch.hasBusNodes(cToBus, cFromBus)) {
+					branch.setInverted(true);
+					CombinedBus tempBus = cFromBus;
+					cFromBus = cToBus;
+					cToBus = tempBus;
+					// branch will be added in the following if block
+				}
 				if(cbranch.hasBusNodes(cFromBus, cToBus)) {
 //					System.out.println("  added to combined branch " + cbranch.getIndex());
 					cbranch.addBranch(branch);
