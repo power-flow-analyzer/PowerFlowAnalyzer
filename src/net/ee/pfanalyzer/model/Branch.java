@@ -7,6 +7,7 @@ import net.ee.pfanalyzer.model.matpower.IBranchDataConstants;
 public class Branch extends AbstractNetworkElement implements IBranchDataConstants {
 	
 	private Bus fromBus, toBus;
+	private boolean isInverted = false;
 	
 	public Branch(Network data, int index) {
 		super(data, index);
@@ -29,19 +30,6 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 		return getInitialBranchStatus() > 0;
 	}
 	
-//	public double getRealPowerInjectedAtFromBusEnd() {
-//		return getData()[REAL_POWER_INJECTED_AT_FROM_BUS_END];
-//	}
-//	
-//	public double getRealPowerInjectedAtToBusEnd() {
-//		return getData()[REAL_POWER_INJECTED_AT_TO_BUS_END];
-//	}
-	
-//	public double getMVARationA() {
-//		return getData()[MVA_RATING_A_LONG_TERM_RATING];
-//	}
-	
-	
 	public Bus getFromBus() {
 		return fromBus;
 	}
@@ -61,11 +49,27 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	public int getFromBusNumber() {
 		return getIntParameter(PROPERTY_FROM_BUS_NUMBER, -1);
 	}
+	
+	void setFromBusNumber(int number) {
+		setParameter(PROPERTY_FROM_BUS_NUMBER, number);
+	}
 
 	public int getToBusNumber() {
 		return getIntParameter(PROPERTY_TO_BUS_NUMBER, -1);
 	}
 	
+	void setToBusNumber(int number) {
+		setParameter(PROPERTY_TO_BUS_NUMBER, number);
+	}
+	
+	public boolean isInverted() {
+		return isInverted;
+	}
+
+	public void setInverted(boolean isInverted) {
+		this.isInverted = isInverted;
+	}
+
 	@Override
 	public String getDisplayName(int displayFlags) {
 		Bus fromBus = getFromBus();
