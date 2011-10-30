@@ -30,6 +30,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.io.MatpowerGUIServer;
@@ -118,6 +119,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private final int environment;
 	
 	public static void main(String[] args) {
+		// setting look and feel of current platform
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		PowerFlowAnalyzer app = new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
 		app.setWorkingDirectory(System.getProperty("user.home"));
 	}
