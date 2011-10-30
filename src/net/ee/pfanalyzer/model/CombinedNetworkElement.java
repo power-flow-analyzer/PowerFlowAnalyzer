@@ -45,4 +45,12 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	public boolean contains(AbstractNetworkElement data) {
 		return networkElements.contains(data);
 	}
+	
+	public double getSumOfParameters(String parameterID) {
+		double result = 0;
+		for (TYPE element : getNetworkElements()) {
+			result += element.getDoubleParameter(parameterID, 0);
+		}
+		return result;
+	}
 }
