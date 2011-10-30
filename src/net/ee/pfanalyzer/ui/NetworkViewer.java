@@ -7,11 +7,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +79,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	
 	private Stroke[] strokesNormal, strokesBold;
 	private Stroke otherStrokeNormal, otherStrokeBold;
+	private GeneralPath arrow_pos, arrow_neg;
 	
 	private void createStrokes(float widthNormal, float widthBold) {
 		strokesNormal = new Stroke[] {
@@ -119,6 +123,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	private boolean drawBranches = true;
 	private boolean drawGenerators = true;
 	private boolean drawOutline = true;
+	private boolean drawPowerDirection = true;
 	
 	private boolean allowZooming = true;
 	private boolean allowDragging = true;
@@ -262,6 +267,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(wheelListener);
 		setFocusable(true);
+		updateArrowSize(10);
 	}
 	
 	public void setController(NetworkViewerController controller) {
@@ -507,22 +513,9 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
 					if(x2 == -1 || y2 == -1)
 						continue;
-					
-					double branch_space = 5;
-					double alpha = Math.atan((y2-y1)/(x2-x1));
-					double beta1 = alpha + Math.PI / 2.0;
-					double xFactor = branch_space * Math.cos(beta1);
-					double yFactor = branch_space * Math.sin(beta1);
-					double nrbranches = cbranch.getBranchCount() - 1;
-					double xOffset = xFactor * nrbranches / 2.0;
-					double yOffset = yFactor * nrbranches / 2.0;
-					for (int b = 0; b < cbranch.getBranchCount(); b++) {
-						double bd = b;
-						double x1l = x1 - xOffset + xFactor * bd;
-						double y1l = y1 - yOffset + yFactor * bd;
-						double x2l = x2 - xOffset + xFactor * bd;
-						double y2l = y2 - yOffset + yFactor * bd;
-						Branch branch = cbranch.getBranch(b);
+					if(drawPowerDirection) {
+						// draw first branch
+						Branch branch = cbranch.getFirstBranch();
 						if(branch.isCorrect()) {
 							if(branch.isActive())
 								g.setColor(Color.BLUE);
@@ -531,7 +524,36 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 						} else
 							g.setColor(Color.RED);
 						g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
-						g2d.draw(new Line2D.Double(x1l, y1l, x2l, y2l));
+						g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+						double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
+						double realInjectionSumTo = cbranch.getToBusRealInjectionSum();
+						g2d.fill(getArrowShape(g2d, x1, y1, x2, y2, realInjectionSumFrom > realInjectionSumTo));
+					} else {
+						double branch_space = 5;
+						double alpha = Math.atan((y2-y1)/(x2-x1));
+						double beta1 = alpha + Math.PI / 2.0;
+						double xFactor = branch_space * Math.cos(beta1);
+						double yFactor = branch_space * Math.sin(beta1);
+						double nrbranches = cbranch.getBranchCount() - 1;
+						double xOffset = xFactor * nrbranches / 2.0;
+						double yOffset = yFactor * nrbranches / 2.0;
+						for (int b = 0; b < cbranch.getBranchCount(); b++) {
+							double bd = b;
+							double x1l = x1 - xOffset + xFactor * bd;
+							double y1l = y1 - yOffset + yFactor * bd;
+							double x2l = x2 - xOffset + xFactor * bd;
+							double y2l = y2 - yOffset + yFactor * bd;
+							Branch branch = cbranch.getBranch(b);
+							if(branch.isCorrect()) {
+								if(branch.isActive())
+									g.setColor(Color.BLUE);
+								else
+									g.setColor(Color.GRAY);
+							} else
+								g.setColor(Color.RED);
+							g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
+							g2d.draw(new Line2D.Double(x1l, y1l, x2l, y2l));
+						}
 					}
 				}
 			}
@@ -686,6 +708,36 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		}
 	}
 	
+	private void updateArrowSize(int size) {
+		arrow_pos = new GeneralPath();
+		arrow_pos.moveTo(-size / 2, -size / 2);
+		arrow_pos.lineTo(-size / 2, size / 2);
+		arrow_pos.lineTo(size / 2, 0);
+		arrow_pos.lineTo(-size / 2, -size / 2);
+
+		arrow_neg = new GeneralPath();
+		arrow_neg.moveTo(-size / 2, 0);
+		arrow_neg.lineTo(size / 2, size / 2);
+		arrow_neg.lineTo(size / 2, -size / 2);
+		arrow_neg.lineTo(-size / 2, 0);
+	}
+
+	private Shape getArrowShape(Graphics2D g2d, double x1, double y1, double x2, double y2, boolean directionOneToTwo) {
+		double x = x1 + (x2 - x1) / 2.0;
+		double y = y1 + (y2 - y1) / 2.0;
+		double angle = Math.atan((y2 - y1) / (x2 - x1));
+		if(x1 > x2) {
+			angle += Math.PI;
+		}
+		AffineTransform transformation = AffineTransform
+				.getTranslateInstance(x, y);
+		transformation
+				.concatenate(AffineTransform.getRotateInstance(angle));
+		return directionOneToTwo ? 
+				arrow_pos.createTransformedShape(transformation) : 
+				arrow_neg.createTransformedShape(transformation);
+	}
+	
 //	private int getBusX(int i, double horizontalScale) {
 //		return (int) getBusXDouble(i, horizontalScale);
 //	}
@@ -816,6 +868,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	}
 	
 	Stroke getBranchStroke(int baseVoltage, boolean bold) {
+		if(drawPowerDirection)
+			return bold ? strokesBold[0] : strokesNormal[0];
 		for (int i = 0; i < getVoltageLevels().size(); i++) {
 			Integer voltageLevel = getVoltageLevels().get(i);
 			if(voltageLevel.intValue() == baseVoltage)
@@ -906,6 +960,11 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		repaint();
 	}
 	
+	public void setDrawPowerDirection(boolean flag) {
+		drawPowerDirection = flag;
+		repaint();
+	}
+
 	public void setDrawGeneratorsNodes(boolean flag) {
 		drawGenerators = flag;
 		repaint();
