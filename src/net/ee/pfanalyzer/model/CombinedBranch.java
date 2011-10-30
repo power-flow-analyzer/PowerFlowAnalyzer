@@ -46,6 +46,28 @@ public class CombinedBranch extends CombinedNetworkElement<Branch> {
 		return (this.fromBus == fromBus && this.toBus == toBus) ;
 //				|| (this.fromBus == toBus && this.toBus == fromBus);
 	}
+	
+	public double getFromBusRealInjectionSum() {
+		double result = 0;
+		for (Branch branch : this.getBranches()) {
+			if(branch.isInverted())
+				result += branch.getDoubleParameter("PT", 0);
+			else
+				result += branch.getDoubleParameter("PF", 0);
+		}
+		return result;
+	}
+	
+	public double getToBusRealInjectionSum() {
+		double result = 0;
+		for (Branch branch : this.getBranches()) {
+			if(branch.isInverted())
+				result += branch.getDoubleParameter("PF", 0);
+			else
+				result += branch.getDoubleParameter("PT", 0);
+		}
+		return result;
+	}
 
 	@Override
 	public String getLabel() {
