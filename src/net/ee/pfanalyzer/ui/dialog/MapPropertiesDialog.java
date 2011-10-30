@@ -56,6 +56,8 @@ public class MapPropertiesDialog extends AbstractPropertyDialog {
 				NetworkViewerController.PROPERTY_DRAW_BUSSES, true);
 		addBooleanProperty(optionsPane, "Draw Branches", 
 				NetworkViewerController.PROPERTY_DRAW_BRANCHES, true);
+		addBooleanProperty(optionsPane, "Draw Power Flow Direction", 
+				NetworkViewerController.PROPERTY_DRAW_POWER_DIRECTION, true);
 		addBooleanProperty(optionsPane, "Draw Generators", 
 				NetworkViewerController.PROPERTY_DRAW_GENERATORS, true);
 		addBooleanProperty(optionsPane, "Draw Outline", 
