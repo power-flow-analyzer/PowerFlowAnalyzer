@@ -55,7 +55,7 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 		return longitude;
 	}
 
-	public double getLattitude() {
+	public double getLatitude() {
 		return lattitude;
 	}
 	
@@ -63,8 +63,8 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 		return Math.abs(getLongitude() - longitude) <= COORDINATE_EPSILON;
 	}
 	
-	public boolean hasLattitude(double lattitude) {
-		return Math.abs(getLattitude() - lattitude) <= COORDINATE_EPSILON;
+	public boolean hasLatitude(double lattitude) {
+		return Math.abs(getLatitude() - lattitude) <= COORDINATE_EPSILON;
 	}
 	
 	public boolean contains(AbstractNetworkElement data) {

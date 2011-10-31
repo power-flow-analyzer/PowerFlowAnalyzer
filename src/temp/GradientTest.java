@@ -45,16 +45,16 @@ public class GradientTest extends JFrame {
 	
 	int outOfBoundsAction = ACTION_CUT_VALUES;
 	
-	double maxValue = 1.1;
-	double middleValue = 1;
-	double minValue = 0.9;
+//	double maxValue = 1.1;
+//	double middleValue = 1;
+//	double minValue = 0.9;
 //	double displayMaxValue = 1.2;
 //	double displayMiddleValue = 1;
 //	double displayMinValue = 0.8;
 	// TODO examples
-//	double maxValue = 100;
-//	double middleValue = 0;
-//	double minValue = -100;
+	double maxValue = 100;
+	double middleValue = 0;
+	double minValue = -100;
 //	double displayMaxValue = 200;
 //	double displayMiddleValue = 0;
 //	double displayMinValue = -200;
@@ -77,7 +77,7 @@ public class GradientTest extends JFrame {
 
 	private void generatePoints() {
 		points = new ValuePoint[120];
-		points[0] = new ValuePoint(50, 150, 1.2);
+		points[0] = new ValuePoint(50, 150, 100);// TODO examples
 //		points[1] = new ValuePoint(getWidth() - 100, getHeight() / 2, 100);
 //		points[2] = new ValuePoint(150, 200, 70);
 //		points[3] = new ValuePoint(70, 250, 52);
@@ -91,9 +91,9 @@ public class GradientTest extends JFrame {
 			double x = 50 + Math.random() * 300;
 			double y = 50 + Math.random() * 300;
 			
-			double value = Math.random() * 0.2 - 0.1 +1;//(Math.random() >= 0.9 ? -100 : -50);
+//			double value = Math.random() * 0.2 - 0.1 +1;//(Math.random() >= 0.9 ? -100 : -50);
 			// TODO examples
-//			double value = Math.random() * 200 - 100;//(Math.random() >= 0.9 ? -100 : -50);
+			double value = Math.random() * 200 - 100;//(Math.random() >= 0.9 ? -100 : -50);
 			
 			points[i] = new ValuePoint(x, y, value);
 		}
@@ -104,6 +104,7 @@ public class GradientTest extends JFrame {
 		if(points == null || paint == null)
 			return;
 		BufferedImage newImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+		// set max acceleration priority for background image
 		newImage.setAccelerationPriority(1f);
 		Graphics2D g2d = newImage.createGraphics();
 		g2d.setPaint(paint);
@@ -124,6 +125,12 @@ public class GradientTest extends JFrame {
 		public void run() {
 			while (shouldRun()) {
 				isRunning();
+				// halt this thread for a moment to give the gui a chance to update
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// do nothing
+				}
 				updateImage = false;
 				createBackgroundImage();
 				repaint();
@@ -174,9 +181,9 @@ public class GradientTest extends JFrame {
 		protected void paintComponent(Graphics g) {
 			Graphics2D g2d = (Graphics2D) g;
 			
-//			points[1] = new ValuePoint(getWidth() - 100, getHeight() / 2, 100);
+			points[1] = new ValuePoint(getWidth() - 100, getHeight() / 2, 100);
 			// TODO examples
-			points[1] = new ValuePoint(getWidth() - 100, getHeight() / 2, 1);
+//			points[1] = new ValuePoint(getWidth() - 100, getHeight() / 2, 1);
 
 			drawBackground(g2d);
 		}

@@ -129,7 +129,7 @@ public class TestIO {
 		voltage.setType(NetworkParameterType.DOUBLE);
 		clazz.getParameter().add(voltage);
 		
-		NetworkParameter lattitude = createProperty(Bus.PROPERTY_LATTITUDE, "Lattitude", "", true);
+		NetworkParameter lattitude = createProperty(Bus.PROPERTY_LATITUDE, "Latitude", "", true);
 		lattitude.setType(NetworkParameterType.DOUBLE);
 		clazz.getParameter().add(lattitude);
 		

@@ -95,7 +95,7 @@
                     <option value="4" label="Isolated" ID="ISOLATED"/>
                     <display/>
                 </parameter>
-                <parameter ID="LATTITUDE" type="double" label="Lattitude" description="" empty="true"/>
+                <parameter ID="LATITUDE" type="double" label="Latitude" description="" empty="true"/>
                 <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
                 <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
                     <display/>

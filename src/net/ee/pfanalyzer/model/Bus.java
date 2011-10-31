@@ -57,12 +57,12 @@ public class Bus extends AbstractNetworkElement implements IExtendedBusParameter
 		setParameter(PROPERTY_LONGITUDE, value);
 	}
 	
-	public double getLattitude() {
-		return getDoubleParameter(PROPERTY_LATTITUDE, Double.NaN);
+	public double getLatitude() {
+		return getDoubleParameter(PROPERTY_LATITUDE, Double.NaN);
 	}
 	
-	public void setLattitude(double value) {
-		setParameter(PROPERTY_LATTITUDE, value);
+	public void setLatitude(double value) {
+		setParameter(PROPERTY_LATITUDE, value);
 	}
 	
 	@Override

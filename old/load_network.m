@@ -32,7 +32,7 @@ for i=1:length(bus(:,1)) %#ok<*NODEF>
     % Setze Bus-Koordinaten
     if length(bus_coordinates) >= real_bus
         jbus.setParameter('LONGITUDE', bus_coordinates(real_bus, 1));
-        jbus.setParameter('LATTITUDE', bus_coordinates(real_bus, 2));
+        jbus.setParameter('LATITUDE', bus_coordinates(real_bus, 2));
     end
     % füge neuen Bus dem Netzwerk hinzu
     jnetwork.addElement(jbus);

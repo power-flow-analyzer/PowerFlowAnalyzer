@@ -173,7 +173,7 @@ public class Network extends ParameterSupport {
 				row++;
 			}
 			bus.setLongitude(longitude);
-			bus.setLattitude(lattitude);
+			bus.setLatitude(lattitude);
 		}
 		findCombinedElements();
 	}
@@ -332,7 +332,7 @@ public class Network extends ParameterSupport {
 			updateElement(event.getNetworkElement());
 		// check if combined busses and branches must be updated
 		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
-				|| IInternalParameters.LATTITUDE.equals(event.getParameterID())
+				|| IInternalParameters.LATITUDE.equals(event.getParameterID())
 				|| IInternalParameters.FROM_BUS.equals(event.getParameterID())
 				|| IInternalParameters.TO_BUS.equals(event.getParameterID())
 				|| IInternalParameters.GEN_BUS.equals(event.getParameterID()))
@@ -496,13 +496,13 @@ public class Network extends ParameterSupport {
 		for (int i = 0; i < busses.size(); i++) {
 			Bus bus = busses.get(i);
 			double longitude = bus.getLongitude();
-			double lattitude = bus.getLattitude();
+			double lattitude = bus.getLatitude();
 			if(Double.isNaN(lattitude) || Double.isNaN(longitude)) // no coords set
 				continue;
 			boolean found = false;
 //			System.out.println("Bus " + i);
 			for (CombinedBus cbus : combinedBusList) {
-				if(cbus.hasLongitude(longitude) && cbus.hasLattitude(lattitude)) {
+				if(cbus.hasLongitude(longitude) && cbus.hasLatitude(lattitude)) {
 //					System.out.println("  added to combined bus " + cbus.getIndex());
 					cbus.addBus(bus);
 					found = true;

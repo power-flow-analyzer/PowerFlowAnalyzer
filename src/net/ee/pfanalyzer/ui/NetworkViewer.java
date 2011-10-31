@@ -296,7 +296,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		for (int i = 0; i < data.getBusses().size(); i++) {
 			Bus bus = data.getBusses().get(i);
 			double longitude = bus.getLongitude();
-			double lattitude = bus.getLattitude();
+			double lattitude = bus.getLatitude();
 			if(Double.isNaN(longitude)// no coords set
 					|| Double.isNaN(lattitude)) {
 				internalBusCoords.put(bus.getBusNumber(), new int[]{-1, -1});
@@ -462,7 +462,6 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		// real painting
-//		double[][] coords = data.getCoordinateData();
 		if(internalBusCoords != null) {
 			double width = internalMaxX - internalMinX;
 			horizontalScale = ((double) getWidth() - 2 * HORIZONTAL_GAP) / width;
@@ -527,7 +526,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 						g2d.draw(new Line2D.Double(x1, y1, x2, y2));
 						double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
 						double realInjectionSumTo = cbranch.getToBusRealInjectionSum();
-						g2d.fill(getArrowShape(g2d, x1, y1, x2, y2, realInjectionSumFrom > realInjectionSumTo));
+						if(realInjectionSumFrom != realInjectionSumTo)
+							g2d.fill(getArrowShape(g2d, x1, y1, x2, y2, realInjectionSumFrom > realInjectionSumTo));
 					} else {
 						double branch_space = 5;
 						double alpha = Math.atan((y2-y1)/(x2-x1));
@@ -557,50 +557,6 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					}
 				}
 			}
-//			for (int i = 0; i < data.getBranchesCount(); i++) {
-//				Branch branch = data.getBranch(i);
-//				if(branch.isCorrect())
-//					g.setColor(Color.BLUE);
-//				else
-//					g.setColor(Color.RED);
-//				int fromBus = branch.getFromBusIndex();
-//				int toBus = branch.getToBusIndex();
-//				// check if coordinates for "from" and "to" are available
-//				if(fromBus >= internalBusCoords.length || toBus >= internalBusCoords.length)
-//					continue;
-//				double x1 = getBusXDouble(fromBus, horizontalScale);
-//				double y1 = getBusYDouble(fromBus, verticalScale);
-//				if(x1 == -1 || y1 == -1)
-//					continue;
-//				double x2 = getBusXDouble(toBus, horizontalScale);
-//				double y2 = getBusYDouble(toBus, verticalScale);
-//				if(x2 == -1 || y2 == -1)
-//					continue;
-//				float dash1[] = { 10.0f, 5.0f, 1.0f };
-//				if(isSelection(branch) || isHovered(branch)) {
-//					BasicStroke dashed = new BasicStroke(3.0f,
-//	                        BasicStroke.CAP_BUTT,
-//	                        BasicStroke.JOIN_MITER,
-//	                        10.0f, dash1, 0.0f);
-////					g2d.setStroke(dashed);
-////					int xDiff = x1 > x2 ? 1 : -1;
-////					int yDiff = y1 < y2 ? 1 : -1;
-////					g2d.drawPolygon(new int[]{
-////							x1 + xDiff, x1 - xDiff, x2 - xDiff, x2 + xDiff
-////					}, new int[]{
-////							y1 + yDiff, y1 - yDiff, y2 - yDiff, y2 + yDiff
-////					}, 4);
-////					g2d.drawLine(x1, y1, x2, y2);
-//				} else {
-//					BasicStroke dashed = new BasicStroke(1.5f,
-//	                        BasicStroke.CAP_BUTT,
-//	                        BasicStroke.JOIN_MITER,
-//	                        10.0f, dash1, 0.0f);
-////					g2d.setStroke(dashed);
-////					g2d.drawLine(x1, y1, x2, y2);
-//				}
-//				g2d.draw(new Line2D.Double(x1, y1, x2, y2));
-//			}
 			g2d.setStroke(defaultStroke);
 			// draw bus nodes
 			if(drawBusNodes) {
@@ -911,7 +867,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	public void networkElementChanged(NetworkChangeEvent event) {
 //		System.out.println("viewer: networkElementChanged");
 		if(IInternalParameters.LONGITUDE.equals(event.getParameterID())
-				|| IInternalParameters.LATTITUDE.equals(event.getParameterID())
+				|| IInternalParameters.LATITUDE.equals(event.getParameterID())
 				|| IInternalParameters.FROM_BUS.equals(event.getParameterID())
 				|| IInternalParameters.TO_BUS.equals(event.getParameterID())
 				|| IInternalParameters.GEN_BUS.equals(event.getParameterID()))
