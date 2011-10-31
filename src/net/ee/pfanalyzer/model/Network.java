@@ -22,6 +22,7 @@ public class Network extends ParameterSupport {
 	private List<Generator> generators = new ArrayList<Generator>();
 	private List<CombinedBus> combinedBusList = new ArrayList<CombinedBus>();
 	private List<CombinedBranch> combinedBranchList = new ArrayList<CombinedBranch>();
+	private List<MarkerElement> markers = new ArrayList<MarkerElement>();
 	
 	private NetworkData networkData;
 	private PowerFlowCase caze;
@@ -212,6 +213,7 @@ public class Network extends ParameterSupport {
 		getBusses().clear();
 		getBranches().clear();
 		getGenerators().clear();
+		getMarkers().clear();
 //		getScenarios().clear();
 //		System.out.println("network: update data");
 		for (int i = 0; i < networkData.getElement().size(); i++) {
@@ -225,6 +227,9 @@ public class Network extends ParameterSupport {
 			} else if(element.getModelID().startsWith("generator.")) {
 				addElementInternal(new Generator(this, element, getGenerators().size()));
 //				System.out.println("    adding generator: " + element.getModelID());
+			} else if(element.getModelID().startsWith("marker.")) {
+				addElementInternal(new MarkerElement(this, element, getMarkers().size()));
+//				System.out.println("    adding marker: " + element.getModelID());
 			} else {
 				addElementInternal(new NetworkElement(this, element, getElements().size()));
 //				System.out.println("    adding element: " + element.getModelID());
@@ -358,6 +363,9 @@ public class Network extends ParameterSupport {
 		} else if(modelID.startsWith("generator.")) {
 			element = new Generator(this, getGenerators().size());
 //			System.out.println("    adding generator: " + modelID);
+		} else if(modelID.startsWith("marker.")) {
+			element = new MarkerElement(this, getMarkers().size());
+//			System.out.println("    adding marker: " + modelID);
 		} else {
 			element = new NetworkElement(this, getElements().size());
 //			System.out.println("    adding element: " + element.getModelID());
@@ -382,6 +390,8 @@ public class Network extends ParameterSupport {
 			getBranches().add((Branch) element);
 		else if(element instanceof Generator)
 			getGenerators().add((Generator) element);
+		else if(element instanceof MarkerElement)
+			getMarkers().add((MarkerElement) element);
 	}
 	
 	public void removeElement(AbstractNetworkElement element) {
@@ -394,6 +404,8 @@ public class Network extends ParameterSupport {
 			getBranches().remove(ListUtils.getIndexOf(getBranches(), (Branch) element));
 		else if(element instanceof Generator)
 			getGenerators().remove(ListUtils.getIndexOf(getGenerators(), (Generator) element));
+		else if(element instanceof MarkerElement)
+			getMarkers().remove(ListUtils.getIndexOf(getMarkers(), (MarkerElement) element));
 	}
 	
 	public void removeElements(List<AbstractNetworkElement> elements) {
@@ -437,6 +449,7 @@ public class Network extends ParameterSupport {
 		getBusses().clear();
 		getBranches().clear();
 		getGenerators().clear();
+		getMarkers().clear();
 	}
 	
 	public boolean isEmpty() {
@@ -653,6 +666,14 @@ public class Network extends ParameterSupport {
 	
 	public int getBranchesCount() {
 		return branches.size();
+	}
+	
+	public List<MarkerElement> getMarkers() {
+		return markers;
+	}
+
+	public int getMarkersCount() {
+		return markers.size();
 	}
 	
 	public double getTime() {

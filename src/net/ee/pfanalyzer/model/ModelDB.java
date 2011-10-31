@@ -18,6 +18,8 @@ public class ModelDB {
 	public final static String DEFAULT_BUS_MODEL = "bus.unknown";
 	public final static String DEFAULT_BRANCH_MODEL = "branch.unknown";
 	public final static String DEFAULT_GENERATOR_MODEL = "generator.unknown";
+	public final static String DEFAULT_MARKER_MODEL = "marker.unknown";
+	public final static String MARKER_CONNECTION_MODEL = "marker.connection";
 	
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";

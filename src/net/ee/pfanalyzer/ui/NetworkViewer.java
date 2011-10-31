@@ -37,8 +37,10 @@ import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.IInternalParameters;
 import net.ee.pfanalyzer.model.INetworkChangeListener;
+import net.ee.pfanalyzer.model.MarkerElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
+import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.preferences.Preferences;
 
 public class NetworkViewer extends JComponent implements INetworkElementSelectionListener, INetworkChangeListener {
@@ -79,7 +81,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	
 	private Stroke[] strokesNormal, strokesBold;
 	private Stroke otherStrokeNormal, otherStrokeBold;
-	private GeneralPath arrow_pos, arrow_neg;
+	private GeneralPath arrow_pos, arrow_neg, networkShape;
 	
 	private void createStrokes(float widthNormal, float widthBold) {
 		strokesNormal = new Stroke[] {
@@ -111,7 +113,7 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	private Network data;
 	private Mercator converter;
 	private Map<Integer, int[]> internalBusCoords = new HashMap<Integer, int[]>();
-//	private int[] internalBusNumbers;
+	private Map<Integer, int[]> internalMarkerCoords = new HashMap<Integer, int[]>();
 	int internalMinX = 0;
 	int internalMaxX = 0;
 	int internalMinY = 0;
@@ -124,10 +126,14 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 	private boolean drawGenerators = true;
 	private boolean drawOutline = true;
 	private boolean drawPowerDirection = true;
+	private boolean drawMarkers = true;
 	
 	private boolean allowZooming = true;
 	private boolean allowDragging = true;
 	private boolean showTooltips = true;
+	
+	private int arrowSize = 10;
+	private int networkMarkerSize = 20;
 	
 	private double minLatitude = NetworkViewerController.ZOOM_GERMANY_COORDINATES[0];
 	private double maxLatitude = NetworkViewerController.ZOOM_GERMANY_COORDINATES[1];
@@ -267,7 +273,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(wheelListener);
 		setFocusable(true);
-		updateArrowSize(10);
+		updateArrowSize(arrowSize);
+		updateNetworkShape(networkMarkerSize);
 	}
 	
 	public void setController(NetworkViewerController controller) {
@@ -296,14 +303,14 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		for (int i = 0; i < data.getBusses().size(); i++) {
 			Bus bus = data.getBusses().get(i);
 			double longitude = bus.getLongitude();
-			double lattitude = bus.getLatitude();
+			double latitude = bus.getLatitude();
 			if(Double.isNaN(longitude)// no coords set
-					|| Double.isNaN(lattitude)) {
+					|| Double.isNaN(latitude)) {
 				internalBusCoords.put(bus.getBusNumber(), new int[]{-1, -1});
 				continue;
 			}
 			int x = converter.getX(longitude);
-			int y = converter.getY(lattitude);
+			int y = converter.getY(latitude);
 			internalBusCoords.put(bus.getBusNumber(), new int[]{x, y});
 			if(perfectFit) {
 				if(i == 0) {// initialize min/max values
@@ -311,8 +318,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					internalMaxX = x;
 					internalMinY = y;
 					internalMaxY = y;
-					minLatitude = lattitude;
-					maxLatitude = lattitude;
+					minLatitude = latitude;
+					maxLatitude = latitude;
 					minLongitude = longitude;
 					maxLongitude = longitude;
 				} else {
@@ -320,61 +327,30 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					internalMaxX = Math.max(internalMaxX, x);
 					internalMinY = Math.min(internalMinY, y);
 					internalMaxY = Math.max(internalMaxY, y);
-					minLatitude = Math.min(minLatitude, lattitude);
-					maxLatitude = Math.max(maxLatitude, lattitude);
+					minLatitude = Math.min(minLatitude, latitude);
+					maxLatitude = Math.max(maxLatitude, latitude);
 					minLongitude = Math.min(minLongitude, longitude);
 					maxLongitude = Math.max(maxLongitude, longitude);
 				}
 			}
 		}
-//		double[][] coords = data.getCoordinateData();
-//		if(coords != null && coords.length > 0) {// no coords at all set
-//			internalBusCoords = new int[coords.length][2];
-//			if(perfectFit == false) {
-//				internalMinX = converter.getX(minLatitude);
-//				internalMaxX = converter.getX(maxLatitude);
-//				internalMinY = converter.getY(minLongitude);
-//				internalMaxY = converter.getY(maxLongitude);
-//			}
-//			for(int i = 0; i < internalBusCoords.length; i++) {
-//				if(Double.isNaN(coords[i][LATITUDE])// no coords set
-//						|| Double.isNaN(coords[i][LONGITUDE])) {
-//					internalBusCoords[i][0] = -1;
-//					internalBusCoords[i][1] = -1;
-//					continue;
-//				}
-//				int x = converter.getX(coords[i][LATITUDE]);
-//				int y = converter.getY(coords[i][LONGITUDE]);
-//				internalBusCoords[i][0] = x;
-//				internalBusCoords[i][1] = y;
-//				if(perfectFit) {
-//					if(i == 0) {// initialize min/max values
-//						internalMinX = x;
-//						internalMaxX = x;
-//						internalMinY = y;
-//						internalMaxY = y;
-//						minLatitude = coords[i][LATITUDE];
-//						maxLatitude = coords[i][LATITUDE];
-//						minLongitude = coords[i][LONGITUDE];
-//						maxLongitude = coords[i][LONGITUDE];
-//					} else {
-//						internalMinX = Math.min(internalMinX, x);
-//						internalMaxX = Math.max(internalMaxX, x);
-//						internalMinY = Math.min(internalMinY, y);
-//						internalMaxY = Math.max(internalMaxY, y);
-//						minLatitude = Math.min(minLatitude, coords[i][LATITUDE]);
-//						maxLatitude = Math.max(maxLatitude, coords[i][LATITUDE]);
-//						minLongitude = Math.min(minLongitude, coords[i][LONGITUDE]);
-//						maxLongitude = Math.max(maxLongitude, coords[i][LONGITUDE]);
-//					}
-//				}
-//			}
-			for (int i = 0; i < GERMANY.length; i++) {
-				int x = converter.getX(GERMANY[i][1]);
-				int y = converter.getY(GERMANY[i][0]);
-				internalGermany[i] = new int[] { x, y };
+		for (MarkerElement marker : data.getMarkers()) {
+			double longitude = marker.getLongitude();
+			double latitude = marker.getLatitude();
+			if(Double.isNaN(longitude)// no coords set
+					|| Double.isNaN(latitude)) {
+				internalMarkerCoords.put(marker.getIndex(), new int[]{-1, -1});
+				continue;
 			}
-//		}
+			int x = converter.getX(longitude);
+			int y = converter.getY(latitude);
+			internalMarkerCoords.put(marker.getIndex(), new int[]{x, y});
+		}
+		for (int i = 0; i < GERMANY.length; i++) {
+			int x = converter.getX(GERMANY[i][1]);
+			int y = converter.getY(GERMANY[i][0]);
+			internalGermany[i] = new int[] { x, y };
+		}
 	}
 	
 	private AbstractNetworkElement getObjectFromScreen(int x, int y) {
@@ -405,6 +381,19 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 //					return generator;
 //			}
 //		}
+		// check markers
+		if(drawMarkers) {
+			Iterator<Integer> busNumbers = internalMarkerCoords.keySet().iterator();
+			while(busNumbers.hasNext()) {
+				int markerIndex = busNumbers.next();
+				double[] coords = getMarkerXYDouble(markerIndex, horizontalScale, verticalScale);
+				if(x == -1 || y == -1)
+					continue;
+				if(Math.abs(coords[0] - x) <= networkMarkerSize / 2.0
+						&& Math.abs(coords[1] - y) <= networkMarkerSize / 2.0)
+					return data.getMarkers().get(markerIndex);
+			}
+		}
 		// check branches
 		if(drawBranches) {
 			for (int i = 0; i < data.getBranches().size(); i++) {
@@ -485,6 +474,46 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 					g2d.draw(new Line2D.Double(lastX, lastY, x, y));
 					lastX = x;
 					lastY = y;
+				}
+			}
+			// draw markers
+			if(drawMarkers) {
+				g.setColor(Color.GRAY);
+				List<MarkerElement> markers = data.getMarkers();
+				for (MarkerElement marker : markers) {
+					double[] markerCoords = getMarkerXYDouble(marker.getIndex(), horizontalScale, verticalScale);
+					double markerX = markerCoords[0];
+					double markerY = markerCoords[1];
+					if(markerX == -1 || markerY == -1)
+						continue;
+					double[] busCoords = getBusXYDouble(marker.getParentBusNumber(), horizontalScale, verticalScale);
+					double busX = busCoords[0];
+					double busY = busCoords[1];
+					// set stroke
+					if(isSelection(marker) || isHovered(marker))
+						g2d.setStroke(strokesBold[0]);
+					else
+						g2d.setStroke(strokesNormal[0]);
+					// draw line between marker and bus
+					if(busX != -1 && busY != -1) {
+						// determine where the line should be connected to the marker
+						double markerOutlineX = markerX;
+						double markerOutlineY = markerY;
+						double xDiff = busX - markerX;
+						double yDiff = busY - markerY;
+						if(xDiff < yDiff || yDiff == 0)
+							markerOutlineX += (Math.signum(xDiff) == 1 ? 1 : -1) * networkMarkerSize / 2.0;
+						else
+							markerOutlineY += (Math.signum(yDiff) == 1 ? 1 : -1) * networkMarkerSize / 2.0;
+						// draw the line
+						g2d.draw(new Line2D.Double(markerOutlineX, markerOutlineY, busX, busY));
+					}
+					// draw the marker
+					g2d.draw(getNetworkShape(markerX, markerY));
+					// draw the marker's name
+					String locationName = marker.getDisplayName(NetworkElement.DISPLAY_NAME);
+					if(locationName != null)
+						g2d.drawString(locationName, (int) markerX+15, (int) markerY+15);
 				}
 			}
 			// draw branches
@@ -587,8 +616,8 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 							g.setColor(Color.BLACK);
 					}
 					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber(), horizontalScale, verticalScale);
-					double x = coords[0];//getBusXDouble(cbus.getFirstBus().getBusNumber(), horizontalScale);
-					double y = coords[1];//getBusYDouble(cbus.getFirstBus().getBusNumber(), verticalScale);
+					double x = coords[0];
+					double y = coords[1];
 					g2d.fill(new Ellipse2D.Double(
 							(int) x - OVAL_HALF_HEIGHT, 
 							(int) y - OVAL_HALF_HEIGHT, 
@@ -694,9 +723,34 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 				arrow_neg.createTransformedShape(transformation);
 	}
 	
-//	private int getBusX(int i, double horizontalScale) {
-//		return (int) getBusXDouble(i, horizontalScale);
-//	}
+	private void updateNetworkShape(int size) {
+		networkShape = new GeneralPath();
+		int stepSize = size / 3;
+		
+		double x = -size / 2.0;
+		double y = -size / 2.0;
+		int counter = 0;
+		for (int step = 1; step * stepSize < 2 * size; step++) {
+			boolean upperHalf = counter >= size;
+			if(upperHalf) {
+				networkShape.append(new Line2D.Double(x + counter - size, y, x + size, y + size - counter + size), false);
+				networkShape.append(new Line2D.Double(x + size, y + counter - size, x - size + counter, y + size), false);
+			} else {
+				networkShape.append(new Line2D.Double(x, y + size - counter, x + counter, y + size), false);
+				networkShape.append(new Line2D.Double(x, y + counter, x + counter, y), false);
+			}
+			counter += stepSize;
+		}
+		networkShape.append(new Line2D.Double(x, y, x + size, y), false);// oben
+		networkShape.append(new Line2D.Double(x, y, x, y + size), false);// links
+		networkShape.append(new Line2D.Double(x, y + size, x + size, y + size), false);// unten
+		networkShape.append(new Line2D.Double(x + size, y, x + size, y + size), false);// rechts
+	}
+	
+	private Shape getNetworkShape(double x, double y) {
+		AffineTransform transformation = AffineTransform.getTranslateInstance(x, y);
+		return networkShape.createTransformedShape(transformation);
+	}
 	
 	private int[] getBusXY(int i, double horizontalScale, double verticalScale) {
 		double[] coords = getBusXYDouble(i, horizontalScale, verticalScale);
@@ -714,23 +768,16 @@ public class NetworkViewer extends JComponent implements INetworkElementSelectio
 		return new double[] { x, y };
 	}
 	
-//	private double getBusXDouble(int i, double horizontalScale) {
-//		int[] coords = internalBusCoords.get(i);
-//		if(coords == null)
-//			return -1;
-//		return ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
-//	}
-	
-//	private int getBusY(int i, double verticalScale) {
-//		return (int) getBusYDouble(i, verticalScale);
-//	}
-	
-//	private double getBusYDouble(int i, double verticalScale) {
-//		int[] coords = internalBusCoords.get(i);
-//		if(coords == null)
-//			return -1;
-//		return getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
-//	}
+	private double[] getMarkerXYDouble(int i, double horizontalScale, double verticalScale) {
+		int[] coords = internalMarkerCoords.get(i);
+		if(coords == null)
+			return new double[] { -1, -1 };
+		if(coords[0] == -1 || coords[1] == -1)
+			return new double[] { -1, -1 };
+		double x = ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
+		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
+		return new double[] { x, y };
+	}
 	
 	private double getOutlineX(int i, double horizontalScale) {
 		return ((internalGermany[i][0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;

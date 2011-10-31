@@ -244,6 +244,20 @@
                 </parameter>
                 <model ID="unknown" label="Unknown Generator"/>
             </modelClass>
+            <modelClass ID="marker" label="Markers">
+                <parameter ID="NAME" type="text" label="Name" description="Name of this marker" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PARENT_BUS" type="integer" label="Bus Number" restriction="existing parameter value" empty="true">
+                    <display elementRestriction="bus" parameterID="BUS_I"/>
+                </parameter>
+                <parameter ID="LATITUDE" type="double" label="Latitude" description="" empty="true"/>
+                <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
+                <modelClass ID="connection" label="Connection">
+                    <model ID="network" label="Network"/>
+                    <model ID="tie_line" label="Tie line"/>
+                </modelClass>
+            </modelClass>
             <model ID="unknown" label="Unknown Element">
                 <parameter ID="NAME" type="text" label="Name" empty="true">
                     <display/>
