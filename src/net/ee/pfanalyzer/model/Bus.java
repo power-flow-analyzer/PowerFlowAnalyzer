@@ -2,7 +2,7 @@ package net.ee.pfanalyzer.model;
 
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 
-public class Bus extends AbstractNetworkElement implements IExtendedBusParameters {
+public class Bus extends AbstractNetworkElement implements ICoordinatesParameters {
 
 	public Bus(Network data, int index) {
 		super(data, index);
