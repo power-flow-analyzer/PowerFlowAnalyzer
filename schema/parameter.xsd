@@ -44,6 +44,9 @@
             <enumeration value="list"/>
             <enumeration value="unique parameter value"/>
             <enumeration value="existing parameter value"/>
+            <enumeration value="model ID"/>
+            <enumeration value="model or class ID"/>
+            <enumeration value="color (RGB)"/>
         </restriction>
     </simpleType>
     
