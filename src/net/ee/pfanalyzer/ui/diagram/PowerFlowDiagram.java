@@ -330,4 +330,9 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	public void networkElementRemoved(NetworkChangeEvent event) {
 		refresh();
 	}
+	
+	@Override
+	public void dispose() {
+		
+	}
 }

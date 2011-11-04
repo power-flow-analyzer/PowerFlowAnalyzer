@@ -174,6 +174,11 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		selfSelection = false;
 	}
 	
+	@Override
+	public void dispose() {
+		
+	}
+
 	class CellRenderer extends JLabel 
     implements TableCellRenderer {
 		

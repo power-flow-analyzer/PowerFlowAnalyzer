@@ -36,8 +36,7 @@ public class DataViewerDialog extends BaseDialog {
 		Group paramPanel = new Group("Parameters for " + viewer.getDataDefinition().getLabel());
 		addParameters(viewer.getDataDefinition(), parameterPanel, paramPanel);
 		
-		addOKButton();
-		addCancelButton();
+		addButton("Close", true, true);
 		
 		JPanel contentPane = new JPanel(new BorderLayout());
 		contentPane.add(paramPanel, BorderLayout.CENTER);

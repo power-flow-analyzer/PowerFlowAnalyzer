@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import net.ee.pfanalyzer.ui.NetworkViewerController;
+import net.ee.pfanalyzer.ui.map.NetworkViewerController;
 
 public class MapPropertiesDialog extends AbstractPropertyDialog {
 	
@@ -90,10 +90,10 @@ public class MapPropertiesDialog extends AbstractPropertyDialog {
 	}
 	
 	protected void applyProperty(String property, boolean value) {
-		controller.setViewerProperty(property, value);
+//		controller.setViewerProperty(property, value);
 	}
 	
 	private void applyProperty(String property, int value) {
-		controller.setViewerProperty(property, value);
+//		controller.setViewerProperty(property, value);
 	}
 }

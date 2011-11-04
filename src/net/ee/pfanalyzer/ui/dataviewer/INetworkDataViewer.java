@@ -10,6 +10,8 @@ public interface INetworkDataViewer extends INetworkElementSelectionListener, IN
 
 	void refresh();
 	
+	void dispose();
+	
 	void setData(Network network);
 	
 	Network getNetwork();

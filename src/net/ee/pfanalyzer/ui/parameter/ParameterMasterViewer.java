@@ -1,5 +1,6 @@
 package net.ee.pfanalyzer.ui.parameter;
 
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
@@ -62,6 +63,9 @@ public class ParameterMasterViewer implements IParameterMasterElement {
 	
 	@Override
 	public void fireValueChanged(String parameterID, String oldValue, String newValue) {
+		DatabaseChangeEvent event = new DatabaseChangeEvent(DatabaseChangeEvent.CHANGED, parameterID, oldValue, newValue);
+//		event.setElementData(getMasterElement());
+		getViewerConfiguration().fireParameterChanged(event);
 	}
 
 	@Override
