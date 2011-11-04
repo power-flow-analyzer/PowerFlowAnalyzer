@@ -29,32 +29,6 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		modelDB.addDatabaseChangeListener(this);
 	}
 	
-	private void addDefaultTableViewers() {
-		if(pfCase.getDataViewer().size() > 0)
-			return;
-		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
-		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
-		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
-	}
-	
-	private DataViewerData createTableViewerData(String title, String filter) {
-		DataViewerData viewerData = new DataViewerData();
-		viewerData.setModelID("viewer.table.type_filter");
-		NetworkParameter p = new NetworkParameter();
-		p.setID("TITLE");
-		p.setValue(title);
-		viewerData.getParameter().add(p);
-		p = new NetworkParameter();
-		p.setID("ELEMENT_FILTER");
-		p.setValue(filter);
-		viewerData.getParameter().add(p);
-		p = new NetworkParameter();
-		p.setID("POSITION");
-		p.setValue("bottom");
-		viewerData.getParameter().add(p);
-		return viewerData;
-	}
-	
 	public PowerFlowCase(File caseFile) {
 		this.caseFile = caseFile;
 		try {
@@ -109,6 +83,59 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 
 	public void setViewer(NetworkContainer viewer) {
 		this.viewer = viewer;
+	}
+	
+	private void addDefaultTableViewers() {
+		// backward compatibility
+		removeOldViewers();
+		if(pfCase.getDataViewer().size() > 0)
+			return;
+		pfCase.getDataViewer().add(createNetworkViewerData("Network"));
+		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
+		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
+		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
+	}
+	
+	private void removeOldViewers() {
+		for (int i = 0; i < pfCase.getDataViewer().size(); i++) {
+			if(pfCase.getDataViewer().get(i).getModelID() == null) {
+				pfCase.getDataViewer().remove(i);
+				removeOldViewers();
+				break;
+			}
+		}
+	}
+	
+	private DataViewerData createNetworkViewerData(String title) {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setModelID("viewer.network.map");
+		NetworkParameter p = new NetworkParameter();
+		p.setID("TITLE");
+		p.setValue(title);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("POSITION");
+		p.setValue("left");
+		viewerData.getParameter().add(p);
+		return viewerData;
+	}
+	
+	private DataViewerData createTableViewerData(String title, String filter) {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setModelID("viewer.table.type_filter");
+		NetworkParameter p = new NetworkParameter();
+		p.setID("TITLE");
+		p.setValue(title);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("ELEMENT_FILTER");
+		p.setValue(filter);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("POSITION");
+		p.setValue("bottom");
+		viewerData.getParameter().add(p);
+		return viewerData;
 	}
 	
 	private Network addNetworkInternal(NetworkData netData) {
