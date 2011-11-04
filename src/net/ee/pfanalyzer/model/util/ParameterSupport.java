@@ -22,15 +22,15 @@ public abstract class ParameterSupport {
 			return p;
 		if(create == false)
 			return null;
-		p = getParameterValue(id);
-		if(p != null) {
+//		p = getParameterValue(id);
+//		if(p != null) {
 			NetworkParameter reference = new NetworkParameter();
 			reference.setID(id);
 //			reference.setTextValue(new String(p.getTextValue()));
 			getParameterList().add(reference);
 			return reference;
-		}
-		return null;
+//		}
+//		return null;
 	}
 	
 	public void removeOwnParameter(String id) {
@@ -94,6 +94,14 @@ public abstract class ParameterSupport {
 		if(p != null && p.getValue() != null)
 			return p.getValue();
 		return null;
+	}
+	
+	public String getTextParameter(String name, String defaultValue) {
+		String text = getTextParameter(name);
+		if(text != null)
+			return text;
+		else
+			return defaultValue;
 	}
 	
 	public void setParameter(String name, String value) {
