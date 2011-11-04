@@ -11,16 +11,7 @@
         <sequence>
             <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="elementFilter" type="string"/>
-        <attribute name="title" type="string"/>
-        <attribute name="type" type="mpui:DataViewerType"/>
+        <attribute name="modelID" type="string"/>
     </complexType>
-    
-    <simpleType name="DataViewerType">
-        <restriction base="string">
-            <enumeration value="table"/>
-            <enumeration value="diagram"/>
-        </restriction>
-    </simpleType>
-    
+
 </schema>
