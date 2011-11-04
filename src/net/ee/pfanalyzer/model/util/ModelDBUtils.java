@@ -17,12 +17,12 @@ public class ModelDBUtils {
 	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
 	public final static String CHANGE_PATH_PARAMETER = "CHANGE_PATH";
 	
-	public static String getParameterID(AbstractModelElementData element) {
+	public static String getFullElementID(AbstractModelElementData element) {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
 			id = "<empty>";
 		if(element.getParent() != null && isRootClass(element.getParent()) == false) {
-			String parentID = getParameterID(element.getParent());
+			String parentID = getFullElementID(element.getParent());
 			if("<empty>".equals(parentID))
 				return id;
 			return parentID + "." + id;
