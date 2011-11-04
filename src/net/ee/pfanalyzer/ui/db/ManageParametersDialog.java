@@ -628,19 +628,26 @@ public class ManageParametersDialog extends BaseDialog {
 			@Override
 			protected NetworkParameterValueRestriction[] getRestrictions() {
 				if(NetworkParameterType.INTEGER.equals(property.getType()))
-					return new NetworkParameterValueRestriction[] { 
+					return new NetworkParameterValueRestriction[] {
 							NetworkParameterValueRestriction.NONE, 
 							NetworkParameterValueRestriction.BUS_NUMBER, 
 							NetworkParameterValueRestriction.LIST,
 							NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE,
 							NetworkParameterValueRestriction.UNIQUE_PARAMETER_VALUE };
-				else if(NetworkParameterType.BOOLEAN.equals(property.getType()))
-					return new NetworkParameterValueRestriction[] { 
-							NetworkParameterValueRestriction.NONE};
+				else if(NetworkParameterType.DOUBLE.equals(property.getType()))
+					return new NetworkParameterValueRestriction[] {
+							NetworkParameterValueRestriction.NONE, 
+							NetworkParameterValueRestriction.LIST };
+				else if(NetworkParameterType.TEXT.equals(property.getType()))
+					return new NetworkParameterValueRestriction[] {
+							NetworkParameterValueRestriction.NONE, 
+							NetworkParameterValueRestriction.LIST,
+							NetworkParameterValueRestriction.MODEL_ID, 
+							NetworkParameterValueRestriction.MODEL_OR_CLASS_ID, 
+							NetworkParameterValueRestriction.COLOR_RGB };
 				else
-					return new NetworkParameterValueRestriction[] { 
-						NetworkParameterValueRestriction.NONE, 
-						NetworkParameterValueRestriction.LIST };
+					return new NetworkParameterValueRestriction[] {
+						NetworkParameterValueRestriction.NONE };
 			}
 		}
 		

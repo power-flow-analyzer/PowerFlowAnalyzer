@@ -17,6 +17,8 @@ public interface IParameterMasterElement {
 	
 	boolean isRequired(String parameterID);
 	
+	boolean showCheckBoxes(String parameterID);
+	
 	void fireValueChanged(String parameterID, String oldValue, String newValue);
 	
 	ParameterSupport getParameterSupport();

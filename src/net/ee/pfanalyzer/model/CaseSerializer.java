@@ -31,6 +31,8 @@ public class CaseSerializer {
 	
 	public final static String INTERNAL_MODEL_DB_INPUT_FILE = "/net/ee/pfanalyzer/default_model_db.xml";
 	
+	public final static String INTERNAL_CONFIGURATION_DB_INPUT_FILE = "/net/ee/pfanalyzer/configuration_db.xml";
+	
 	private JAXBContext context;
 	
 	public CaseSerializer() {
@@ -137,14 +139,22 @@ public class CaseSerializer {
 	}
 	
 	public static ModelDBData readInternalModelDB() throws IllegalDataException {
+		return readInternalDB(INTERNAL_MODEL_DB_INPUT_FILE);
+	}
+	
+	public static ModelDBData readInternalConfigurationDB() throws IllegalDataException {
+		return readInternalDB(INTERNAL_CONFIGURATION_DB_INPUT_FILE);
+	}
+	
+	public static ModelDBData readInternalDB(String inputFile) throws IllegalDataException {
 		try {
 			CaseSerializer serializer = new CaseSerializer();
 			CaseData pfCase = serializer.readCase(CaseSerializer.class.getResourceAsStream(
-					INTERNAL_MODEL_DB_INPUT_FILE));
+					inputFile));
 			updateParents(pfCase);
 			return pfCase.getModelDb();
 		} catch (Exception e) {
-			throw new IllegalDataException("Cannot load internal model DB", e);
+			throw new IllegalDataException("Cannot load internal database " + inputFile, e);
 		}
 	}
 }

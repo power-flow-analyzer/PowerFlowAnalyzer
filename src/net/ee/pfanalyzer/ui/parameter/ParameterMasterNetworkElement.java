@@ -27,6 +27,11 @@ public class ParameterMasterNetworkElement implements IParameterMasterElement {
 	}
 	
 	@Override
+	public boolean showCheckBoxes(String parameterID) {
+		return true;
+	}
+	
+	@Override
 	public NetworkParameter getParameter(String parameterID, boolean create) {
 		return getMasterElement().getParameter(parameterID, create);
 	}

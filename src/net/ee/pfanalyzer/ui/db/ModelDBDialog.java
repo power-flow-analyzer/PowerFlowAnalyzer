@@ -223,7 +223,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 			String oldModelID = selectedNetworkElement.getModelID();
 			ModelData model = (ModelData) selected;
 			selectedNetworkElement.setModel(model);
-			String newModelID = ModelDBUtils.getParameterID(model);
+			String newModelID = ModelDBUtils.getFullElementID(model);
 			selectedNetworkElement.setModelID(newModelID);
 			selectedNetworkElement.getNetwork().fireNetworkElementChanged(new NetworkChangeEvent(
 					selectedNetworkElement, oldModelID, newModelID));
@@ -335,7 +335,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		if(data instanceof AbstractNetworkElement)
 			setSelectedElement((AbstractNetworkElement) data);
 		else
-			setSelectedElement(null);
+			setSelectedElement((AbstractNetworkElement) null);
 	}
 	
 	public void setSelectedElement(AbstractNetworkElement element) {
@@ -343,15 +343,19 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		if(selectedNetworkElement != null) {
 			ModelData model = selectedNetworkElement.getModel();
 			if(model != null) {
-				DefaultMutableTreeNode node = findNode(model);
-				if(node != null)
-					modelTree.setSelectionPath(new TreePath(node.getPath()));
-				updateButtons(node);
-				modelTree.repaint();
+				setSelectedElement(model);
 			} else
 				updateButtons(null);
 		} else
 			updateButtons(null);
+	}
+	
+	public void setSelectedElement(AbstractModelElementData model) {
+		DefaultMutableTreeNode node = findNode(model);
+		if(node != null)
+			modelTree.setSelectionPath(new TreePath(node.getPath()));
+		updateButtons(node);
+		modelTree.repaint();
 	}
 	
 	private DefaultMutableTreeNode findNode(AbstractModelElementData data) {

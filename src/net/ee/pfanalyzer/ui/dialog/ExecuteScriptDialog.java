@@ -32,7 +32,7 @@ public class ExecuteScriptDialog extends BaseDialog {
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
 //		parameterPanel.setShowNetworkParameters(true);
 		parameterPanel.setEditable(true);// default setting
-		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network, true));//(new ParameterMasterModel(script));
+		parameterPanel.setParameterMaster(new ParameterMasterNetwork(network, true, false));
 		Group paramPanel = new Group("Script Parameters");
 		for (NetworkParameter parameter : script.getParameter()) {
 			if(ModelDBUtils.isInternalScriptParameter(parameter.getID())) {

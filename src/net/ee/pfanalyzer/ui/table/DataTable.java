@@ -22,20 +22,20 @@ import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.IDerivedElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
-import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
+import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
 public class DataTable extends JTable implements INetworkDataViewer {
 
-	private DataViewerData viewerData;
+	private DataViewerConfiguration viewerConfiguration;
 	private Network network;
 	private DataTableModel model;
 	private boolean selfSelection = false;
 	
-	public DataTable(DataViewerData viewerData) {
+	public DataTable(DataViewerConfiguration viewerConfiguration) {
 		super();
-		this.viewerData = viewerData;
+		this.viewerConfiguration = viewerConfiguration;
 		model = new DataTableModel();
 		setModel(model);
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -75,8 +75,8 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	}
 	
 	@Override
-	public DataViewerData getViewerData() {
-		return viewerData;
+	public DataViewerConfiguration getViewerConfiguration() {
+		return viewerConfiguration;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	@Override
 	public void refresh() {
 		selfSelection = true;
-		model.setData(getNetwork().getElements(viewerData.getElementFilter()));
+		model.setData(getNetwork().getElements(viewerConfiguration.getTextParameter("ELEMENT_FILTER", "")));
 //		model.reloadTableData();
 		resizeAndRepaint();
 		selfSelection = false;

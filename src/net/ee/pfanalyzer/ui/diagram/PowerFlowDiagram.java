@@ -20,6 +20,7 @@ import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
+import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
 public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
@@ -49,7 +50,7 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	
 	public PowerFlowDiagram(DataViewerData viewerData) {
 		this.viewerData = viewerData;
-		this.elementID = viewerData.getElementFilter();
+//		this.elementID = viewerData.getElementFilter();
 		if(true)
 			throw new RuntimeException("TODO: Parameter-ID setzen");//TODO
 //		this.parameterID = viewerData.get;
@@ -94,11 +95,17 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 		revalidate();
 	}
 	
-	@Override
-	public DataViewerData getViewerData() {
-		return viewerData;
-	}
+//	@Override
+//	public DataViewerData getViewerData() {
+//		return viewerData;
+//	}
 	
+	@Override
+	public DataViewerConfiguration getViewerConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public JComponent getComponent() {
 		return this;

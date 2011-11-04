@@ -23,12 +23,12 @@ public class ModelDB {
 	
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";
+	public final static String ROOT_CONFIGURATION_CLASS = "conf";
 	
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
-	private ModelClassData networkClass;
-	private ModelClassData scriptClass;
+	private ModelClassData networkClass, scriptClass, configurationClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	
@@ -56,9 +56,13 @@ public class ModelDB {
 				networkClass = clazz;
 			else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 				scriptClass = clazz;
+			else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
+				configurationClass = clazz;
 		}
 		if(networkClass != null)
 			addModelsRecursive(networkClass);
+		if(configurationClass != null)
+			addModelsRecursive(configurationClass);
 //		for (ModelClassData clazz : getData().getModelClass()) {
 //			addModelsRecursive(clazz);
 //		}
@@ -68,7 +72,7 @@ public class ModelDB {
 	private void addModelsRecursive(AbstractModelElementData element) {
 		if(element instanceof ModelData) {
 			ModelData model = (ModelData) element;
-			models.put(ModelDBUtils.getParameterID(model), model);
+			models.put(ModelDBUtils.getFullElementID(model), model);
 //			System.out.println("   add " + ModelDBUtils.getParameterID(model));
 		} else if(element instanceof ModelClassData) {
 			for (ModelClassData clazz : ((ModelClassData) element).getModelClass())
@@ -96,7 +100,7 @@ public class ModelDB {
 	}
 	
 	public String getModelID(ModelData model) {
-		return ModelDBUtils.getParameterID(model);
+		return ModelDBUtils.getFullElementID(model);
 	}
 	
 	public ModelClassData getNetworkClass() {
@@ -105,6 +109,10 @@ public class ModelDB {
 	
 	public ModelClassData getScriptClass() {
 		return scriptClass;
+	}
+	
+	public ModelClassData getConfigurationClass() {
+		return configurationClass;
 	}
 	
 	public void fireElementChanged(DatabaseChangeEvent event) {

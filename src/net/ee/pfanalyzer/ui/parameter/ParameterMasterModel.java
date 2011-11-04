@@ -25,6 +25,11 @@ public class ParameterMasterModel implements IParameterMasterElement {
 	public boolean isRequired(String parameterID) {
 		return false;
 	}
+	
+	@Override
+	public boolean showCheckBoxes(String parameterID) {
+		return true;
+	}
 
 	@Override
 	public NetworkParameter getParameter(String parameterID, boolean create) {

@@ -8,11 +8,16 @@ import net.ee.pfanalyzer.model.util.ParameterSupport;
 public class ParameterMasterNetwork implements IParameterMasterElement {
 
 	private Network network;
-	private boolean parametersAreRequired;
+	private boolean parametersAreRequired, showCheckBoxes;
 	
 	public ParameterMasterNetwork(Network network, boolean parametersAreRequired) {
+		this(network, parametersAreRequired, true);
+	}
+	
+	public ParameterMasterNetwork(Network network, boolean parametersAreRequired, boolean showCheckBoxes) {
 		this.network = network;
 		this.parametersAreRequired = parametersAreRequired;
+		this.showCheckBoxes = showCheckBoxes;
 	}
 	
 	public Network getNetwork() {
@@ -22,6 +27,11 @@ public class ParameterMasterNetwork implements IParameterMasterElement {
 	@Override
 	public boolean isRequired(String parameterID) {
 		return parametersAreRequired;
+	}
+	
+	@Override
+	public boolean showCheckBoxes(String parameterID) {
+		return showCheckBoxes;
 	}
 	
 	@Override

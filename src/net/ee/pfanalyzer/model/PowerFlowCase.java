@@ -6,8 +6,8 @@ import java.util.List;
 
 import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.DataViewerData;
-import net.ee.pfanalyzer.model.data.DataViewerType;
 import net.ee.pfanalyzer.model.data.NetworkData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.NetworkContainer;
 
 public class PowerFlowCase implements IDatabaseChangeListener {
@@ -24,18 +24,34 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		pfCase = new CaseData();
 		this.modelDB = modelDB;
 		pfCase.setModelDb(modelDB.getData());
-		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
-		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
-		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
+		addDefaultTableViewers();
 		updateAllNetworkData();
 		modelDB.addDatabaseChangeListener(this);
 	}
 	
+	private void addDefaultTableViewers() {
+		if(pfCase.getDataViewer().size() > 0)
+			return;
+		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
+		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
+		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
+	}
+	
 	private DataViewerData createTableViewerData(String title, String filter) {
 		DataViewerData viewerData = new DataViewerData();
-		viewerData.setType(DataViewerType.TABLE);
-		viewerData.setTitle(title);
-		viewerData.setElementFilter(filter);
+		viewerData.setModelID("viewer.table.type_filter");
+		NetworkParameter p = new NetworkParameter();
+		p.setID("TITLE");
+		p.setValue(title);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("ELEMENT_FILTER");
+		p.setValue(filter);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("POSITION");
+		p.setValue("bottom");
+		viewerData.getParameter().add(p);
 		return viewerData;
 	}
 	
@@ -48,6 +64,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 			for (NetworkData netData : pfCase.getNetwork()) {
 				addNetworkInternal(netData);
 			}
+			addDefaultTableViewers();
 			modelDB.addDatabaseChangeListener(this);
 		} catch (Exception e) {
 			e.printStackTrace();

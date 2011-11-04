@@ -40,7 +40,7 @@ public abstract class ParameterValuePanel extends JPanel {
 		boolean isDefinition = getMasterElement().hasParameterDefinition(property.getID());
 		boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose());
 		boolean isScenarioParam = NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
-		if( editable && ! isResult && ! isScenarioParam) {
+		if( editable && ! isResult && ! isScenarioParam && getMasterElement().showCheckBoxes(property.getID())) {
 			if(isDefinition) {
 				emptyBox = new JCheckBox("empty");
 				emptyBox.setToolTipText("Leave this value empty.");

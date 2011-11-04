@@ -33,7 +33,7 @@ public class ParameterPanel extends ParameterContainer {
 		this.paramDB = paramDB;
 		if(master.getParent() == null)
 			setShowNetworkParameters(true);
-		referenceLabel = new JLabel(ModelDBUtils.getParameterID(master));
+		referenceLabel = new JLabel(ModelDBUtils.getFullElementID(master));
 		JPanel commonPanel = addElementGroup("Common Parameters");
 		commonPanel.add(new JLabel("Label: "));
 		commonPanel.add(new ParameterLabelBox());
@@ -51,7 +51,7 @@ public class ParameterPanel extends ParameterContainer {
 	}
 	
 	private void refreshID() {
-		referenceLabel.setText(ModelDBUtils.getParameterID(master));
+		referenceLabel.setText(ModelDBUtils.getFullElementID(master));
 	}
 	
 	private void fireElementChanged() {

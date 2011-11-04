@@ -16,11 +16,12 @@ import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.DataViewerData;
-import net.ee.pfanalyzer.model.data.DataViewerType;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
+import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerDialog;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.dataviewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.table.DataTable;
@@ -75,7 +76,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		
 		// add data viewers
 		for (DataViewerData viewerData : getPowerFlowCase().getDataViewerData()) {
-			addDataViewer(viewerData);
+			addDataViewer(new DataViewerConfiguration(viewerData));
 		}
 
 		getNetwork().addNetworkChangeListener(networkViewer);
@@ -108,7 +109,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		removeNetworkElementSelectionListener(viewer);
 		getNetwork().removeNetworkChangeListener(viewer);
 		if(removeFromCase)
-			getPowerFlowCase().getDataViewerData().remove(viewer.getViewerData());
+			getPowerFlowCase().getDataViewerData().remove(viewer.getViewerConfiguration().getData());
 	}
 	
 	public void dispose() {
@@ -122,38 +123,28 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		}
 	}
 	
-	public void addTable() {
-		DataViewerData viewerData = new DataViewerData();
-		viewerData.setType(DataViewerType.TABLE);
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
-				"Create Table", viewerData, getPowerFlowCase());
-		dialog.showDialog(-1, -1);
-		if(dialog.isCancelPressed())
+	public void addViewer() {
+		SelectViewerDialog dialog1 = new SelectViewerDialog(SwingUtilities.getWindowAncestor(this));
+		dialog1.showDialog(-1, -1);
+		if(dialog1.isCancelPressed())
 			return;
-		addDataViewer(viewerData);
+		DataViewerConfiguration configuration = new DataViewerConfiguration(dialog1.getSelectedViewer());
+		DataViewerDialog dialog2 = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+				"Create Table", configuration, getPowerFlowCase());
+		dialog2.showDialog(-1, -1);
+		if(dialog2.isCancelPressed())
+			return;
+		addDataViewer(configuration);
 		dataTabs.selectLastTab();
-		getPowerFlowCase().getDataViewerData().add(viewerData);
+		getPowerFlowCase().getDataViewerData().add(configuration.getData());
 	}
 	
-	public void addDiagram() {
-		DataViewerData viewerData = new DataViewerData();
-		viewerData.setType(DataViewerType.DIAGRAM);
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
-				"Create Diagram", viewerData, getPowerFlowCase());
-		dialog.showDialog(-1, -1);
-		if(dialog.isCancelPressed())
-			return;
-		addDataViewer(viewerData);
-		dataTabs.selectLastTab();
-		getPowerFlowCase().getDataViewerData().add(viewerData);
-	}
-	
-	private void addDataViewer(DataViewerData viewerData) {
+	private void addDataViewer(DataViewerConfiguration viewerData) {
 		INetworkDataViewer viewer = null;
-		if(DataViewerType.TABLE.equals(viewerData.getType()))
+		if("viewer.table.type_filter".equals(viewerData.getModelID()))
 			viewer = new DataTable(viewerData);
-		else if(DataViewerType.DIAGRAM.equals(viewerData.getType()))
-			viewer = new PowerFlowDiagram(viewerData);
+//		else if("viewer.diagram.bar".equals(viewerData.getModelID()))
+//			viewer = new PowerFlowDiagram(viewerData);
 		if(viewer == null)
 			return;
 		viewer.setData(getNetwork());
@@ -242,8 +233,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			String modelID = ((AbstractNetworkElement) data).getModelID();
 			if(modelID == null || modelID.isEmpty())
 				return;
-			for (int i = 0; i < getPowerFlowCase().getDataViewerData().size(); i++) {
-				if(modelID.startsWith(getPowerFlowCase().getDataViewerData().get(i).getElementFilter())) {
+			for (int i = 0; i < viewers.size(); i++) {
+				if(modelID.startsWith(viewers.get(i).getViewerConfiguration().getElementFilter())) {
 					dataTabs.setSelectedIndex(i);
 					break;
 				}
@@ -279,7 +270,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	public void updateTabTitles() {
 		// update tab titles for viewers
 		for (int i = 0; i < viewers.size(); i++) {
-			dataTabs.setTitleAt(i, viewers.get(i).getViewerData().getTitle());
+			dataTabs.setTitleAt(i, viewers.get(i).getViewerConfiguration().getTitle());
 		}
 	}
 	

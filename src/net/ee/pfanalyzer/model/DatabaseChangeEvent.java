@@ -19,7 +19,7 @@ public class DatabaseChangeEvent {
 
 	public DatabaseChangeEvent(int type, AbstractModelElementData elementData) {
 		this.elementData = elementData;
-		this.parameterID = ModelDBUtils.getParameterID(elementData);
+		this.parameterID = ModelDBUtils.getFullElementID(elementData);
 	}
 
 	public DatabaseChangeEvent(int type, String parameterID, String oldValue, String newValue) {

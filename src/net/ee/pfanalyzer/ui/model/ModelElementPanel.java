@@ -44,23 +44,25 @@ public class ModelElementPanel extends ParameterContainer {
 		titleLabel.setFont(titleFont);
 		titleLabel.setBorder(new EmptyBorder(5, 10, 5, 10));
 		
-		final JToggleButton editButton = PowerFlowAnalyzer.createToggleButton("Toggle editing mode", 
-				"pencil.png", "Toggle editing mode", false);
-		editButton.setMargin(new Insets(2, 2, 1, 1));
-		editButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setEditable( editButton.isSelected());
-				getController().reloadCard();
-			}
-		});
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setOpaque(false);
-		buttonPanel.add(editButton);
 		JPanel titlePanel = new JPanel(new BorderLayout());
 		titlePanel.setOpaque(false);
-		titlePanel.add(buttonPanel, BorderLayout.EAST);
 		titlePanel.add(titleLabel, BorderLayout.CENTER);
+		if(controller != null) {
+			final JToggleButton editButton = PowerFlowAnalyzer.createToggleButton("Toggle editing mode", 
+					"pencil.png", "Toggle editing mode", false);
+			editButton.setMargin(new Insets(2, 2, 1, 1));
+			editButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					setEditable( editButton.isSelected());
+					getController().reloadCard();
+				}
+			});
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setOpaque(false);
+			buttonPanel.add(editButton);
+			titlePanel.add(buttonPanel, BorderLayout.EAST);
+		}
 		
 		add(titlePanel, BorderLayout.NORTH);
 	}

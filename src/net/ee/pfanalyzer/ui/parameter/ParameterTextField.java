@@ -24,6 +24,10 @@ public class ParameterTextField extends ParameterValuePanel implements ActionLis
 		textfield = new JTextField();
 	}
 	
+	protected JTextField getTextField() {
+		return textfield;
+	}
+	
 	protected JComponent getValuePanel() {
 		return textfield;
 	}
@@ -37,7 +41,7 @@ public class ParameterTextField extends ParameterValuePanel implements ActionLis
 		setNewValue();
 	}
 	
-	private void setNewValue() {
+	protected void setNewValue() {
 		if(ignoreAction())
 			return;
 		NetworkParameter property = getMasterElement().getParameter(getPropertyID(), true);

@@ -116,6 +116,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private boolean largeIcons = Preferences.getBooleanProperty(PROPERTY_UI_LARGE_ICONS);
 //	private boolean showSuccessMessage = Preferences.getBooleanProperty(PROPERTY_UI_SHOW_SUCCESS_MESSAGE);
 	
+	private ModelDB configuration;
 	private final int environment;
 	
 	public static void main(String[] args) {
@@ -133,6 +134,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		return INSTANCE;
 	}
 	
+	public static ModelDB getConfiguration() {
+		return getInstance().configuration;
+	}
+	
 	public PowerFlowAnalyzer(int environment) {
 		super();
 		this.environment = environment;
@@ -144,6 +149,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				closeProgram();
 			}
 		});
+		// load default configuration
+		configuration = new ModelDB(CaseSerializer.readInternalConfigurationDB());
 		
 		getContentPane().setLayout(new BorderLayout());
 		
@@ -258,7 +265,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			} else if(e.getActionCommand().equals(ACTION_TABLE_ADD)) {
 				if(getCurrentViewer() == null)
 					return;
-				getCurrentViewer().addTable();
+				getCurrentViewer().addViewer();
 //			} else if(e.getActionCommand().equals(ACTION_DIAGRAM_EDIT)) {
 //				DiagramSheetPropertiesDialog dialog = new DiagramSheetPropertiesDialog(this, 
 //						getCurrentViewer().getCurrentDiagramSheetProperties());
@@ -617,7 +624,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		dialog.showDialog(900, 500);
 		AbstractModelElementData selected = dialog.getSelectedElement();
 		if(selected instanceof ModelData) {
-			String modelID = ModelDBUtils.getParameterID(selected);
+			String modelID = ModelDBUtils.getFullElementID(selected);
 			AbstractNetworkElement element = getCurrentNetwork().createElement(modelID);
 			getCurrentNetwork().addElement(element);
 			getCurrentNetwork().fireNetworkElementAdded(element);

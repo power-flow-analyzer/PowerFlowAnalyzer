@@ -471,7 +471,7 @@ public class Network extends ParameterSupport {
 //				System.err.println("model is null");
 				continue;
 			}
-			if(ModelDBUtils.getParameterID(element.getModel()).startsWith(idPrefix))
+			if(ModelDBUtils.getFullElementID(element.getModel()).startsWith(idPrefix))
 				list.add(element);
 		}
 		return list;

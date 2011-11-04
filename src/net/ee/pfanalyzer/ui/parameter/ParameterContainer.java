@@ -105,6 +105,12 @@ public class ParameterContainer extends JPanel {
 				ParameterRestrictionValueBox box = new ParameterRestrictionValueBox(
 						(ParameterMasterNetworkElement) parameterMaster, propertyDefinition, propertyValue);
 				panel.add(box);
+			} else if(parameterMaster instanceof ParameterMasterViewer
+					&& (NetworkParameterValueRestriction.MODEL_OR_CLASS_ID.equals(propertyDefinition.getRestriction())
+							|| NetworkParameterValueRestriction.MODEL_ID.equals(propertyDefinition.getRestriction()))) {
+				ParameterModelIDField box = new ParameterModelIDField(
+						(ParameterMasterViewer) parameterMaster, propertyDefinition, propertyValue);
+				panel.add(box);
 			} else {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
 					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);

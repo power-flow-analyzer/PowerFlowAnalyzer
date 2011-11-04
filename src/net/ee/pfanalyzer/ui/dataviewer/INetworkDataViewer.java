@@ -4,7 +4,6 @@ import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
-import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.INetworkElementSelectionListener;
 
 public interface INetworkDataViewer extends INetworkElementSelectionListener, INetworkChangeListener {
@@ -17,5 +16,5 @@ public interface INetworkDataViewer extends INetworkElementSelectionListener, IN
 	
 	JComponent getComponent();
 	
-	DataViewerData getViewerData();
+	DataViewerConfiguration getViewerConfiguration();
 }
