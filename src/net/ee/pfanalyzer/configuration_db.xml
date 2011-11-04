@@ -6,14 +6,56 @@
                 <parameter ID="TITLE" type="text" label="Title" empty="true">
                     <display/>
                 </parameter>
-                <parameter ID="POSITION" type="text" label="Position" restriction="list" value="bottom" empty="false">
+                <parameter ID="POSITION" type="text" label="Position" restriction="list" empty="true">
                     <option value="left" label="Left" ID="LEFT"/>
                     <option value="bottom" label="Bottom" ID="BOTTOM"/>
                     <option value="right" label="Right" ID="RIGHT"/>
                     <option value="free" label="Free" ID="FREE"/>
                     <display/>
                 </parameter>
+                <modelClass ID="network" label="Network">
+                    <parameter ID="POSITION" value="left"/>
+                    <model ID="map" label="Network Map">
+                        <parameter ID="ZOOM" type="integer" label="Zoom" restriction="list" value="0" empty="false">
+                            <option value="0" label="Best fit" ID="BEST_FIT"/>
+                            <option value="1" label="Custom" ID="CUSTOM"/>
+                            <option value="2" label="Germany" ID="GERMANY"/>
+                            <display/>
+                        </parameter>
+                        <parameter ID="SHOW_LEGEND" type="boolean" label="Show Legend" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="KEEP_ASPECT_RATIO" type="boolean" label="Keep Aspect Ratio" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="DRAW_BUSSES" type="boolean" label="Draw Bus Nodes" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="DRAW_BRANCHES" type="boolean" label="Draw Branches" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="DRAW_POWER_FLOW_DIRECTION" type="boolean" label="Draw Power Flow Direction" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="DRAW_GENERATORS" type="boolean" label="Draw Generators" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="DRAW_OUTLINE" type="boolean" label="Draw Outline" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="ALLOW_ZOOMING" type="boolean" label="Allow zooming" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="ALLOW_DRAGGING" type="boolean" label="Allow dragging" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="SHOW_TOOLTIPS" type="boolean" label="Show Tooltips" value="true">
+                            <display/>
+                        </parameter>
+                    </model>
+                </modelClass>
                 <modelClass ID="table" label="Table">
+                    <parameter ID="POSITION" value="bottom"/>
                     <model ID="type_filter" label="Data Table">
                         <parameter ID="ELEMENT_FILTER" type="text" label="Element filter" restriction="model or class ID" empty="true">
                             <display/>
