@@ -51,6 +51,8 @@
     </simpleType>
     
     <complexType name="NetworkParameterValueDisplay">
+        <attribute name="group" type="string"/>
+        <attribute name="section" type="string"/>
         <attribute name="min" type="double"/>
         <attribute name="max" type="double"/>
         <attribute name="increment" type="double" default="1"/>
