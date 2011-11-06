@@ -141,20 +141,25 @@ public class NetworkOverviewPane extends JPanel {
 			@Override
 			protected void actionPerformed() {
 				Network[] selection = selectedNetworks.toArray(new Network[selectedNetworks.size()]);
-				for (Network network : selection) {
-					if(network != null) {
-						String name = parent.getNetworkName(network);
-						int choice = JOptionPane.showConfirmDialog(NetworkOverviewPane.this, 
-								"Do you want to delete the network \"" + name + "\"?", "Delete network", JOptionPane.YES_NO_OPTION);
-						if(choice == JOptionPane.YES_OPTION) {
-							getPowerFlowCase().removeNetwork(network);
-							int tabIndex = parent.getNetworkTabIndex(network);
-							if(tabIndex != -1)
-								parent.closeTab(tabIndex);
-							refreshTree();
-							networkTree.clearSelection();
-						} else
-							return;
+				if(selection.length > 1) {
+					int choice = JOptionPane.showConfirmDialog(NetworkOverviewPane.this, 
+							"Do you want to delete the selected " + selection.length + " networks?", "Delete networks", JOptionPane.YES_NO_OPTION);
+					if(choice == JOptionPane.YES_OPTION) {
+						for (Network network : selection) {
+							deleteNetwork(network);
+						}
+					}
+				} else {
+					for (Network network : selection) {
+						if(network != null) {
+							String name = parent.getNetworkName(network);
+							int choice = JOptionPane.showConfirmDialog(NetworkOverviewPane.this, 
+									"Do you want to delete the network \"" + name + "\"?", "Delete network", JOptionPane.YES_NO_OPTION);
+							if(choice == JOptionPane.YES_OPTION) {
+								deleteNetwork(network);
+							} else
+								return;
+						}
 					}
 				}
 			}
@@ -221,6 +226,15 @@ public class NetworkOverviewPane extends JPanel {
 	
 	public PowerFlowCase getPowerFlowCase() {
 		return parent.getPowerFlowCase();
+	}
+	
+	private void deleteNetwork(Network network) {
+		getPowerFlowCase().removeNetwork(network);
+		int tabIndex = parent.getNetworkTabIndex(network);
+		if(tabIndex != -1)
+			parent.closeTab(tabIndex);
+		refreshTree();
+		networkTree.clearSelection();
 	}
 	
 	private Network getSelectedNetwork() {
