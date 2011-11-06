@@ -152,7 +152,7 @@ public class NetworkOverviewPane extends JPanel {
 				} else {
 					for (Network network : selection) {
 						if(network != null) {
-							String name = parent.getNetworkName(network);
+							String name = network.getDisplayName();
 							int choice = JOptionPane.showConfirmDialog(NetworkOverviewPane.this, 
 									"Do you want to delete the network \"" + name + "\"?", "Delete network", JOptionPane.YES_NO_OPTION);
 							if(choice == JOptionPane.YES_OPTION) {
@@ -464,7 +464,7 @@ public class NetworkOverviewPane extends JPanel {
 				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 				if(value instanceof Network) {
 					Network network = (Network) value;
-					setText(parent.getNetworkName(network));
+					setText(network.getDisplayName());
 					if(network.hasFailures())
 						setForeground(Preferences.getFlagFailureColor());
 					else 

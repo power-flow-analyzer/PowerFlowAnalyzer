@@ -105,7 +105,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //			}
 //		}
 		PowerFlowViewer viewer = new PowerFlowViewer(powerFlowCase, network);
-		networkTabs.addNetworkTab(getNetworkName(network), viewer, true);
+		networkTabs.addNetworkTab(network.getDisplayName(), viewer, true);
 		viewer.addActionUpdateListener(this);
 		viewer.addNetworkElementSelectionListener(modelDBDialog);
 		overviewPane.refreshTree();
@@ -182,12 +182,12 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //		return name;
 //	}
 	
-	String getNetworkName(Network network) {
-		String name = network.getName();
-		if(name.isEmpty())
-			return "Untitled " + network.getInternalID();
-		return name;
-	}
+//	String getNetworkName(Network network) {
+//		String name = network.getName();
+//		if(name.isEmpty())
+//			return "Untitled " + network.getInternalID();
+//		return name;
+//	}
 	
 //	private boolean containsNetworkName(String name) {
 //		for (Network network : getPowerFlowCase().getNetworks()) {
@@ -214,7 +214,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			Component comp = networkTabs.getTabComponent(i);
 			if(comp instanceof PowerFlowViewer) {
 				Network n = ((PowerFlowViewer) comp).getNetwork();
-				networkTabs.setTitleAt(i, getNetworkName(n));
+				networkTabs.setTitleAt(i, n.getDisplayName());
 			}
 		}
 	}

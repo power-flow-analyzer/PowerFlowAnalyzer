@@ -9,12 +9,17 @@
                 <parameter ID="POSITION" type="text" label="Position" restriction="list" empty="true">
                     <option value="left" label="Left" ID="LEFT"/>
                     <option value="bottom" label="Bottom" ID="BOTTOM"/>
-                    <option value="right" label="Right" ID="RIGHT"/>
                     <option value="free" label="Free" ID="FREE"/>
                     <display/>
                 </parameter>
                 <parameter ID="ICON" type="text" label="Icon" empty="true">
                     <display/>
+                </parameter>
+                <parameter ID="WIDTH" type="integer" label="Width" value="300.0">
+                    <display min="10.0"/>
+                </parameter>
+                <parameter ID="HEIGHT" type="integer" label="Height" value="300.0">
+                    <display min="10.0"/>
                 </parameter>
                 <modelClass ID="network" label="Network">
                     <parameter ID="POSITION" value="left"/>

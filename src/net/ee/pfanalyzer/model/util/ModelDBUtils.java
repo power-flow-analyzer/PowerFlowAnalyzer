@@ -18,6 +18,8 @@ public class ModelDBUtils {
 	public final static String CHANGE_PATH_PARAMETER = "CHANGE_PATH";
 	
 	public final static String ICON_PARAMETER = "ICON";
+	public final static String WIDTH_PARAMETER = "WIDTH";
+	public final static String HEIGHT_PARAMETER = "HEIGHT";
 	
 	public static String getFullElementID(AbstractModelElementData element) {
 		String id = element.getID();
@@ -182,7 +184,9 @@ public class ModelDBUtils {
 	}
 	
 	public static boolean isInternalViewerParameter(String parameterName) {
-		return ICON_PARAMETER.equals(parameterName);
+		return ICON_PARAMETER.equals(parameterName) 
+		|| WIDTH_PARAMETER.equals(parameterName)
+		|| HEIGHT_PARAMETER.equals(parameterName);
 	}
 	
 	public static boolean isNetworkCreatingScript(ModelData script) {

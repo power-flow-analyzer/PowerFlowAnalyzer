@@ -1,20 +1,24 @@
 package net.ee.pfanalyzer.ui;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.util.ListUtils;
+import net.ee.pfanalyzer.ui.PowerFlowViewer.ViewerFrame;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 
 public class NetworkElementSelectionManager implements INetworkElementSelectionListener {
 
-	public static NetworkElementSelectionManager getInstance(JComponent component) {
+	public static NetworkElementSelectionManager getInstance(Component component) {
 		if(component instanceof PowerFlowViewer)
 			return ((PowerFlowViewer) component).getSelectionManager();
-		if(component.getParent() != null && component.getParent() instanceof JComponent)
-			return getInstance((JComponent) component.getParent());
+		if(component instanceof ViewerFrame)
+			return ((ViewerFrame) component).getPowerFlowViewer().getSelectionManager();
+		if(component.getParent() != null && component.getParent() instanceof Component)
+			return getInstance((Component) component.getParent());
 		return null;
 	}
 	

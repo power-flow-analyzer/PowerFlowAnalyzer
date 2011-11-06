@@ -706,6 +706,13 @@ public class Network extends ParameterSupport {
     	return getData().getName();
     }
     
+    public String getDisplayName() {
+    	String name = getName();
+		if(name.isEmpty())
+			return "Untitled Network " + getInternalID();
+    	return name;
+    }
+    
     public void setName(String value) {
     	if(value == null || value.trim().isEmpty())
     		getData().setName(null);

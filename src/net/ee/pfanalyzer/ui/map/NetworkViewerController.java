@@ -85,6 +85,8 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 	
 	private void setViewerProperty(String property, String value) {
 		if(property.equals(PROPERTY_ZOOM_CHOICE)) {
+			if(value == null)
+				value = "0";
 			int intvalue = Integer.valueOf(value);
 			if(intvalue == 2)
 				viewer.setView(ZOOM_GERMANY_COORDINATES);

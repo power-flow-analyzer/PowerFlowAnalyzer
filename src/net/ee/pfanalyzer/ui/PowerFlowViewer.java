@@ -1,6 +1,8 @@
 package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerDialog;
@@ -351,12 +354,16 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		}
 	}
 	
+	public static String getFrameTitle(DataViewerConfiguration viewerConfiguration, Network network) {
+		return viewerConfiguration.getTitle() + " - " + network.getDisplayName();
+	}
+	
 	class ViewerFrame extends JFrame {
 		
 		private INetworkDataViewer viewer;
 		
 		ViewerFrame(INetworkDataViewer viewer) {
-			super(viewer.getViewerConfiguration().getTitle());
+			super(getFrameTitle(viewer.getViewerConfiguration(), getNetwork()));
 			this.viewer = viewer;
 			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			
@@ -373,9 +380,20 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 				public void windowClosed(WindowEvent e) {
 				}
 			});
+			addComponentListener(new ComponentAdapter() {
+				public void componentResized(ComponentEvent e) {
+					ViewerFrame.this.viewer.getViewerConfiguration().setParameter(
+							ModelDBUtils.WIDTH_PARAMETER, getWidth());
+					ViewerFrame.this.viewer.getViewerConfiguration().setParameter(
+							ModelDBUtils.HEIGHT_PARAMETER, getHeight());
+				}
+			});
 			
 			getContentPane().add(new DataViewerContainer(viewer, PowerFlowViewer.this));
 			pack();
+			int width = viewer.getViewerConfiguration().getIntParameter(ModelDBUtils.WIDTH_PARAMETER, 300);
+			int height = viewer.getViewerConfiguration().getIntParameter(ModelDBUtils.HEIGHT_PARAMETER, 300);
+			setSize(width, height);
 			setVisible(true);
 		}
 		
@@ -394,7 +412,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			String position = conf.getTextParameter("POSITION", "bottom");
 			// check if position is "free"
 			if(position.equals("free")) {
-				setTitle(conf.getTitle());
+				setTitle(getFrameTitle(conf, getNetwork()));
 				return true;
 			} else {
 				closeFrame(false);
@@ -402,6 +420,10 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 				addDataViewer(conf, true);
 				return false;
 			}
+		}
+		
+		PowerFlowViewer getPowerFlowViewer() {
+			return PowerFlowViewer.this;
 		}
 	}
 	
