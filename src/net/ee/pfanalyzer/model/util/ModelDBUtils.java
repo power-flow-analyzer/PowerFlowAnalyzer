@@ -17,6 +17,8 @@ public class ModelDBUtils {
 	public final static String CREATE_NETWORK_PARAMETER = "CREATE_NETWORK";
 	public final static String CHANGE_PATH_PARAMETER = "CHANGE_PATH";
 	
+	public final static String ICON_PARAMETER = "ICON";
+	
 	public static String getFullElementID(AbstractModelElementData element) {
 		String id = element.getID();
 		if(id == null || id.isEmpty())
@@ -177,6 +179,10 @@ public class ModelDBUtils {
 		return SCRIPT_PARAMETER.equals(parameterName) 
 				|| CREATE_NETWORK_PARAMETER.equals(parameterName)
 				|| CHANGE_PATH_PARAMETER.equals(parameterName);
+	}
+	
+	public static boolean isInternalViewerParameter(String parameterName) {
+		return ICON_PARAMETER.equals(parameterName);
 	}
 	
 	public static boolean isNetworkCreatingScript(ModelData script) {

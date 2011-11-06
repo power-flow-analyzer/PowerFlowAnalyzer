@@ -49,7 +49,7 @@ public class ClosableTabbedPane {
 		getTabbedPane().setTabComponentAt(getTabbedPane().getTabCount() - 1, tabRenderer);
 	}
 	
-	private JTabbedPane getTabbedPane() {
+	protected JTabbedPane getTabbedPane() {
 		return tabbedPane;
 	}
 	

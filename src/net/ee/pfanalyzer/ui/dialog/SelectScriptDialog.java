@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
@@ -22,21 +22,24 @@ public class SelectScriptDialog extends BaseDialog {
 		setText("<html><center><b>Select a script to be executed and press OK.");
 		
 		Box contentPane = Box.createVerticalBox();
-		ButtonGroup bg = new ButtonGroup();
 		for (final ModelData script : caze.getModelDB().getScriptClass().getModel()) {
-			JRadioButton button = new JRadioButton(script.getLabel());
+			String text = "<html>"  + "<b>" + script.getLabel() + "</b>";
+			if(script.getDescription() != null)
+				text += "<br>" + script.getDescription();
+			JButton button = new JButton(text);
+			button.setHorizontalAlignment(SwingConstants.LEFT);
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					selectedScript = script;
+					okPressed = true;
+					SelectScriptDialog.this.setVisible(false);
 				}
 			});
 			if(caze.getModelDB().getScriptClass().getModel().size() == 1)
 				button.doClick();
 			contentPane.add(button);
-			bg.add(button);
 		}
-		addOKButton();
 		addCancelButton();
 		
 		JPanel contentPaneResizer = new JPanel();

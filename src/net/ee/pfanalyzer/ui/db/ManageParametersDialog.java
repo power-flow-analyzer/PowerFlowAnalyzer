@@ -200,6 +200,12 @@ public class ManageParametersDialog extends BaseDialog {
 			typePanel.add(new TypeField());
 			add(typePanel);
 			
+			displayOptions = property.getDisplay();
+			if(displayOptions == null) {
+				displayOptions = new NetworkParameterValueDisplay();
+				property.setDisplay(displayOptions);
+			}
+			
 			commonPanel = new JPanel(new GridLayout(0, 2));
 			commonPanel.setBorder(new TitledBorder("General Attributes"));
 			commonPanel.add(new JLabel("ID: "));
@@ -208,6 +214,10 @@ public class ManageParametersDialog extends BaseDialog {
 			commonPanel.add(new LabelField());
 			commonPanel.add(new JLabel("Description: "));
 			commonPanel.add(new DescriptionField());
+			commonPanel.add(new JLabel("Section: "));
+			commonPanel.add(new SectionField());
+			commonPanel.add(new JLabel("Group: "));
+			commonPanel.add(new GroupField());
 			commonPanel.add(new JLabel("Purpose: "));
 			commonPanel.add(new PurposeField());
 			commonPanel.add(new JLabel("Inherit to children: "));
@@ -220,12 +230,6 @@ public class ManageParametersDialog extends BaseDialog {
 			valuePanel = new JPanel(new GridLayout(0, 2));
 			valuePanel.setBorder(new TitledBorder("Value"));
 			add(valuePanel);
-			
-			displayOptions = property.getDisplay();
-			if(displayOptions == null) {
-				displayOptions = new NetworkParameterValueDisplay();
-				property.setDisplay(displayOptions);
-			}
 			
 			typeChanged();
 		}
@@ -894,6 +898,30 @@ public class ManageParametersDialog extends BaseDialog {
 			@Override
 			protected void setValue(String value) {
 				displayOptions.setElementRestriction(value);
+			}
+		}
+		
+		class GroupField extends StringField {
+			@Override
+			protected String getValue() {
+				return displayOptions.getGroup();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				displayOptions.setGroup(value);
+			}
+		}
+		
+		class SectionField extends StringField {
+			@Override
+			protected String getValue() {
+				return displayOptions.getSection();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				displayOptions.setSection(value);
 			}
 		}
 	}

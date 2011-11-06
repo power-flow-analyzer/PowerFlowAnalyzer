@@ -86,7 +86,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private final static String ACTION_NETWORK_ADD_ELEMENT = "action.network.add.element";
 	private final static String ACTION_NETWORK_REMOVE_ELEMENT = "action.network.remove.element";
 	
-	private final static String ACTION_MAP_PROPERTIES = "action.map.properties";
+//	private final static String ACTION_MAP_PROPERTIES = "action.map.properties";
 //	private final static String ACTION_PANEL_PROPERTIES = "action.panel.properties";
 	private final static String ACTION_MODEL_DB_PROPERTIES = "action.model.db.properties";
 //	private final static String ACTION_APP_PROPERTIES = "action.app.properties";
@@ -199,8 +199,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbar.add(createToolbarButton(ACTION_CASE_LAYOUT, "Change layout", "grid.png", "Change layout"));
 //		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_APP_PROPERTIES, "Edit program settings", "widgets.png", "App settings"));
-		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data table for a filtered set of elements", "table_add.png", "New Table"));
-		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
+		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data viewer to this layout", "table_add.png", "New Table"));
+//		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
@@ -272,8 +272,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //				if(dialog.isCancelPressed())
 //					return;
 //				getCurrentViewer().setCurrentDiagramSheet(dialog.getDiagramSheetProperties());
-			} else if(e.getActionCommand().equals(ACTION_MAP_PROPERTIES)) {
-				getCurrentViewer().getViewerController().showMapPropertiesDialog(this);
+//			} else if(e.getActionCommand().equals(ACTION_MAP_PROPERTIES)) {
+//				getCurrentViewer().getViewerController().showMapPropertiesDialog(this);
 //			} else if(e.getActionCommand().equals(ACTION_PANEL_PROPERTIES)) {
 //				getCurrentViewer().getPanelController().showPanelPropertiesDialog(this);
 			} else if(e.getActionCommand().equals(ACTION_MODEL_DB_PROPERTIES)) {
@@ -319,15 +319,19 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	
 	public static void decorateButton(AbstractButton button, String tooltipText, String iconName, String altText, 
 			boolean largeIcons) {
-			String iconSizePath = largeIcons ? "32x32" : "16x16";
-			URL iconURL = PowerFlowAnalyzer.class.getResource("/" + iconSizePath + "/" + iconName);
-			button.setFocusable(false);
-			button.setToolTipText(tooltipText);
-			if(iconURL != null) {
-				button.setIcon(new ImageIcon(iconURL, altText));
-			} else {
-				button.setText(altText);
-			}
+		URL iconURL = getIconURL(iconName, largeIcons);
+		button.setFocusable(false);
+		button.setToolTipText(tooltipText);
+		if(iconURL != null) {
+			button.setIcon(new ImageIcon(iconURL, altText));
+		} else {
+			button.setText(altText);
+		}
+	}
+	
+	public static URL getIconURL(String iconName, boolean largeIcons) {
+		String iconSizePath = largeIcons ? "32x32" : "16x16";
+		return PowerFlowAnalyzer.class.getResource("/" + iconSizePath + "/" + iconName);
 	}
 
 	private JButton createToolbarButton(String actionCommand, String tooltipText, String iconName, String altText) {
@@ -891,7 +895,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbarButtons.get(ACTION_TABLE_ADD).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(hasCase);
 //		toolbarButtons.get(ACTION_DIAGRAM_EDIT).setEnabled(hasDiagrams);
-		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);
+//		toolbarButtons.get(ACTION_MAP_PROPERTIES).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_EXECUTE_SCRIPT).setEnabled(isMatlabEnv && hasViewer);
 		toolbarButtons.get(ACTION_NETWORK_ADD_ELEMENT).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_NETWORK_REMOVE_ELEMENT).setEnabled(hasViewer

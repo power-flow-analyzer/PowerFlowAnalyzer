@@ -1,11 +1,14 @@
 package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +40,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	
 	private NetworkElementSelectionManager selectionManager;
 	private ViewerTabbedPane bottomViewers, leftViewers;
+	private List<ViewerFrame> viewerFrames = new ArrayList<ViewerFrame>();
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	private ElementPanelController panelController;
@@ -86,6 +90,10 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		removeNetworkElementSelectionListener(this);
 		leftViewers.dispose();
 		bottomViewers.dispose();
+		for (ViewerFrame frame : viewerFrames) {
+			frame.closeFrame(false);
+		}
+		viewerFrames.clear();
 	}
 	
 	public void addViewer() {
@@ -95,7 +103,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			return;
 		DataViewerConfiguration configuration = new DataViewerConfiguration(dialog1.getSelectedViewer());
 		DataViewerDialog dialog2 = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
-				"Create Table", configuration, getPowerFlowCase());
+				"Add viewer", configuration, getPowerFlowCase(), true);
 		dialog2.showDialog(-1, -1);
 		if(dialog2.isCancelPressed())
 			return;
@@ -115,24 +123,37 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			return;
 		viewer.setData(getNetwork());
 		viewer.refresh();
-		String position = viewerData.getTextParameter("POSITION", "bottom");
+		ViewerTabbedPane tabPane = getViewerTab(viewer);
+		if(tabPane == null) {
+			ViewerFrame frame = new ViewerFrame(viewer);
+			viewerFrames.add(frame);
+//			frame.toFront();
+		} else {
+			tabPane.addViewer(viewer);
+			if(selectTab)
+				tabPane.selectLastTab();
+			if(verticalSplitPane.getBottomComponent() == null)
+				verticalSplitPane.setBottomComponent(bottomViewers.getComponent());
+			if(bottomViewers.getComponent().getHeight() == 0) {
+				verticalSplitPane.setDividerLocation(400);
+			}
+		}
+		addNetworkElementSelectionListener(viewer);
+		getNetwork().addNetworkChangeListener(viewer);
+	}
+	
+	private ViewerTabbedPane getViewerTab(INetworkDataViewer viewer) {
+		String position = viewer.getViewerConfiguration().getTextParameter("POSITION", "bottom");
 		ViewerTabbedPane tabPane;
 		if(position.equals("bottom"))
 			tabPane = bottomViewers;
 		else if(position.equals("left"))
 			tabPane = leftViewers;
+		else if(position.equals("free"))
+			tabPane = null;
 		else
 			tabPane = bottomViewers;
-		tabPane.addViewer(viewer);
-		if(selectTab)
-			tabPane.selectLastTab();
-		addNetworkElementSelectionListener(viewer);
-		getNetwork().addNetworkChangeListener(viewer);
-		if(verticalSplitPane.getBottomComponent() == null)
-			verticalSplitPane.setBottomComponent(bottomViewers.getComponent());
-		if(bottomViewers.getComponent().getHeight() == 0) {
-			verticalSplitPane.setDividerLocation(400);
-		}
+		return tabPane;
 	}
 	
 //	private void addDiagram(String label, String elementID, String parameterID) {
@@ -232,8 +253,29 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	}
 
 	public void updateTabTitles() {
-		leftViewers.updateTabTitles();
-		bottomViewers.updateTabTitles();
+		leftViewers.updateTabs("left");
+		bottomViewers.updateTabs("bottom");
+		updateFrames();
+		fireActionUpdate();
+	}
+	
+	private void updateFrames() {
+		boolean updateAgain = false;
+		for (ViewerFrame frame : viewerFrames) {
+			if(frame.updateFrame() == false) {
+				updateAgain = true;
+				break;
+			}
+		}
+		if(updateAgain)
+			updateFrames();
+	}
+	
+	private void removeViewer(INetworkDataViewer viewer, boolean removeFromCase) {
+		removeNetworkElementSelectionListener(viewer);
+		getNetwork().removeNetworkChangeListener(viewer);
+		if(removeFromCase)
+			getPowerFlowCase().getDataViewerData().remove(viewer.getViewerConfiguration().getData());
 	}
 	
 	class ViewerTabbedPane extends ClosableTabbedPane {
@@ -286,17 +328,79 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			}
 		}
 		
-		private void removeViewer(INetworkDataViewer viewer, boolean removeFromCase) {
-			removeNetworkElementSelectionListener(viewer);
-			getNetwork().removeNetworkChangeListener(viewer);
-			if(removeFromCase)
-				getPowerFlowCase().getDataViewerData().remove(viewer.getViewerConfiguration().getData());
-		}
-		
-		public void updateTabTitles() {
+		public void updateTabs(String tabPosition) {
+			boolean updateAgain = false;
 			// update tab titles for viewers
 			for (int i = 0; i < viewers.size(); i++) {
-				setTitleAt(i, viewers.get(i).getViewerConfiguration().getTitle());
+				DataViewerConfiguration conf = viewers.get(i).getViewerConfiguration();
+				String position = conf.getTextParameter("POSITION", "bottom");
+				// check if position is still correct
+				if(position.equals(tabPosition)) {
+					setTitleAt(i, conf.getTitle());
+				} else {
+					removeViewer(viewers.get(i), false);
+					viewers.remove(i);
+					getTabbedPane().remove(i);
+					addDataViewer(conf, true);
+					updateAgain = true;
+					break;
+				}
+			}
+			if(updateAgain)
+				updateTabs(tabPosition);
+		}
+	}
+	
+	class ViewerFrame extends JFrame {
+		
+		private INetworkDataViewer viewer;
+		
+		ViewerFrame(INetworkDataViewer viewer) {
+			super(viewer.getViewerConfiguration().getTitle());
+			this.viewer = viewer;
+			setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			
+			addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					int choice = JOptionPane.showConfirmDialog(ViewerFrame.this, 
+							"Do you want to remove this viewer?", "Close viewer", JOptionPane.YES_NO_OPTION);
+					if(choice == JOptionPane.YES_OPTION) {
+						closeFrame(true);
+					}
+				}
+				@Override
+				public void windowClosed(WindowEvent e) {
+				}
+			});
+			
+			getContentPane().add(new DataViewerContainer(viewer, PowerFlowViewer.this));
+			pack();
+			setVisible(true);
+		}
+		
+		private void closeFrame(boolean removeFromCase) {
+			viewer.dispose();
+			removeViewer(viewer, removeFromCase);
+			if(removeFromCase)
+				viewerFrames.remove(ViewerFrame.this);
+			setVisible(false);
+			dispose();
+			fireActionUpdate();
+		}
+		
+		public boolean updateFrame() {
+			DataViewerConfiguration conf = viewer.getViewerConfiguration();
+			String position = conf.getTextParameter("POSITION", "bottom");
+			// check if position is "free"
+			if(position.equals("free")) {
+				setTitle(conf.getTitle());
+				return true;
+			} else {
+				closeFrame(false);
+				viewerFrames.remove(this);
+				addDataViewer(conf, true);
+				return false;
 			}
 		}
 	}

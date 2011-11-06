@@ -7,6 +7,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -38,7 +40,7 @@ public class ParameterPanel extends ParameterContainer {
 		commonPanel.add(new JLabel("Label: "));
 		commonPanel.add(new ParameterLabelBox());
 		commonPanel.add(new JLabel("Description: "));
-		commonPanel.add(new ParameterDescriptionBox());
+		commonPanel.add(new JScrollPane(new ParameterDescriptionBox()));
 		commonPanel.add(new JLabel("Element ID: "));
 		commonPanel.add(new ParameterIDBox());
 		commonPanel.add(new JLabel("Reference: "));
@@ -59,7 +61,7 @@ public class ParameterPanel extends ParameterContainer {
 			paramDB.fireElementChanged(new DatabaseChangeEvent(DatabaseChangeEvent.CHANGED, master));
 	}
 	
-	class ParameterIDBox extends ParameterTextBox implements ActionListener, KeyListener {
+	class ParameterIDBox extends ParameterTextField implements ActionListener, KeyListener {
 		ParameterIDBox() {
 			super("ID");
 		}
@@ -84,7 +86,7 @@ public class ParameterPanel extends ParameterContainer {
 		}
 	}
 	
-	class ParameterLabelBox extends ParameterTextBox implements ActionListener, KeyListener {
+	class ParameterLabelBox extends ParameterTextField implements ActionListener, KeyListener {
 		ParameterLabelBox() {
 			super("LABEL");
 		}
@@ -106,7 +108,7 @@ public class ParameterPanel extends ParameterContainer {
 		}
 	}
 	
-	class ParameterDescriptionBox extends ParameterTextBox implements ActionListener, KeyListener {
+	class ParameterDescriptionBox extends ParameterTextBox implements KeyListener {
 		ParameterDescriptionBox() {
 			super("DESCR");
 		}
@@ -135,10 +137,8 @@ public class ParameterPanel extends ParameterContainer {
 //		return null;
 //	}
 	
-	abstract class ParameterTextBox extends JTextField implements ActionListener, KeyListener {
-		
-		
-		public ParameterTextBox(String parameterID) {
+	abstract class ParameterTextField extends JTextField implements ActionListener, KeyListener {
+		public ParameterTextField(String parameterID) {
 			super();
 			initField();
 		}
@@ -154,6 +154,38 @@ public class ParameterPanel extends ParameterContainer {
 		public void actionPerformed(ActionEvent e) {
 			setParameterValue(getText());
 			updateView();
+		}
+		
+		protected void updateView() {
+			// empty implementation
+		}
+		
+		protected abstract void setParameterValue(String text);
+		
+		protected abstract String getParameterValue();
+		
+		@Override
+		public void keyReleased(KeyEvent e) {
+			setParameterValue(getText());
+			updateView();
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {}
+		@Override
+		public void keyPressed(KeyEvent e) {}
+	}
+	
+	abstract class ParameterTextBox extends JTextArea implements KeyListener {
+		public ParameterTextBox(String parameterID) {
+			super(3, 20);
+			initField();
+		}
+		
+		private void initField() {
+			if(getParameterValue() != null)
+				setText(getParameterValue());
+			addKeyListener(this);
 		}
 		
 		protected void updateView() {

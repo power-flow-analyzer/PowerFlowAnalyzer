@@ -6,12 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
-import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
 
 public class SelectViewerDialog extends BaseDialog {
@@ -23,19 +26,27 @@ public class SelectViewerDialog extends BaseDialog {
 		setText("<html><center><b>Select the viewer type and press OK.");
 		
 		Box contentPane = Box.createVerticalBox();
-		ButtonGroup bg = new ButtonGroup();
-		for (final ModelData script : PowerFlowAnalyzer.getConfiguration().getModels("viewer")) {
-			JRadioButton button = new JRadioButton(script.getLabel());
+		for (final ModelData viewer : PowerFlowAnalyzer.getConfiguration().getModels("viewer")) {
+			String text = "<html>"  + "<b>" + viewer.getLabel() + "</b>";
+			if(viewer.getDescription() != null)
+				text += "<br>" + viewer.getDescription();
+			JButton button = new JButton(text);
+			button.setHorizontalAlignment(SwingConstants.LEFT);
+			button.setIconTextGap(10);
 			button.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					selectedViewer = script;
+					selectedViewer = viewer;
+					okPressed = true;
+					SelectViewerDialog.this.setVisible(false);
 				}
 			});
+			NetworkParameter iconName = ModelDBUtils.getParameterValue(viewer, "ICON");
+			if(iconName != null && iconName.getValue() != null)
+				button.setIcon(new ImageIcon(PowerFlowAnalyzer.getIconURL(iconName.getValue(), true)));
 			contentPane.add(button);
-			bg.add(button);
+			contentPane.add(Box.createVerticalStrut(10));
 		}
-		addOKButton();
 		addCancelButton();
 		
 		JPanel contentPaneResizer = new JPanel();

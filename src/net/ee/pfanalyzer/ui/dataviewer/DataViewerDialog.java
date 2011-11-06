@@ -1,9 +1,10 @@
 package net.ee.pfanalyzer.ui.dataviewer;
 
-import java.awt.BorderLayout;
 import java.awt.Window;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.JPanel;
+import javax.swing.Box;
 
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
@@ -22,32 +23,37 @@ public class DataViewerDialog extends BaseDialog {
 //			"The viewer will only contain those elements whose model ID matches the filter.";
 	
 	private DataViewerConfiguration viewer;
+	private Map<String, Group> groups = new HashMap<String, Group>();
+	private Box contentPane;
 
-	public DataViewerDialog(Window frame, String title, DataViewerConfiguration viewer, PowerFlowCase caze) {
+	public DataViewerDialog(Window frame, String title, DataViewerConfiguration viewer, PowerFlowCase caze, boolean canCancel) {
 		super(frame, title, true);
 		this.viewer = viewer;
 		setText(DEFAULT_TEXT);
 		
+		contentPane = Box.createVerticalBox();
 
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
 //		parameterPanel.setShowNetworkParameters(true);
 		parameterPanel.setEditable(true);// default setting
 		parameterPanel.setParameterMaster(new ParameterMasterViewer(caze, viewer, true));
-		Group paramPanel = new Group("Parameters for " + viewer.getDataDefinition().getLabel());
-		addParameters(viewer.getDataDefinition(), parameterPanel, paramPanel);
+		addParameters(viewer.getDataDefinition(), parameterPanel);
 		
-		addButton("Close", true, true);
-		
-		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.add(paramPanel, BorderLayout.CENTER);
+		if(canCancel) {
+			addOKButton();
+			addCancelButton();
+		} else
+			addButton("Close", true, true);
 		
 		setCenterComponent(contentPane);
 	}
 	
-	private void addParameters(AbstractModelElementData element, ModelElementPanel parameterPanel, Group paramPanel) {
+	private void addParameters(AbstractModelElementData element, ModelElementPanel parameterPanel) {
 		if(element.getParent() != null)
-			addParameters(element.getParent(), parameterPanel, paramPanel);
+			addParameters(element.getParent(), parameterPanel);
 		for (NetworkParameter paramDef : element.getParameter()) {
+			if(ModelDBUtils.isInternalViewerParameter(paramDef.getID()))
+				continue;
 			NetworkParameter parameterValue = viewer.getParameter(paramDef.getID(), true);
 			if(parameterValue.getValue() == null) {
 				NetworkParameter modelValue = ModelDBUtils.getParameterValue(element, paramDef.getID());
@@ -55,8 +61,19 @@ public class DataViewerDialog extends BaseDialog {
 					parameterValue.setValue(modelValue.getValue());
 			}
 			parameterValue = viewer.getParameter(paramDef.getID(), true);
-			parameterPanel.addParameter(paramDef, parameterValue, paramPanel);
+			String groupTitle = paramDef.getDisplay() == null ? null : paramDef.getDisplay().getGroup();
+			parameterPanel.addParameter(paramDef, parameterValue, getGroup(groupTitle));
 		}
+	}
+	
+	private Group getGroup(String name) {
+		Group group = groups.get(name);
+		if(group == null) {
+			group = new Group(name);
+			groups.put(name, group);
+			contentPane.add(group);
+		}
+		return group;
 	}
 	
 	@Override
