@@ -898,7 +898,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 	
 	@Override
 	public JComponent getComponent() {
-		return this;
+		return getViewerController();
 	}
 
 	@Override
@@ -978,7 +978,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 	
 	private void changeZoom() {
 		perfectFit = false;
-		controller.zoomChanged(NetworkViewerController.ZOOM_CUSTOM);
+		getViewerConfiguration().setParameter("ZOOM", 1);
 	}
 	
 	public void setRespectAspectRation(boolean flag) {

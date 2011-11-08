@@ -88,7 +88,7 @@ public class NetworkOverviewPane extends JPanel {
 		createEmptyNetworkAction = new HyperLinkAction("Create empty network") {
 			@Override
 			protected void actionPerformed() {
-				Network network = new Network();
+				Network network = new Network(getPowerFlowCase().getCaseID());
 				getPowerFlowCase().addNetwork(network);
 				refreshTree();
 				selectNetwork(network);
@@ -322,44 +322,82 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	private void executeScript(ModelData script) {
-		Network network = getSelectedNetwork();
-		if(network == null) {
-			if(ModelDBUtils.isNetworkCreatingScript(script)) {
-				network = new Network();
+		Network network = null;
+		if(ModelDBUtils.isNetworkCreatingScript(script)) {
+			if(selectedNetworks.isEmpty()) {
+				network = new Network(getPowerFlowCase().getCaseID());
 				getPowerFlowCase().addNetwork(network);
 				refreshTree();
 				selectNetwork(network);
+			} else if(selectedNetworks.size() == 1) {
+				network = selectedNetworks.get(0);
+				int action = JOptionPane.showOptionDialog(this, 
+						"<html>This script will create a new network but the selected " +
+						"network is not empty.<br>Do you want to overwrite " +
+						"the selected network or create a new network instead?", "Question", 
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
+						null, new String[] {
+								"Overwrite network", "Create new network", "Cancel"
+						}, null);
+				if(action == JOptionPane.YES_OPTION) {
+					network.removeAllElements();
+					network.getParameterList().clear();
+					network.fireNetworkChanged();
+				} else if(action == JOptionPane.NO_OPTION) {
+					network = new Network();
+					getPowerFlowCase().addNetwork(network);
+					refreshTree();
+					selectNetwork(network);
+				} else if(action == JOptionPane.CANCEL_OPTION)
+					return;
 			} else
 				return;
-		} else if(network.isEmpty() == false && ModelDBUtils.isNetworkCreatingScript(script)) {
-			int action = JOptionPane.showOptionDialog(this, 
-					"<html>This script will create a new network but the selected " +
-					"network is not empty.<br>Do you want to overwrite " +
-					"the selected network or create a new network instead?", "Question", 
-					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
-					null, new String[] {
-							"Overwrite network", "Create new network", "Cancel"
-					}, null);
-			if(action == JOptionPane.YES_OPTION) {
-				network.removeAllElements();
-				network.getParameterList().clear();
-				network.fireNetworkChanged();
-			} else if(action == JOptionPane.NO_OPTION) {
-				network = new Network();
-				getPowerFlowCase().addNetwork(network);
-				refreshTree();
-				selectNetwork(network);
-			} else if(action == JOptionPane.CANCEL_OPTION)
-				return;
 		}
-		if(network == null)
-			return;
-		PowerFlowAnalyzer.getInstance().executeScript(network, script);
+		PowerFlowAnalyzer.getInstance().executeScript(selectedNetworks.toArray(new Network[selectedNetworks.size()]), script);
+
+//		Network network = getSelectedNetwork();
+//		selectedNetworks
+//		if(network == null) {
+//			if(ModelDBUtils.isNetworkCreatingScript(script)) {
+//				network = new Network(getPowerFlowCase().getCaseID());
+//				getPowerFlowCase().addNetwork(network);
+//				refreshTree();
+//				selectNetwork(network);
+//			} else
+//				return;
+//		} else if(network.isEmpty() == false && ModelDBUtils.isNetworkCreatingScript(script)) {
+//			int action = JOptionPane.showOptionDialog(this, 
+//					"<html>This script will create a new network but the selected " +
+//					"network is not empty.<br>Do you want to overwrite " +
+//					"the selected network or create a new network instead?", "Question", 
+//					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
+//					null, new String[] {
+//							"Overwrite network", "Create new network", "Cancel"
+//					}, null);
+//			if(action == JOptionPane.YES_OPTION) {
+//				network.removeAllElements();
+//				network.getParameterList().clear();
+//				network.fireNetworkChanged();
+//			} else if(action == JOptionPane.NO_OPTION) {
+//				network = new Network();
+//				getPowerFlowCase().addNetwork(network);
+//				refreshTree();
+//				selectNetwork(network);
+//			} else if(action == JOptionPane.CANCEL_OPTION)
+//				return;
+//		}
+//		if(network == null)
+//			return;
+//		PowerFlowAnalyzer.getInstance().executeScript(network, script);
 	}
 	
 	void refreshTree() {
 		treeModel.refreshModel();
 		networkTree.revalidate();
+	}
+	
+	void repaintTree() {
+		networkTree.repaint();
 	}
 	
 	class NetworkTreeModel implements TreeModel {

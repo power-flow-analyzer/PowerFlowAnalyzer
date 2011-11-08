@@ -19,6 +19,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private ModelDB modelDB;
 	private NetworkContainer viewer;
 	private long maxNetworkID = 0;
+	private long caseID = -1;
 	
 	public PowerFlowCase(ModelDB modelDB) {
 		pfCase = new CaseData();
@@ -141,7 +142,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private Network addNetworkInternal(NetworkData netData) {
 		return addNetworkInternal(new Network(netData), false);
 	}
-	
+
 	private Network addNetworkInternal(Network network, boolean isScenario) {
 		network.setPowerFlowCase(this);
 		if(isScenario == false)
@@ -156,7 +157,19 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		} else
 			maxNetworkID = Math.max(maxNetworkID, network.getInternalID());
 		network.updateModels();
+		network.setCaseID(getCaseID());
 		return network;
+	}
+	
+	public long getCaseID() {
+		return caseID;
+	}
+
+	public void setCaseID(long caseID) {
+		this.caseID = caseID;
+		for (NetworkData netData : pfCase.getNetwork()) {
+			netData.setCaseID(caseID);
+		}
 	}
 	
 	public Network addNetwork(Network network) {
@@ -240,6 +253,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 //		System.out.println("  old: " + event.getOldValue());
 //		System.out.println("  new: " + event.getNewValue());
 		for (Network network : getNetworks(true)) {
+			network.updateModels();
 			network.fireNetworkChanged();
 		}
 	}

@@ -205,6 +205,10 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		overviewPane.updateScriptActions();
 	}
 	
+	public void repaintNetworkTree() {
+		overviewPane.repaintTree();
+	}
+	
 	void updateTabTitles() {
 //		for (int i = 0; i < getViewerCount(); i++) {
 //			Network n = getViewer(i).getNetwork();

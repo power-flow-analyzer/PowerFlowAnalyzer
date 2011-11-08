@@ -44,6 +44,11 @@ public class Network extends ParameterSupport {
 		networkData = new NetworkData();	
 	}
 	
+	public Network(long caseID) {
+		networkData = new NetworkData();	
+		setCaseID(caseID);
+	}
+	
 	public Network(NetworkData networkData) {
 		this.networkData = networkData;
 		updateNetworkData();
@@ -88,6 +93,14 @@ public class Network extends ParameterSupport {
 	
 	public void setInternalID(long id) {
 		getData().setInternalID(id);
+	}
+	
+	public long getCaseID() {
+		return getData().getCaseID();
+	}
+	
+	public void setCaseID(long id) {
+		getData().setCaseID(id);
 	}
 	
 	void addScenario(Network scenario) {

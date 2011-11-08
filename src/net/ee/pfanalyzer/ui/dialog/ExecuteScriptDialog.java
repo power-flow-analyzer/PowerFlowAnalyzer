@@ -15,18 +15,21 @@ import net.ee.pfanalyzer.ui.util.Group;
 
 public class ExecuteScriptDialog extends BaseDialog {
 
-	private final static String DEFAULT_TEXT = "Select the desired script parameters and press OK.";
-	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.";
+	private final static String DEFAULT_TEXT = "<html>Select the desired script parameters and press OK.";
+	private final static String TEXT_MULTI = "<br>These parameters will be applied to all selected networks.";
+	private final static String ERROR_TEXT = "<br><font color=\"red\">All values must be filled in to proceed.";
 	
 	private Network network;
 	private ModelData script;
 	private boolean showDialog = true;
+	private String text;
 	
-	public ExecuteScriptDialog(Frame frame, Network network, ModelData script) {
+	public ExecuteScriptDialog(Frame frame, Network network, ModelData script, boolean multipleNetworks) {
 		super(frame, "Script parameters", true);
 		this.network = network;
 		this.script = script;
-		setText(DEFAULT_TEXT);
+		text = DEFAULT_TEXT + (multipleNetworks ? TEXT_MULTI : "");
+		setText(text);
 		JPanel contentPane = new JPanel(new BorderLayout());
 		
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
@@ -70,11 +73,13 @@ public class ExecuteScriptDialog extends BaseDialog {
 		for (NetworkParameter parameter : script.getParameter()) {
 			NetworkParameter value = network.getParameterValue(parameter.getID());
 			if(value == null || value.getValue() == null) {
-				setText(ERROR_TEXT);
+				setText(text + ERROR_TEXT);
+				pack();
 				return false;
 			}
 		}
-		setText(DEFAULT_TEXT);
+		setText(text);
+		pack();
 		return true;
 	}
 }

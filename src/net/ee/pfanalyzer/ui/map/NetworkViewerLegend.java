@@ -11,10 +11,10 @@ import javax.swing.JComponent;
 
 public class NetworkViewerLegend extends JComponent {
 
-	private final static int branchLength = 50;
+	private final static int branchLength = 30;
 	private final static int X_OFFSET = 10;
 	private final static int Y_OFFSET = 5;
-	private final static int X_MARGIN = 30;
+	private final static int X_MARGIN = 20;
 	private final static int X_PADDING = 5;
 	
 	private NetworkViewer viewer;

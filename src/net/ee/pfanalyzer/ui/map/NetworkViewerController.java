@@ -1,14 +1,12 @@
 package net.ee.pfanalyzer.ui.map;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
 
 import javax.swing.JPanel;
 
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.ui.dialog.MapPropertiesDialog;
 
 public class NetworkViewerController extends JPanel implements IDatabaseChangeListener {
 
@@ -33,7 +31,6 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 	
 	private NetworkViewer viewer;
 	private NetworkViewerLegend legend;
-	private MapPropertiesDialog mapPropertiesDialog;
 	
 	public NetworkViewerController(NetworkViewer viewer) {
 		super(new BorderLayout());
@@ -70,19 +67,6 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 		viewer.getViewerConfiguration().removeDatabaseChangeListener(this);
 	}
 	
-	public void showMapPropertiesDialog(Frame frame) {
-		if(mapPropertiesDialog != null) {
-			mapPropertiesDialog.setVisible(true);
-			mapPropertiesDialog.toFront();
-		} else
-			mapPropertiesDialog = new MapPropertiesDialog(frame, this);
-	}
-	
-	public void zoomChanged(int zoomID) {
-		if(mapPropertiesDialog != null)
-			mapPropertiesDialog.setZoomChoice(zoomID);
-	}
-	
 	private void setViewerProperty(String property, String value) {
 		if(property.equals(PROPERTY_ZOOM_CHOICE)) {
 			if(value == null)
@@ -91,8 +75,7 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 			if(intvalue == 2)
 				viewer.setView(ZOOM_GERMANY_COORDINATES);
 			viewer.setPerfectFit(intvalue == 0);
-		}
-		else if(property.equals(PROPERTY_RESPECT_ASPECT_RATIO))
+		} else if(property.equals(PROPERTY_RESPECT_ASPECT_RATIO))
 			viewer.setRespectAspectRation(Boolean.valueOf(value));
 		else if(property.equals(PROPERTY_DRAW_BUSSES))
 			viewer.setDrawBusNodes(Boolean.valueOf(value));
@@ -116,6 +99,7 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 			viewer.setAllowDragging(Boolean.valueOf(value));
 		else if(property.equals(PROPERTY_SHOW_TOOLTIPS))
 			viewer.setShowTooltips(Boolean.valueOf(value));
+		legend.repaint();
 	}
 
 	@Override

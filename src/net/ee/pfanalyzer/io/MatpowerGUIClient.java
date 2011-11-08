@@ -48,6 +48,10 @@ public class MatpowerGUIClient implements IConnectionConstants {
 		sendData(dataMap);
 	}
 	
+	public void setProgress(double caseID, String text, int progress) {
+		// send request to server
+		sendRequest(POWER_FLOW_CANCELED_CONNECTION);
+	}
 	
 	public void cancelPowerFlow() {
 		// send request to server
