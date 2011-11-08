@@ -14,6 +14,7 @@
             <element name="element" type="mpui:AbstractNetworkElementData" minOccurs="0" maxOccurs="unbounded"/>
             <element name="scenario" type="mpui:NetworkData" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
+        <attribute name="caseID" type="long" default="-1"/>
         <attribute name="internalID" type="long" default="-1"/>
         <attribute name="description" type="string"/>
         <attribute name="name" type="string"/>
