@@ -54,6 +54,12 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		this.caseFile = caseFile;
 	}
 	
+	public File getAbsolutePath(String relativePath) {
+		if(getCaseFile() == null)
+			return null;
+		return new File(getCaseFile().getParentFile(), relativePath);
+	}
+	
 	public ModelDB getModelDB() {
 		return modelDB;
 	}
