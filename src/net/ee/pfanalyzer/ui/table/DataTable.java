@@ -28,6 +28,8 @@ import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
 public class DataTable extends JTable implements INetworkDataViewer {
 
+	public final static String VIEWER_ID = "viewer.table.type_filter";
+	
 	private DataViewerConfiguration viewerConfiguration;
 	private Network network;
 	private DataTableModel model;
