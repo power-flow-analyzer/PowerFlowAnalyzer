@@ -33,6 +33,10 @@ public class ParameterCheckBox extends ParameterValuePanel implements ActionList
 	protected void createValuePanel() {
 		checkBox = new JCheckBox();
 	}
+	
+	public JCheckBox getCheckBox() {
+		return checkBox;
+	}
 
 	@Override
 	protected JComponent getValuePanel() {
