@@ -24,11 +24,12 @@ public class ModelDB {
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";
 	public final static String ROOT_CONFIGURATION_CLASS = "conf";
+	public final static String ROOT_OUTLINE_CLASS = "outline";
 	
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
-	private ModelClassData networkClass, scriptClass, configurationClass;
+	private ModelClassData networkClass, scriptClass, configurationClass, outlineClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	
@@ -58,6 +59,8 @@ public class ModelDB {
 				scriptClass = clazz;
 			else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
 				configurationClass = clazz;
+			else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
+				outlineClass = clazz;
 		}
 		if(networkClass != null)
 			addModelsRecursive(networkClass);
@@ -109,6 +112,10 @@ public class ModelDB {
 	
 	public ModelClassData getScriptClass() {
 		return scriptClass;
+	}
+	
+	public ModelClassData getOutlineClass() {
+		return outlineClass;
 	}
 	
 	public ModelClassData getConfigurationClass() {
