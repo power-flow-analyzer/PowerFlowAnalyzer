@@ -5,13 +5,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Box;
+import javax.swing.JTabbedPane;
 
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
+import net.ee.pfanalyzer.model.data.ModelClassData;
+import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
+import net.ee.pfanalyzer.ui.map.NetworkViewer;
 import net.ee.pfanalyzer.ui.model.ModelElementPanel;
+import net.ee.pfanalyzer.ui.parameter.ParameterCheckBox;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterViewer;
 import net.ee.pfanalyzer.ui.util.Group;
 
@@ -24,20 +29,24 @@ public class DataViewerDialog extends BaseDialog {
 	
 	private DataViewerConfiguration viewer;
 	private Map<String, Group> groups = new HashMap<String, Group>();
-	private Box contentPane;
+	private Map<String, Box> tabs = new HashMap<String, Box>();
+	private JTabbedPane tabbedPane;
 
 	public DataViewerDialog(Window frame, String title, DataViewerConfiguration viewer, PowerFlowCase caze, boolean canCancel) {
 		super(frame, title, true);
 		this.viewer = viewer;
 		setText(DEFAULT_TEXT);
 		
-		contentPane = Box.createVerticalBox();
+		tabbedPane = new JTabbedPane();
 
 		ModelElementPanel parameterPanel = new ModelElementPanel(null);
 //		parameterPanel.setShowNetworkParameters(true);
 		parameterPanel.setEditable(true);// default setting
 		parameterPanel.setParameterMaster(new ParameterMasterViewer(caze, viewer, true));
 		addParameters(viewer.getDataDefinition(), parameterPanel);
+		if(viewer.getModelID().startsWith(NetworkViewer.BASE_NETWORK_VIEWER_ID)) {
+			addOutlineParameters(caze.getModelDB().getOutlineClass(), parameterPanel);
+		}
 		
 		if(canCancel) {
 			addOKButton();
@@ -45,7 +54,7 @@ public class DataViewerDialog extends BaseDialog {
 		} else
 			addButton("Close", true, true);
 		
-		setCenterComponent(contentPane);
+		setCenterComponent(tabbedPane);
 	}
 	
 	private void addParameters(AbstractModelElementData element, ModelElementPanel parameterPanel) {
@@ -62,18 +71,48 @@ public class DataViewerDialog extends BaseDialog {
 			}
 			parameterValue = viewer.getParameter(paramDef.getID(), true);
 			String groupTitle = paramDef.getDisplay() == null ? null : paramDef.getDisplay().getGroup();
-			parameterPanel.addParameter(paramDef, parameterValue, getGroup(groupTitle));
+			String sectionTitle = paramDef.getDisplay() == null ? null : paramDef.getDisplay().getSection();
+			parameterPanel.addParameter(paramDef, parameterValue, getGroup(groupTitle, sectionTitle));
 		}
 	}
 	
-	private Group getGroup(String name) {
+	private void addOutlineParameters(ModelClassData outlines, ModelElementPanel parameterPanel) {
+		for (ModelData outline : outlines.getModel()) {
+			String viewerParamName = "OUTLINE." + outline.getID();
+			NetworkParameter enablement = viewer.getParameter(viewerParamName, true);
+			if(enablement.getValue() == null) {
+				NetworkParameter modelValue = ModelDBUtils.getParameterValue(outline, "ENABLED");
+				if(modelValue != null && modelValue.getValue() != null)
+					enablement.setValue(modelValue.getValue());
+				else
+					enablement.setValue("false");
+			}
+			ParameterCheckBox box = new ParameterCheckBox(
+					parameterPanel.getParameterMaster(), enablement, enablement);
+			getGroup("Outlines", "Outlines").add(box);
+			box.getCheckBox().setText(outline.getLabel());
+		}
+	}
+	
+	private Group getGroup(String name, String section) {
 		Group group = groups.get(name);
 		if(group == null) {
 			group = new Group(name);
 			groups.put(name, group);
-			contentPane.add(group);
+			getSection(section).add(group);
 		}
 		return group;
+	}
+	
+	private Box getSection(String name) {
+		Box box = tabs.get(name);
+		if(box == null) {
+			box = Box.createVerticalBox();
+			tabs.put(name, box);
+			String title = name == null || name.isEmpty() ? "Common" : name;
+			tabbedPane.addTab(title, box);
+		}
+		return box;
 	}
 	
 	@Override
