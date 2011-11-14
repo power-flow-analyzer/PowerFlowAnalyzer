@@ -2,6 +2,7 @@ package net.ee.pfanalyzer.ui.map;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -17,6 +18,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,23 +36,31 @@ import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.IInternalParameters;
 import net.ee.pfanalyzer.model.MarkerElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkElement;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.Preferences;
+import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 
-public class NetworkViewer extends JComponent implements INetworkDataViewer {
+public class NetworkViewer extends JComponent implements INetworkDataViewer, IDatabaseChangeListener {
 
-	private final static double OVAL_HALF_HEIGHT = 8;
-	private final static int RECTANGLE_HALF_HEIGHT = 10;
-	private final static int HORIZONTAL_GAP = 20;
-	private final static int VERTICAL_GAP = 20;
+	public final static String BASE_NETWORK_VIEWER_ID = "viewer.network";
+	public final static String VIEWER_ID = BASE_NETWORK_VIEWER_ID + ".map";
+	
+	protected final static double OVAL_HALF_HEIGHT = 8;
+	protected final static int RECTANGLE_HALF_HEIGHT = 10;
+	protected final static int HORIZONTAL_GAP = 20;
+	protected final static int VERTICAL_GAP = 20;
 	
 	private final static double[][] GERMANY = {
 		{54.899671,8.639831}, {53.892362,8.623352}, {53.233331,7.206116}, {51.958823,6.805115}, 
@@ -81,9 +91,10 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 	final static int VOLTAGE_LEVEL_220KV = 1;
 	final static int VOLTAGE_LEVEL_110KV = 2;
 	
-	private Stroke[] strokesNormal, strokesBold;
+	protected Stroke[] strokesNormal, strokesBold;
 	private Stroke otherStrokeNormal, otherStrokeBold;
 	private GeneralPath arrow_pos, arrow_neg, networkShape;
+	private List<Integer> voltageLevels;
 	
 	private void createStrokes(float widthNormal, float widthBold) {
 		strokesNormal = new Stroke[] {
@@ -114,26 +125,28 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 	
 	private Network data;
 	private Mercator converter;
-	private Map<Integer, int[]> internalBusCoords = new HashMap<Integer, int[]>();
-	private Map<Integer, int[]> internalMarkerCoords = new HashMap<Integer, int[]>();
+	protected Map<Integer, int[]> internalBusCoords = new HashMap<Integer, int[]>();
+	protected Map<Integer, int[]> internalMarkerCoords = new HashMap<Integer, int[]>();
 	int internalMinX = 0;
 	int internalMaxX = 0;
 	int internalMinY = 0;
 	int internalMaxY = 0;
+	private List<Outline> outlines;
+	private Collection<Outline> lastOutlineList;
 	
-	private boolean respectAspectRatio = true;
-	private boolean perfectFit = true;
-	private boolean drawBusNodes = true;
-	private boolean drawBusNames = true;
-	private boolean drawBranches = true;
-	private boolean drawGenerators = true;
-	private boolean drawOutline = true;
-	private boolean drawPowerDirection = true;
-	private boolean drawMarkers = true;
+	protected boolean respectAspectRatio = true;
+	protected boolean perfectFit = true;
+	protected boolean drawBusNodes = true;
+	protected boolean drawBusNames = true;
+	protected boolean drawBranches = true;
+	protected boolean drawGenerators = true;
+	protected boolean drawOutline = true;
+	protected boolean drawPowerDirection = true;
+	protected boolean drawMarkers = true;
 	
-	private boolean allowZooming = true;
-	private boolean allowDragging = true;
-	private boolean showTooltips = true;
+	protected boolean allowZooming = true;
+	protected boolean allowDragging = true;
+	protected boolean showTooltips = true;
 	
 	private int arrowSize = 10;
 	private int networkMarkerSize = 20;
@@ -143,7 +156,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 	private double minLongitude = NetworkViewerController.ZOOM_GERMANY_COORDINATES[2];
 	private double maxLongitude = NetworkViewerController.ZOOM_GERMANY_COORDINATES[3];
 	
-	private double horizontalScale, verticalScale;
+	protected double horizontalScale, verticalScale;
 	
 	private Object selection, hover;
 	private DataViewerConfiguration viewerConfiguration;
@@ -280,10 +293,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		setFocusable(true);
 		updateArrowSize(arrowSize);
 		updateNetworkShape(networkMarkerSize);
+		getViewerConfiguration().addDatabaseChangeListener(this);
 	}
 	
 	public void dispose() {
 		getViewerController().dispose();
+		getViewerConfiguration().removeDatabaseChangeListener(this);
 	}
 	
 	private double getLatitudeDifference(int y1, int y2) {
@@ -468,18 +483,9 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 					verticalScale = horizontalScale;
 				}
 			}
-			// draw outline
+			// draw outlines
 			if(drawOutline) {
-				g.setColor(Color.GRAY);
-				double lastX = getOutlineX(0, horizontalScale);
-				double lastY = getOutlineY(0, horizontalScale);
-				for (int i = 1; i < GERMANY.length; i++) {
-					double x = getOutlineX(i, horizontalScale);
-					double y = getOutlineY(i, verticalScale);
-					g2d.draw(new Line2D.Double(lastX, lastY, x, y));
-					lastX = x;
-					lastY = y;
-				}
+				drawOutlines(g2d);
 			}
 			// draw markers
 			if(drawMarkers) {
@@ -700,6 +706,60 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		}
 	}
 	
+	private void drawOutlines(Graphics2D g2d) {
+		for (Outline outline : getOutlines()) {
+			Color outlineColor = outline.getBorderColor();
+			Color backgroundColor = outline.getBackgroundColor();
+			int[][] coords = outline.getScreenPoints();
+			if(coords.length == 0)
+				continue;
+			double lastX = getX(coords[0]);
+			double lastY = getY(coords[0]);
+			GeneralPath polygon = new GeneralPath();
+			polygon.moveTo(lastX, lastY);
+			for (int i = 1; i < coords.length; i++) {
+				// check if polygon must be closed
+				if(coords[i][0] == -1 && coords[i][1] == -1) {
+					if(polygon != null) {
+						polygon.closePath();
+						drawOutline(g2d, polygon, outlineColor, backgroundColor);
+						// new polygon will be created next round
+						polygon = null;
+					}
+					continue;
+				}
+				double x = getX(coords[i]);
+				double y = getY(coords[i]);
+				if(polygon == null) {
+					polygon = new GeneralPath();
+					polygon.moveTo(x, y);
+					
+					continue;
+				}
+//				g2d.draw(new Line2D.Double(lastX, lastY, x, y));
+//				lastX = x;
+//				lastY = y;
+				polygon.lineTo(x, y);
+			}
+			if(polygon != null) {
+				polygon.closePath();
+				drawOutline(g2d, polygon, outlineColor, backgroundColor);
+			}
+		}
+	}
+	
+	private void drawOutline(Graphics2D g2d, GeneralPath polygon, Color outlineColor, Color backgroundColor) {
+		if(backgroundColor != null) {
+			g2d.setColor(backgroundColor);
+			g2d.fill(polygon);
+		}
+		if(outlineColor != null)
+			g2d.setColor(outlineColor);
+		else
+			g2d.setColor(Color.LIGHT_GRAY);
+		g2d.draw(polygon);
+	}
+	
 	private void updateArrowSize(int size) {
 		arrow_pos = new GeneralPath();
 		arrow_pos.moveTo(-size / 2, -size / 2);
@@ -759,12 +819,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		return networkShape.createTransformedShape(transformation);
 	}
 	
-	private int[] getBusXY(int i, double horizontalScale, double verticalScale) {
+	protected int[] getBusXY(int i, double horizontalScale, double verticalScale) {
 		double[] coords = getBusXYDouble(i, horizontalScale, verticalScale);
 		return new int[] { (int) coords[0], (int) coords[1] };
 	}
 	
-	private double[] getBusXYDouble(int i, double horizontalScale, double verticalScale) {
+	protected double[] getBusXYDouble(int i, double horizontalScale, double verticalScale) {
 		int[] coords = internalBusCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
@@ -775,7 +835,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		return new double[] { x, y };
 	}
 	
-	private double[] getMarkerXYDouble(int i, double horizontalScale, double verticalScale) {
+	protected double[] getMarkerXYDouble(int i, double horizontalScale, double verticalScale) {
 		int[] coords = internalMarkerCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
@@ -786,23 +846,29 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		return new double[] { x, y };
 	}
 	
-	private double getOutlineX(int i, double horizontalScale) {
+	protected double getOutlineX(int i, double horizontalScale) {
 		return ((internalGermany[i][0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
 	}
 	
-	private double getOutlineY(int i, double verticalScale) {
+	protected double getOutlineY(int i, double verticalScale) {
 		return getHeight() - ((internalGermany[i][1] - internalMinY) * verticalScale) - VERTICAL_GAP;
 	}
 	
-	private boolean isHovered(Object object) {
+	protected double getX(int[] coords) {
+		return ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
+	}
+	
+	protected double getY(int[] coords) {
+		return getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
+	}
+	
+	protected boolean isHovered(Object object) {
 		return hover != null && hover == object;
 	}
 	
-	private boolean isSelection(Object object) {
+	protected boolean isSelection(Object object) {
 		return selection != null && selection == object;
 	}
-	
-	private List<Integer> voltageLevels;
 	
 	List<Integer> getVoltageLevels() {
 		if(voltageLevels == null)
@@ -873,7 +939,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		return super.getToolTipLocation(event);
     }
 	
-	private Stroke getBranchStroke(Branch branch, boolean bold) {
+	protected Stroke getBranchStroke(Branch branch, boolean bold) {
 		return getBranchStroke(getBaseVoltage(branch), bold);
 	}
 	
@@ -961,6 +1027,56 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer {
 		initializeInternalCoordinates();
 		updateVoltageLevels();
 		repaint();
+	}
+
+	@Override
+	public void elementChanged(DatabaseChangeEvent event) {
+		if(event.getParameterID().startsWith("OUTLINE.")) {
+			updateOutlines();
+			repaint();
+		}
+	}
+
+	@Override
+	public void parameterChanged(DatabaseChangeEvent event) {
+		if(event.getParameterID().startsWith("OUTLINE.")) {
+			updateOutlines();
+			repaint();
+		}
+	}
+	
+	private void updateOutlines() {
+//		System.out.println("updateOutlines");
+		outlines = new ArrayList<Outline>();
+		NetworkContainer container = getNetworkContainer(this);
+		lastOutlineList = container.getOutlines();
+		for (Outline outline : lastOutlineList) {
+			String paramID = "OUTLINE." + outline.getOutlineID();
+			NetworkParameter param = getViewerConfiguration().getParameterValue(paramID);
+			if(param == null)
+				param = ModelDBUtils.getParameterValue(outline.getOutlineData(), "ENABLED");
+			boolean defaultEnabled = param == null ? false : Boolean.parseBoolean(param.getValue());
+			if(getViewerConfiguration().getBooleanParameter(paramID, defaultEnabled))
+				outlines.add(outline);
+		}
+//		repaint();
+	}
+	
+	private NetworkContainer getNetworkContainer(Component c) {
+		if(c instanceof NetworkContainer)
+			return (NetworkContainer) c;
+		if(c.getParent() != null)
+			return getNetworkContainer(c.getParent());
+		return null;
+	}
+	
+	private List<Outline> getOutlines() {
+		if(outlines == null)
+			updateOutlines();
+		NetworkContainer container = getNetworkContainer(this);
+		if(container != null && container.getOutlines() != lastOutlineList)
+			updateOutlines();
+		return outlines;
 	}
 
 	public void setView(double[] coordinates) {
