@@ -18,6 +18,7 @@ public class DatabaseChangeEvent {
 	}
 
 	public DatabaseChangeEvent(int type, AbstractModelElementData elementData) {
+		this.type = type;
 		this.elementData = elementData;
 		this.parameterID = ModelDBUtils.getFullElementID(elementData);
 	}
