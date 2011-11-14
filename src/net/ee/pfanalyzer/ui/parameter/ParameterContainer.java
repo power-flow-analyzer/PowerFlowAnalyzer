@@ -55,6 +55,10 @@ public class ParameterContainer extends JPanel {
 	public void setParameterMaster(IParameterMasterElement parameterMaster) {
 		this.parameterMaster = parameterMaster;
 	}
+	
+	public IParameterMasterElement getParameterMaster() {
+		return parameterMaster;
+	}
 
 	public void addParameters(AbstractModelElementData element, AbstractModelElementData master, JComponent parent) {
 		if(element.getParent() != null)
@@ -110,6 +114,9 @@ public class ParameterContainer extends JPanel {
 							|| NetworkParameterValueRestriction.MODEL_ID.equals(propertyDefinition.getRestriction()))) {
 				ParameterModelIDField box = new ParameterModelIDField(
 						(ParameterMasterViewer) parameterMaster, propertyDefinition, propertyValue);
+				panel.add(box);
+			} else if(NetworkParameterValueRestriction.COLOR_RGB.equals(propertyDefinition.getRestriction())) {
+				ParameterColorField box = new ParameterColorField(parameterMaster, propertyDefinition, propertyValue);
 				panel.add(box);
 			} else {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
