@@ -23,48 +23,48 @@
                 </parameter>
                 <modelClass ID="network" label="Network">
                     <parameter ID="POSITION" value="left"/>
-                    <model ID="map" label="Network Map" description=" Creates a new map displaying the network.">
-                        <parameter ID="ZOOM" type="integer" label="Zoom" restriction="list" value="0" empty="false">
-                            <option value="0" label="Best fit" ID="BEST_FIT"/>
-                            <option value="1" label="Custom" ID="CUSTOM"/>
-                            <option value="2" label="Germany" ID="GERMANY"/>
-                            <display group="View"/>
-                        </parameter>
-                        <parameter ID="SHOW_LEGEND" type="boolean" label="Show Legend" value="true">
-                            <display group="View"/>
-                        </parameter>
-                        <parameter ID="KEEP_ASPECT_RATIO" type="boolean" label="Keep Aspect Ratio" value="true">
-                            <display group="View"/>
-                        </parameter>
-                        <parameter ID="DRAW_BUSSES" type="boolean" label="Draw Bus Nodes" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="DRAW_BRANCHES" type="boolean" label="Draw Branches" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="DRAW_POWER_FLOW_DIRECTION" type="boolean" label="Draw Power Flow Direction" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="DRAW_GENERATORS" type="boolean" label="Draw Generators" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="DRAW_OUTLINE" type="boolean" label="Draw Outline" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="ALLOW_ZOOMING" type="boolean" label="Allow zooming" value="true">
-                            <display group="Interaction"/>
-                        </parameter>
-                        <parameter ID="ALLOW_DRAGGING" type="boolean" label="Allow dragging" value="true">
-                            <display group="Interaction"/>
-                        </parameter>
-                        <parameter ID="SHOW_TOOLTIPS" type="boolean" label="Show Tooltips" value="true">
-                            <display group="Interaction"/>
-                        </parameter>
-                        <parameter ID="DRAW_BUS_NAMES" type="boolean" label="Draw bus names" value="true">
-                            <display group="Draw"/>
-                        </parameter>
-                        <parameter ID="ICON" value="map.png"/>
-                    </model>
+                    <parameter ID="ZOOM" type="integer" label="Zoom" restriction="list" value="0" empty="false">
+                        <option value="0" label="Best fit" ID="BEST_FIT"/>
+                        <option value="1" label="Custom" ID="CUSTOM"/>
+                        <option value="2" label="Germany" ID="GERMANY"/>
+                        <display group="View"/>
+                    </parameter>
+                    <parameter ID="SHOW_LEGEND" type="boolean" label="Show Legend" value="true">
+                        <display group="View"/>
+                    </parameter>
+                    <parameter ID="KEEP_ASPECT_RATIO" type="boolean" label="Keep Aspect Ratio" value="true">
+                        <display group="View"/>
+                    </parameter>
+                    <parameter ID="DRAW_BUSSES" type="boolean" label="Draw Bus Nodes" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="DRAW_BRANCHES" type="boolean" label="Draw Branches" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="DRAW_POWER_FLOW_DIRECTION" type="boolean" label="Draw Power Flow Direction" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="DRAW_GENERATORS" type="boolean" label="Draw Generators" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="DRAW_OUTLINE" type="boolean" label="Draw Outline" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="ALLOW_ZOOMING" type="boolean" label="Allow zooming" value="true">
+                        <display group="Interaction"/>
+                    </parameter>
+                    <parameter ID="ALLOW_DRAGGING" type="boolean" label="Allow dragging" value="true">
+                        <display group="Interaction"/>
+                    </parameter>
+                    <parameter ID="SHOW_TOOLTIPS" type="boolean" label="Show Tooltips" value="true">
+                        <display group="Interaction"/>
+                    </parameter>
+                    <parameter ID="DRAW_BUS_NAMES" type="boolean" label="Draw bus names" value="true">
+                        <display group="Draw"/>
+                    </parameter>
+                    <parameter ID="ICON" value="map.png"/>
+                    <model ID="busbar" label="Busbar View" description="Experimental!"/>
+                    <model ID="map" label="Network Map" description=" Creates a new map displaying the network."/>
                 </modelClass>
                 <modelClass ID="table" label="Table">
                     <parameter ID="POSITION" value="bottom"/>
