@@ -183,6 +183,10 @@ public class ModelDBUtils {
 				|| CHANGE_PATH_PARAMETER.equals(parameterName);
 	}
 	
+	public static boolean isOutlineClass(AbstractModelElementData element) {
+		return ModelDB.ROOT_OUTLINE_CLASS.equals(getRootClass(element).getID());
+	}
+	
 	public static boolean isInternalViewerParameter(String parameterName) {
 		return ICON_PARAMETER.equals(parameterName) 
 		|| WIDTH_PARAMETER.equals(parameterName)
