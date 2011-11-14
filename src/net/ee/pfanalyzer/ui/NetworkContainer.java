@@ -2,18 +2,28 @@ package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import net.ee.pfanalyzer.math.coordinate.ICoordinateConverter;
+import net.ee.pfanalyzer.math.coordinate.Mercator;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
+import net.ee.pfanalyzer.model.data.AbstractModelElementData;
+import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
+import net.ee.pfanalyzer.ui.map.Outline;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -27,6 +37,9 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	
 	private ModelDBDialog modelDBDialog;
 	private NetworkOverviewPane overviewPane;
+	
+	private Map<String, Outline> outlinesMap = new HashMap<String, Outline>();
+	private Collection<Outline> cachedOutlines;
 
 	public NetworkContainer(PowerFlowCase caze) {
 		super(new BorderLayout());
@@ -70,6 +83,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
+		updateOutlines(null, false);
 	}
 	
 	int getNetworkTabIndex(Network network) {
@@ -240,17 +254,66 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	@Override
 	public void elementChanged(DatabaseChangeEvent event) {
 		updateScriptsFromDB(event);
+		updateOutlinesFromDB(event);
 	}
 	
 	@Override
 	public void parameterChanged(DatabaseChangeEvent event) {
 		updateScriptsFromDB(event);
+		updateOutlinesFromDB(event);
 	}
 	
 	private void updateScriptsFromDB(DatabaseChangeEvent event) {
 		// update scripts from DB
 		if(event.getElementData() != null && ModelDBUtils.isScriptClass(event.getElementData()))
 			overviewPane.updateScriptActions();
+	}
+	
+	private void updateOutlinesFromDB(DatabaseChangeEvent event) {
+		// update outlines from DB
+		if(event.getElementData() != null && ModelDBUtils.isOutlineClass(event.getElementData()))
+			updateOutlines(event.getElementData(), event.getType() == DatabaseChangeEvent.REMOVED);
+	}
+	
+	private void updateOutlines(AbstractModelElementData changedElement, boolean deleted) {
+//		System.out.println("deleted: " + deleted);
+//		System.out.println("changedElement: " + changedElement);
+//		outlines.clear();
+		String changedID = changedElement == null ? null : changedElement.getID();
+//		System.out.println("changedID: " + changedID);
+		if(deleted && changedID != null && getOutline(changedID) != null) {
+			outlinesMap.remove(changedID);
+//			System.out.println("remove outline " + changedID);
+		}
+		ICoordinateConverter converter = new Mercator();
+		for (final ModelData outlineData : getPowerFlowCase().getModelDB().getOutlineClass().getModel()) {
+			Outline oldOutline = getOutline(outlineData.getID());
+			if(oldOutline != null && oldOutline.getOutlineID().equals(changedID) == false)
+				continue;
+//			System.out.println("reload outline " + outlineData.getID());
+			outlinesMap.remove(outlineData.getID());
+			NetworkParameter fileParam = ModelDBUtils.getParameterValue(outlineData, "CSV_DATA_FILE");
+			if(fileParam == null || fileParam.getValue() == null)
+				continue;
+			File csvDataFile = getPowerFlowCase().getAbsolutePath(fileParam.getValue());
+			if(csvDataFile.exists() == false || csvDataFile.isDirectory())
+				continue;
+			Outline outline = new Outline(converter, outlineData, csvDataFile);
+			outlinesMap.put(outlineData.getID(), outline);
+		}
+		cachedOutlines = null;
+		if(getCurrentViewer() != null)
+			getCurrentViewer().repaint();
+	}
+	
+	public Outline getOutline(String name) {
+		return outlinesMap.get(name);
+	}
+	
+	public Collection<Outline> getOutlines() {
+		if(cachedOutlines == null)
+			cachedOutlines = new ArrayList<Outline>(outlinesMap.values());
+		return cachedOutlines;
 	}
 
 	public void dispose() {
