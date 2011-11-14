@@ -29,6 +29,7 @@ import net.ee.pfanalyzer.ui.dataviewer.DataViewerDialog;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.dataviewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.diagram.PowerFlowDiagram;
+import net.ee.pfanalyzer.ui.map.BusBarViewer;
 import net.ee.pfanalyzer.ui.map.NetworkViewer;
 import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.table.DataTable;
@@ -116,12 +117,14 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	
 	private void addDataViewer(DataViewerConfiguration viewerData, boolean selectTab) {
 		INetworkDataViewer viewer = null;
-		if("viewer.table.type_filter".equals(viewerData.getModelID()))
+		if(DataTable.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new DataTable(viewerData);
 //		else if("viewer.diagram.bar".equals(viewerData.getModelID()))
 //			viewer = new PowerFlowDiagram(viewerData);
-		else if("viewer.network.map".equals(viewerData.getModelID()))
+		else if(NetworkViewer.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new NetworkViewer(getNetwork(), viewerData);
+		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
+			viewer = new BusBarViewer(getNetwork(), viewerData);
 		if(viewer == null)
 			return;
 		viewer.setData(getNetwork());
