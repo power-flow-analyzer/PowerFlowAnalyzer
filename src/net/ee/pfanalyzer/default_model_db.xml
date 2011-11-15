@@ -288,5 +288,19 @@
                 <parameter ID="CHANGE_PATH" value="false"/>
             </model>
         </modelClass>
+        <modelClass ID="outline" label="Outlines">
+            <parameter ID="CSV_DATA_FILE" type="text" label="CSV Data file" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="ENABLED" type="boolean" label="Enabled" value="true">
+                <display/>
+            </parameter>
+            <parameter ID="BORDER_COLOR" type="text" label="Border color" restriction="color (RGB)" value="192,192,192" empty="false">
+                <display/>
+            </parameter>
+            <parameter ID="BACKGROUND_COLOR" type="text" label="Background color" restriction="color (RGB)" empty="true">
+                <display/>
+            </parameter>
+        </modelClass>
     </model-db>
 </power_flow_case>
