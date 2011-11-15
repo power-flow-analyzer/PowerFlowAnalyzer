@@ -21,6 +21,7 @@ public class Outline {
 //	private double[][] points;
 	private int[][] screenPoints;
 	private ICoordinateConverter converter;
+	private Color borderColor, backgroundColor;
 	
 	public Outline(ICoordinateConverter converter, ModelData outlineData, File dataFile) {
 		this.converter = converter;
@@ -37,17 +38,23 @@ public class Outline {
 	}
 	
 	public Color getBorderColor() {
-		NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BORDER_COLOR");
-		if(param == null || param.getValue() == null)
-			return null;
-		return parseColor(param.getValue());
+		if(borderColor == null) {
+			NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BORDER_COLOR");
+			if(param == null || param.getValue() == null)
+				return null;
+			borderColor = parseColor(param.getValue());
+		}
+		return borderColor;
 	}
 	
 	public Color getBackgroundColor() {
-		NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BACKGROUND_COLOR");
-		if(param == null || param.getValue() == null)
-			return null;
-		return parseColor(param.getValue());
+		if(backgroundColor == null) {
+			NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BACKGROUND_COLOR");
+			if(param == null || param.getValue() == null)
+				return null;
+			backgroundColor = parseColor(param.getValue());
+		}
+		return backgroundColor;
 	}
 	
 	public static Color parseColor(String text) {
