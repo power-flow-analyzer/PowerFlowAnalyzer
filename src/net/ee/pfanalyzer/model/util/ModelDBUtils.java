@@ -1,8 +1,11 @@
 package net.ee.pfanalyzer.model.util;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.ModelDB;
+import net.ee.pfanalyzer.model.ParameterException;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.ModelData;
@@ -10,6 +13,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
 
 public class ModelDBUtils {
 
@@ -131,7 +135,28 @@ public class ModelDBUtils {
 		return null;
 	}
 	
+	public static String getParameterDisplayValue(AbstractNetworkElement element, String parameterID) {
+		return getParameterValue(element, parameterID, true, null, "label", false, false);
+	}
+	
+	public static String getParameterValue(AbstractNetworkElement element, String parameterID,
+			boolean roundedValues, String decimalSeparator, String exportListValues, 
+			boolean removePercentageSymbol, boolean convertBooleanValues) {
+		NetworkParameter param = element.getParameterDefinition(parameterID);
+		if(param != null) {
+			return getParameterValue(element, param, roundedValues, decimalSeparator, exportListValues, 
+					removePercentageSymbol, convertBooleanValues);
+		}
+		return element.getTextParameter(parameterID);
+	}
+	
 	public static String getParameterDisplayValue(ParameterSupport support, NetworkParameter paramDef) {
+		return getParameterValue(support, paramDef, true, null, "label", false, false);
+	}
+	
+	public static String getParameterValue(ParameterSupport support, NetworkParameter paramDef, 
+			boolean roundedValues, String decimalSeparator, String exportListValues, 
+			boolean removePercentageSymbol, boolean convertBooleanValues) {
 		if(support == null)
 			return "";
 		String parameterID = paramDef.getID();
@@ -144,8 +169,14 @@ public class ModelDBUtils {
 					value = result.toString();
 			}
 			for (NetworkParameterValueOption option: paramDef.getOption()) {
-				if(option.getValue().equals(value))
-					return option.getLabel() + " (" + option.getValue() + ")";
+				if(option.getValue().equals(value)) {
+					if("value".equals(exportListValues))
+						return option.getValue();
+					else if("label".equals(exportListValues))
+						return option.getLabel();
+					else if("id".equals(exportListValues))
+						return option.getID();
+				}
 			}
 		}
 		if(type != null) {
@@ -153,20 +184,91 @@ public class ModelDBUtils {
 				Integer result = support.getIntParameter(parameterID);
 				if(result != null)
 					return result.toString();
-				return "";
+				else
+					return "";
 			} else if(type.equals(NetworkParameterType.DOUBLE)) {
 				Double dvalue = support.getDoubleParameter(parameterID);
-				if(dvalue != null && paramDef.getDisplay() != null) {
+				// round and replace decimal separator
+				if(dvalue != null && roundedValues && paramDef.getDisplay() != null) {
 					String pattern = paramDef.getDisplay().getDecimalFormatPattern();
-					DecimalFormat format = new DecimalFormat(pattern);
+					if(removePercentageSymbol)
+						pattern = pattern.replace("%", "");
+					DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+					if(decimalSeparator != null)
+						symbols.setDecimalSeparator(decimalSeparator.trim().charAt(0));
+					DecimalFormat format = new DecimalFormat(pattern, symbols);
 					return format.format(dvalue);
 				}
-				if(dvalue != null)
-					return dvalue.toString();
-				return "";
+				// replace decimal separator in exact values
+				if(dvalue != null) {
+					String value = dvalue.toString();
+					if(decimalSeparator == null || decimalSeparator.length() == 0)
+						value = value.replace('.', SwingUtils.DEFAULT_DECIMAL_SEPARATOR_CHAR);
+					else if(decimalSeparator.trim().charAt(0) != '.')
+						value = value.replace('.', decimalSeparator.trim().charAt(0));
+					return value;
+				} else
+					return "";
+			} else if(type.equals(NetworkParameterType.BOOLEAN)) {
+				if(convertBooleanValues) {
+					Boolean bvalue = support.getBooleanParameter(parameterID);
+					if(bvalue != null)
+						return bvalue.booleanValue() ? "1" : "0";
+					else
+						return "";
+				}
 			}
 		}
 		return support.getTextParameter(parameterID);
+	}
+	
+	public static String setParameterValue(AbstractNetworkElement element, String parameterID, String value, 
+			String decimalSeparator, boolean overwriteWithEmpty) throws ParameterException {
+		if(element == null)
+			return value;
+		if(value != null && value.isEmpty())
+			value = null;
+		NetworkParameter paramDef = element.getParameterDefinition(parameterID);
+		if(paramDef != null && value != null) {
+			NetworkParameterType type = paramDef.getType();
+			if(type != null) {
+				if(type.equals(NetworkParameterType.INTEGER) || type.equals(NetworkParameterType.DOUBLE)) {
+					if(decimalSeparator == null || decimalSeparator.length() == 0)
+						value = value.replace(SwingUtils.DEFAULT_DECIMAL_SEPARATOR_CHAR, '.');
+					else if(decimalSeparator.trim().charAt(0) != '.')
+						value = value.replace(decimalSeparator.trim().charAt(0), '.');
+					try {
+						Double.parseDouble(value);
+					} catch(NumberFormatException ex) {
+						throw new ParameterException(parameterID, value, type.name());
+					}
+				} else if(type.equals(NetworkParameterType.BOOLEAN)) {
+					value = value.toLowerCase();
+					if( !("true".equals(value) || "false".equals(value))) {
+						if("yes".equals(value))
+							value = "true";
+						else if("no".equals(value))
+							value = "false";
+						else if(value.endsWith(".0")) { // value is a double
+							if("1.0".equals(value))
+								value = "true";
+							else if("0.0".equals(value))
+								value = "false";
+							else
+								throw new ParameterException(parameterID, value, type.name());
+						} else if("1".equals(value)) // value is an integer
+							value = "true";
+						else if("0".equals(value)) // value is an integer
+							value = "false";
+						else
+							throw new ParameterException(parameterID, value, type.name());
+					}
+				}
+			}
+		}
+		if(value != null || overwriteWithEmpty)
+			element.setParameter(parameterID, value);
+		return value;
 	}
 	
 	public static boolean isNetworkClass(AbstractModelElementData element) {
