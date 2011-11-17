@@ -109,8 +109,16 @@ public class ModelElementPanel extends ParameterContainer {
 			if(paramDef != null) {
 				addParameter(paramDef, parameter, propGroup);
 			} else {
-				propGroup.add(new JLabel(getLabel(parameter) + ": "));
-				propGroup.add(new JLabel(value));
+				String tooltipText = "<html>Parameter ID: " + getLabel(parameter);
+				tooltipText += "<br>Value: " + value;
+				tooltipText += "<br><br><i>This is an unknown parameter, i.e. " +
+						"it has no definition in the parameter database.</i>";
+				JLabel label = new JLabel(getLabel(parameter) + ": ");
+				label.setToolTipText(tooltipText);
+				propGroup.add(label);
+				label = new JLabel(value);
+				label.setToolTipText(tooltipText);
+				propGroup.add(label);
 			}
 		}
 		if(propGroup.getComponentCount() > 0)
