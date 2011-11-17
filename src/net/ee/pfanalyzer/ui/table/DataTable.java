@@ -149,7 +149,7 @@ public class DataTable extends JTable implements INetworkDataViewer {
 //			System.out.println("    old Value="+oldValue);
 			String newValue = ModelDBUtils.setParameterValue(element, parameterID, value, 
 					decimalSeparator, overwriteWithEmpty);
-//			System.out.println("    new value="+newValue);
+//			System.out.println("    new value="+newValue); 
 			NetworkChangeEvent event = new NetworkChangeEvent(element, parameterID, oldValue, newValue);
 			element.getNetwork().fireNetworkElementChanged(event);
 		} catch (ParameterException e) {
