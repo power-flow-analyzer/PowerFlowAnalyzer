@@ -161,10 +161,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private Object selection, hover;
 	private DataViewerConfiguration viewerConfiguration;
 	private NetworkViewerController controller;
+	private Component parentContainer;
 
-	public NetworkViewer(Network data, DataViewerConfiguration viewerConfiguration) {
+	public NetworkViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		this.data = data;
 		this.viewerConfiguration = viewerConfiguration;
+		this.parentContainer = parent;
 		createStrokes(1.0f, 2.0f);
 		converter = new Mercator();
 		initializeInternalCoordinates();
@@ -1048,7 +1050,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private void updateOutlines() {
 //		System.out.println("updateOutlines");
 		outlines = new ArrayList<Outline>();
-		NetworkContainer container = getNetworkContainer(this);
+		NetworkContainer container = getNetworkContainer(parentContainer);
 		lastOutlineList = container.getOutlines();
 		for (Outline outline : lastOutlineList) {
 			String paramID = "OUTLINE." + outline.getOutlineID();
@@ -1073,7 +1075,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private List<Outline> getOutlines() {
 		if(outlines == null)
 			updateOutlines();
-		NetworkContainer container = getNetworkContainer(this);
+		NetworkContainer container = getNetworkContainer(parentContainer);
 		if(container != null && container.getOutlines() != lastOutlineList)
 			updateOutlines();
 		return outlines;

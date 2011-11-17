@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.ui.map;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -30,8 +31,8 @@ public class BusBarViewer extends NetworkViewer { //JComponent implements INetwo
 	private int busBarSize = 50;
 	private int branchOffset = 10;
 	
-	public BusBarViewer(Network network, DataViewerConfiguration configuration) {
-		super(network, configuration);
+	public BusBarViewer(Network network, DataViewerConfiguration configuration, Component parent) {
+		super(network, configuration, parent);
 		analyzeNetwork();
 	}
 	
