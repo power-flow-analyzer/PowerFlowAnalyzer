@@ -296,6 +296,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			if(fileParam == null || fileParam.getValue() == null)
 				continue;
 			File csvDataFile = getPowerFlowCase().getAbsolutePath(fileParam.getValue());
+			if(csvDataFile == null)
+				continue;
 			if(csvDataFile.exists() == false || csvDataFile.isDirectory())
 				continue;
 			Outline outline = new Outline(converter, outlineData, csvDataFile);
