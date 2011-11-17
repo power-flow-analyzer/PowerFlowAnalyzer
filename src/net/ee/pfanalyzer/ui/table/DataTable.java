@@ -18,13 +18,18 @@ import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.IDerivedElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
+import net.ee.pfanalyzer.model.ParameterException;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
 
 public class DataTable extends JTable implements INetworkDataViewer {
 
@@ -34,13 +39,17 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	private Network network;
 	private DataTableModel model;
 	private boolean selfSelection = false;
+//	private Component parentContainer;
 	
-	public DataTable(DataViewerConfiguration viewerConfiguration) {
+	public DataTable(DataViewerConfiguration viewerConfiguration, Component parent) {
 		super();
 		this.viewerConfiguration = viewerConfiguration;
+//		this.parentContainer = parent;
 		model = new DataTableModel();
 		setModel(model);
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        setColumnSelectionAllowed(true);
 		setAutoResizeMode(AUTO_RESIZE_OFF);
 		for (int i = 0; i < getColumnCount(); i++) {
 			getColumnModel().getColumn(i).setMinWidth(50);
@@ -57,6 +66,13 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		});
 //		if(model.getColumnCount() > 2)
 //			model.moveColumns(getColumnModel());
+		
+		// add handler for copy and paste actions
+		new ClipboardHandler(this);
+	}
+	
+	public DataTableModel getTableModel() {
+		return model;
 	}
 	
 	protected JTableHeader createDefaultTableHeader() {
@@ -96,6 +112,51 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		this.network = network;
 		filterElements();
 		refresh();
+	}
+	
+	public String exportValue(int rowIndex, int columnIndex) {
+		boolean roundedValues = getViewerConfiguration().getBooleanParameter(
+				"EXPORT_ROUND_VALUES", false);
+		boolean removePercentageSymbol = getViewerConfiguration().getBooleanParameter(
+				"EXPORT_REMOVE_PERCENTAGE_SYMBOL", true);
+		boolean convertBooleanValues = getViewerConfiguration().getBooleanParameter(
+				"EXPORT_CONVERT_BOOLEAN_VALUES", true);
+		String decimalSeparator = getViewerConfiguration().getTextParameter(
+				"EXPORT_DECIMAL_SEPARATOR", SwingUtils.DEFAULT_DECIMAL_SEPARATOR);
+		String exportListValues = getViewerConfiguration().getTextParameter(
+				"EXPORT_LIST_VALUES", "value");
+		AbstractNetworkElement element = getTableModel().getElement(rowIndex);
+		String parameterID = getTableModel().getParameterID(columnIndex);
+		String value = ModelDBUtils.getParameterValue(element, parameterID, roundedValues, 
+				decimalSeparator, exportListValues, removePercentageSymbol, convertBooleanValues);
+		if(value != null)
+			return value;
+		else
+			return "";
+	}
+	
+	public void importValue(String value, int rowIndex, int columnIndex) throws ParameterException {
+		String decimalSeparator = getViewerConfiguration().getTextParameter(
+				"IMPORT_DECIMAL_SEPARATOR", SwingUtils.DEFAULT_DECIMAL_SEPARATOR);
+		boolean overwriteWithEmpty = getViewerConfiguration().getBooleanParameter(
+				"IMPORT_OVERWRITE_WITH_EMPTY", true);
+		AbstractNetworkElement element = getTableModel().getElement(rowIndex);
+		String parameterID = getTableModel().getParameterID(columnIndex);
+		try {
+//			System.out.println("import value=" + value);
+			NetworkParameter oldParameter = element.getParameterValue(parameterID);
+			String oldValue = oldParameter != null ? oldParameter.getValue() : null;
+//			System.out.println("    old Value="+oldValue);
+			String newValue = ModelDBUtils.setParameterValue(element, parameterID, value, 
+					decimalSeparator, overwriteWithEmpty);
+//			System.out.println("    new value="+newValue);
+			NetworkChangeEvent event = new NetworkChangeEvent(element, parameterID, oldValue, newValue);
+			element.getNetwork().fireNetworkElementChanged(event);
+		} catch (ParameterException e) {
+			e.setRowIndex(rowIndex);
+			e.setColumnIndex(columnIndex);
+			throw e;
+		}
 	}
 	
 	private void filterElements() {
