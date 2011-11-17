@@ -36,6 +36,7 @@ public class ParameterContainer extends JPanel {
 	private boolean editable = true;
 	private boolean showNetworkParameters = false;
 	private boolean showResultsWhenEditing = true;
+	private boolean showFullParameterInfo = true;
 
 	public ParameterContainer(IParameterMasterElement parameterMaster, boolean scrollable) {
 		super(new BorderLayout());
@@ -99,43 +100,39 @@ public class ParameterContainer extends JPanel {
 		boolean editParameter = NetworkParameterPurposeRestriction.PARAMETER.equals(
 						propertyDefinition.getPurpose())
 				|| NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
+		ParameterValuePanel valuePanel;
 		if(isEditable() && editParameter) {
 			if(NetworkParameterValueRestriction.LIST.equals(propertyDefinition.getRestriction())) {// list
-				ParameterValueBox box = new ParameterValueBox(
+				valuePanel = new ParameterValueBox(
 						parameterMaster, propertyDefinition, propertyValue);
-				panel.add(box);
 			} else if(parameterMaster instanceof ParameterMasterNetworkElement 
 					&& NetworkParameterValueRestriction.EXISTING_PARAMETER_VALUE.equals(propertyDefinition.getRestriction())) {
-				ParameterRestrictionValueBox box = new ParameterRestrictionValueBox(
+				valuePanel = new ParameterRestrictionValueBox(
 						(ParameterMasterNetworkElement) parameterMaster, propertyDefinition, propertyValue);
-				panel.add(box);
 			} else if(parameterMaster instanceof ParameterMasterViewer
 					&& (NetworkParameterValueRestriction.MODEL_OR_CLASS_ID.equals(propertyDefinition.getRestriction())
 							|| NetworkParameterValueRestriction.MODEL_ID.equals(propertyDefinition.getRestriction()))) {
-				ParameterModelIDField box = new ParameterModelIDField(
+				valuePanel = new ParameterModelIDField(
 						(ParameterMasterViewer) parameterMaster, propertyDefinition, propertyValue);
-				panel.add(box);
 			} else if(NetworkParameterValueRestriction.COLOR_RGB.equals(propertyDefinition.getRestriction())) {
-				ParameterColorField box = new ParameterColorField(parameterMaster, propertyDefinition, propertyValue);
-				panel.add(box);
+				valuePanel = new ParameterColorField(parameterMaster, propertyDefinition, propertyValue);
 			} else {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
-					ParameterCheckBox box = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
-					panel.add(box);
+					valuePanel = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
 				} else if(NetworkParameterType.DOUBLE.equals(propertyDefinition.getType())) {
-					ParameterNumberSpinnerField box = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, false);
-					panel.add(box);
+					valuePanel = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, false);
 				} else if(NetworkParameterType.INTEGER.equals(propertyDefinition.getType())) {
-					ParameterNumberSpinnerField box = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, true);
-					panel.add(box);
+					valuePanel = new ParameterNumberSpinnerField(parameterMaster, propertyDefinition, propertyValue, true);
 				} else { //if(NetworkParameterType.TEXT.equals(propertyDefinition.getType())) {
-					ParameterTextField box = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
-					panel.add(box);
+					valuePanel = new ParameterTextField(parameterMaster, propertyDefinition, propertyValue);
 				}
 			}
 		} else { //if(NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose())) {
-			panel.add(new ParameterTextLabel(parameterMaster, propertyDefinition, propertyValue));
+			valuePanel = new ParameterTextLabel(parameterMaster, propertyDefinition, propertyValue);
 		}
+		if(showFullParameterInfo == false)
+			valuePanel.setShowFullParameterInfo(showFullParameterInfo);
+		panel.add(valuePanel);
 		parameterAdded(propertyDefinition);
 	}
 	
@@ -180,9 +177,11 @@ public class ParameterContainer extends JPanel {
 	protected JComponent createModelLink(final AbstractNetworkElement element) {
 		String modelName = element.getModelID();
 		if(element.getModel() != null)
-			modelName = element.getModel().getLabel() + " (\"" + modelName + "\")";
+			modelName = element.getModel().getLabel();
 		JPanel linkPanel = new JPanel(new BorderLayout());
-		linkPanel.add(new JLabel(modelName), BorderLayout.CENTER);
+		JLabel label = new JLabel(modelName);
+		label.setToolTipText("Model ID: " + element.getModelID());
+		linkPanel.add(label, BorderLayout.CENTER);
 		if(isEditable()) {
 			JButton changeModelButton = PowerFlowAnalyzer.createButton("Select a model from the database", "database_go.png", "Change Model", false);
 			changeModelButton.setMargin(new Insets(2, 2, 1, 1));
@@ -226,9 +225,9 @@ public class ParameterContainer extends JPanel {
 	}
 	
 	protected void finishLayout() {
-//		elementContainer.add(Box.createVerticalGlue());
-//		elementContainer.add(Box.createVerticalGlue());
-//		elementContainer.add(Box.createVerticalGlue());
+		elementContainer.add(Box.createVerticalGlue());
+		elementContainer.add(Box.createVerticalGlue());
+		elementContainer.add(Box.createVerticalGlue());
 	}
 	
 	private void showModelDB(ModelData model) {
@@ -249,5 +248,9 @@ public class ParameterContainer extends JPanel {
 
 	public void setShowResultsWhenEditing(boolean showResultsWhenEditing) {
 		this.showResultsWhenEditing = showResultsWhenEditing;
+	}
+	
+	public void setShowFullParameterInfo(boolean flag) {
+		showFullParameterInfo = flag;
 	}
 }
