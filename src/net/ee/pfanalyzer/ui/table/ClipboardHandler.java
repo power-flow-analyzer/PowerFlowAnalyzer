@@ -50,6 +50,7 @@ public class ClipboardHandler {
 				StringSelection content = new StringSelection(buffer.toString());
 				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(content, content);
 			} catch(Exception e) {
+				Toolkit.getDefaultToolkit().beep();
 				PowerFlowAnalyzer.getInstance().setError("Cannot copy contents from table: " + e);
 				e.printStackTrace();
 			}
@@ -92,6 +93,7 @@ public class ClipboardHandler {
 					}
 				}
 			} catch (ParameterException e) {
+				Toolkit.getDefaultToolkit().beep();
 				String text = "Cannot import value \"" + e.getValue() + "\""
 						+ "\nThe column " + e.getParameterID() + " only allows values of type " + e.getExpectedType()
 						+ "\n"
@@ -99,6 +101,7 @@ public class ClipboardHandler {
 						+ "\nTarget cell: row " + (e.getRowIndex()+1) + ", column " + (e.getColumnIndex()+1);
 				PowerFlowAnalyzer.getInstance().setError(text);
 			} catch (Exception e) {
+				Toolkit.getDefaultToolkit().beep();
 				PowerFlowAnalyzer.getInstance().setError("Cannot paste contents into table: " + e);
 				e.printStackTrace();
 			}
