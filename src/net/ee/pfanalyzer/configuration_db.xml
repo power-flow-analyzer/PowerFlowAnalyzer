@@ -3,10 +3,10 @@
     <model-db>
         <modelClass ID="conf" label="Configuration">
             <modelClass ID="viewer" label="Viewer">
-                <parameter ID="TITLE" type="text" label="Title" empty="true">
+                <parameter ID="TITLE" type="text" label="Title" description="The title of this viewer" empty="true">
                     <display/>
                 </parameter>
-                <parameter ID="POSITION" type="text" label="Position" restriction="list" empty="true">
+                <parameter ID="POSITION" type="text" label="Position" description="&lt;html&gt;The position of this viewer.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Left: positioned at the left&lt;/li&gt;&lt;li&gt;Bottom: positioned at the bottom&lt;/li&gt;&lt;li&gt;Free: displayed in an external window&lt;/li&gt;&lt;/ul&gt;The default position is &quot;bottom&quot;." restriction="list" empty="true">
                     <option value="left" label="Left" ID="LEFT"/>
                     <option value="bottom" label="Bottom" ID="BOTTOM"/>
                     <option value="free" label="Free" ID="FREE"/>
@@ -68,11 +68,32 @@
                 </modelClass>
                 <modelClass ID="table" label="Table">
                     <parameter ID="POSITION" value="bottom"/>
-                    <model ID="type_filter" label="Data Table" description=" Creates a new table containing the parameters &lt;br&gt; of all elements whose model ID matches a given pattern">
-                        <parameter ID="ELEMENT_FILTER" type="text" label="Element filter" restriction="model or class ID" empty="true">
+                    <model ID="type_filter" label="Data Table" description=" Creates a table containing the parameters &lt;br&gt;of all elements whose model ID matches a given pattern">
+                        <parameter ID="ELEMENT_FILTER" type="text" label="Element filter" description="&lt;html&gt;Only those elements will be displayed&lt;br&gt;whose model ID starts with this pattern." restriction="model or class ID" empty="true">
                             <display/>
                         </parameter>
                         <parameter ID="ICON" value="table.png"/>
+                        <parameter ID="EXPORT_ROUND_VALUES" type="boolean" label="Round values" description="&lt;html&gt;Select this option if floating point numbers should be exported&lt;br&gt;with the precision defined in the parameter database.&lt;br&gt;Disable this option if values should not be rounded at all." value="false">
+                            <display group="Export values"/>
+                        </parameter>
+                        <parameter ID="EXPORT_REMOVE_PERCENTAGE_SYMBOL" type="boolean" label="Convert percentage values" description="&lt;html&gt;If enabled percentage values will not be exported as such, i.e. their value&lt;br&gt;will not be multiplied by 100 and it will not contain a percentage symbol (%).&lt;br&gt;This option only has an effect if rounding of values is enabled." value="true">
+                            <display group="Export values"/>
+                        </parameter>
+                        <parameter ID="EXPORT_CONVERT_BOOLEAN_VALUES" type="boolean" label="Convert boolean values" description="&lt;html&gt;If enabled boolean values will be exported as integers, &lt;br&gt;i.e. the values &quot;true&quot;/&quot;false&quot; will be exported as &quot;1&quot;/&quot;0&quot;." value="true">
+                            <display group="Export values"/>
+                        </parameter>
+                        <parameter ID="EXPORT_DECIMAL_SEPARATOR" type="text" label="Decimal separator" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." empty="true">
+                            <display group="Export values"/>
+                        </parameter>
+                        <parameter ID="EXPORT_LIST_VALUES" type="text" label="Values of list parameters" description="&lt;html&gt;Sets how the value of list parameters will be exported.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Value: exports the value of the selected option&lt;/li&gt;&lt;li&gt;Label: exports the label of the selected option.&lt;/li&gt;&lt;li&gt;ID: exports the ID of the selected option.&lt;/li&gt;&lt;/ul&gt;" restriction="list" value="value">
+                            <option value="value" label="Value" ID="VALUE"/>
+                            <option value="label" label="Label" ID="LABEL"/>
+                            <option value="id" label="ID" ID="ID"/>
+                            <display group="Export values"/>
+                        </parameter>
+                        <parameter ID="IMPORT_DECIMAL_SEPARATOR" type="text" label="Decimal separator" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." empty="true">
+                            <display group="Import values"/>
+                        </parameter>
                     </model>
                 </modelClass>
             </modelClass>
