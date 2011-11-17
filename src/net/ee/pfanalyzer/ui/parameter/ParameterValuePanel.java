@@ -14,6 +14,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
 import net.ee.pfanalyzer.model.util.ParameterUtils;
+import net.ee.pfanalyzer.ui.util.HTMLUtil;
 
 public abstract class ParameterValuePanel extends JPanel {
 	
@@ -21,6 +22,7 @@ public abstract class ParameterValuePanel extends JPanel {
 	private NetworkParameter propertyDefinition, propertyValue;
 	private JCheckBox inheritBox, emptyBox;
 	private boolean userAction = true;
+	private boolean showFullParameterInfo = true;
 
 	public ParameterValuePanel(IParameterMasterElement element, NetworkParameter property, 
 			NetworkParameter propertyValue) {
@@ -35,8 +37,6 @@ public abstract class ParameterValuePanel extends JPanel {
 		this.propertyValue = propertyValue;
 		
 		createValuePanel();
-		if(propertyDefinition.getDescription() != null && propertyDefinition.getDescription().length() > 0)
-			getValuePanel().setToolTipText(propertyDefinition.getDescription());
 		boolean isDefinition = getMasterElement().hasParameterDefinition(property.getID());
 		boolean isResult = NetworkParameterPurposeRestriction.RESULT.equals(propertyDefinition.getPurpose());
 		boolean isScenarioParam = NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
@@ -120,6 +120,21 @@ public abstract class ParameterValuePanel extends JPanel {
 			// set data in panel
 			setValue(value);
 		}
+		// set the tooltip text for the value panel
+		String tooltipText = "<html>";
+		if(showFullParameterInfo) {
+			tooltipText += "Parameter ID: " + propertyDefinition.getID();
+			tooltipText += "<br>Raw value: " + (value == null ? "&lt;empty&gt;" : value);
+		}
+		if(propertyDefinition.getDescription() != null && propertyDefinition.getDescription().length() > 0) {
+			if(showFullParameterInfo)
+				tooltipText += "<br><br>";
+			tooltipText += HTMLUtil.removeHTMLTags(propertyDefinition.getDescription());
+		}
+		if(tooltipText.length() > 6)
+			getValuePanel().setToolTipText(tooltipText);
+		else
+			getValuePanel().setToolTipText(null);
 	}
 	
 	protected String getNormalizedParameterValue(String value) {
@@ -192,5 +207,10 @@ public abstract class ParameterValuePanel extends JPanel {
 	
 	protected void refresh() {
 		
+	}
+	
+	public void setShowFullParameterInfo(boolean flag) {
+		showFullParameterInfo = flag;
+		setValue(propertyValue);
 	}
 }
