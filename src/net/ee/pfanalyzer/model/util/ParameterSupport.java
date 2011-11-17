@@ -69,10 +69,17 @@ public abstract class ParameterSupport {
 	}
 	
 	public boolean getBooleanParameter(String name, boolean defaultValue) {
+		Boolean value = getBooleanParameter(name);
+		if(value == null)
+			return defaultValue;
+		return defaultValue;
+	}
+	
+	public Boolean getBooleanParameter(String name) {
 		NetworkParameter p = getParameterValue(name);
 		if(p != null && p.getValue() != null)
-			return Boolean.valueOf(p.getValue()).booleanValue();
-		return defaultValue;
+			return Boolean.valueOf(p.getValue());
+		return null;
 	}
 	
 	public double getDoubleParameter(String name, double defaultValue) {
