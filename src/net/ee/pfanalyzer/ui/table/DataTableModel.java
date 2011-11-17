@@ -101,6 +101,25 @@ public class DataTableModel extends AbstractTableModel {
 		}
 	}
 	
+	AbstractNetworkElement getElement(int rowIndex) {
+		return data.get(rowIndex);
+	}
+	
+	String getParameterID(int columnIndex) {
+		return parameters.get(columnIndex);
+	}
+	
+//	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+//		if(emptyParameters)
+//			return;
+//		String value = (String) aValue;
+//		AbstractNetworkElement element = data.get(rowIndex);
+//		String parameterID = parameters.get(columnIndex);
+//		element.setParameter(parameterID, value);
+//		NetworkChangeEvent event = new NetworkChangeEvent(element, parameterID, null, value);
+//		element.getNetwork().fireNetworkElementChanged(event);
+//    }
+	
 	protected boolean isValueCorrect(int row, int column) {
 		AbstractNetworkElement element = data.get(row);
 		List<NetworkFlag> flags = element.getFlags();
