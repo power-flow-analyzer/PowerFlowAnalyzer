@@ -22,11 +22,6 @@ import net.ee.pfanalyzer.ui.util.Group;
 
 public class DataViewerDialog extends BaseDialog {
 	
-	private final static String DEFAULT_TEXT = "<html><b>Enter the properties for this viewer.<br>" +
-			"The viewer will only contain those elements whose model ID matches the filter.";
-//	private final static String ERROR_TEXT = "<html><font color=\"red\">All values must be filled in to proceed.<br>" +
-//			"The viewer will only contain those elements whose model ID matches the filter.";
-	
 	private DataViewerConfiguration viewer;
 	private Map<String, Group> groups = new HashMap<String, Group>();
 	private Map<String, Box> tabs = new HashMap<String, Box>();
@@ -35,7 +30,7 @@ public class DataViewerDialog extends BaseDialog {
 	public DataViewerDialog(Window frame, String title, DataViewerConfiguration viewer, PowerFlowCase caze, boolean canCancel) {
 		super(frame, title, true);
 		this.viewer = viewer;
-		setText(DEFAULT_TEXT);
+		setText("<html><b>" + "Enter the properties for this viewer.");
 		
 		tabbedPane = new JTabbedPane();
 
@@ -43,6 +38,7 @@ public class DataViewerDialog extends BaseDialog {
 //		parameterPanel.setShowNetworkParameters(true);
 		parameterPanel.setEditable(true);// default setting
 		parameterPanel.setParameterMaster(new ParameterMasterViewer(caze, viewer, true));
+		parameterPanel.setShowFullParameterInfo(false);
 		addParameters(viewer.getDataDefinition(), parameterPanel);
 		if(viewer.getModelID().startsWith(NetworkViewer.BASE_NETWORK_VIEWER_ID)) {
 			addOutlineParameters(caze.getModelDB().getOutlineClass(), parameterPanel);
@@ -54,6 +50,7 @@ public class DataViewerDialog extends BaseDialog {
 		} else
 			addButton("Close", true, true);
 		
+		finishLayout();
 		setCenterComponent(tabbedPane);
 	}
 	
@@ -89,6 +86,7 @@ public class DataViewerDialog extends BaseDialog {
 			}
 			ParameterCheckBox box = new ParameterCheckBox(
 					parameterPanel.getParameterMaster(), enablement, enablement);
+			box.setShowFullParameterInfo(false);
 			getGroup("Outlines", "Outlines").add(box);
 			box.getCheckBox().setText(outline.getLabel());
 		}
@@ -108,11 +106,20 @@ public class DataViewerDialog extends BaseDialog {
 		Box box = tabs.get(name);
 		if(box == null) {
 			box = Box.createVerticalBox();
+			box.setOpaque(true);
 			tabs.put(name, box);
 			String title = name == null || name.isEmpty() ? "Common" : name;
 			tabbedPane.addTab(title, box);
 		}
 		return box;
+	}
+	
+	private void finishLayout() {
+		for (Box box : tabs.values()) {
+			box.add(Box.createVerticalGlue());
+			box.add(Box.createVerticalGlue());
+			box.add(Box.createVerticalGlue());
+		}
 	}
 	
 	@Override
