@@ -118,13 +118,13 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private void addDataViewer(DataViewerConfiguration viewerData, boolean selectTab) {
 		INetworkDataViewer viewer = null;
 		if(DataTable.VIEWER_ID.equals(viewerData.getModelID()))
-			viewer = new DataTable(viewerData);
+			viewer = new DataTable(viewerData, this);
 //		else if("viewer.diagram.bar".equals(viewerData.getModelID()))
 //			viewer = new PowerFlowDiagram(viewerData);
 		else if(NetworkViewer.VIEWER_ID.equals(viewerData.getModelID()))
-			viewer = new NetworkViewer(getNetwork(), viewerData);
+			viewer = new NetworkViewer(getNetwork(), viewerData, this);
 		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
-			viewer = new BusBarViewer(getNetwork(), viewerData);
+			viewer = new BusBarViewer(getNetwork(), viewerData, this);
 		if(viewer == null)
 			return;
 		viewer.setData(getNetwork());
