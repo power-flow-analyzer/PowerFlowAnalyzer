@@ -245,7 +245,17 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			else
 				title = getCurrentCase().getCaseFile().getName() + " - " + title;
 		}
+		if(hasUnsavedCases())
+			title += " *";
 		return title;
+	}
+	
+	private boolean hasUnsavedCases() {
+		for (int i = 0; i < cases.size(); i++) {
+			if(cases.get(i).isDirty())
+				return true;
+		}
+		return false;
 	}
 	
 	@Override
@@ -370,6 +380,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			database = new ModelDB(CaseSerializer.readModelDB(new File(dialog.getSelectedParameterFile())));
 		if(database == null)
 			return;
+		database.setDirty(true);
 		getCurrentCase().changeModelDB(database);
 		for (Network net : getCurrentCase().getNetworks(true))
 			net.fireNetworkChanged();
@@ -822,6 +833,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			t.printStackTrace();
 		}
 		updateToolbarButtons();
+		updateTabTitles();
 	}
 	
 	private void openCase(PowerFlowCase caze) {
@@ -858,6 +870,18 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		}
 		caze.setCaseID(maxCaseID);
 		cases.add(caze);
+	}
+	
+	private void updateTabTitles() {
+//		for (int i = 0; i < getViewerCount(); i++) {
+//			Network n = getViewer(i).getNetwork();
+//			networkTabs.setTitleAt(i, getScenarioName(n));
+//		}
+		for (int i = 0; i < cases.size(); i++) {
+			PowerFlowCase caze = cases.get(i);
+			String dirtySuffix = caze.isDirty() ? " *" : "";
+			casesParent.setTitleAt(i, findName(caze) + dirtySuffix);
+		}
 	}
 	
 	private void checkForMissingCoordinates(Network network) {
@@ -931,6 +955,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	@Override
 	public void updateActions() {
 		updateToolbarButtons();
+		updateTabTitles();
 	}
 
 	private void updateToolbarButtons() {
