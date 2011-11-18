@@ -16,6 +16,7 @@ import net.ee.pfanalyzer.math.coordinate.ICoordinateConverter;
 import net.ee.pfanalyzer.math.coordinate.Mercator;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.IDatabaseChangeListener;
+import net.ee.pfanalyzer.model.IPowerFlowCaseListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
@@ -28,7 +29,7 @@ import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
 
-public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener {
+public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener, IPowerFlowCaseListener {
 
 	private PowerFlowCase powerFlowCase;
 
@@ -54,35 +55,25 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			PowerFlowViewer lastViewer;
 			@Override
 			public boolean tabClosing(int tabIndex) {
-//				String name = getScenarioName(getViewer(tabIndex).getNetwork());
-//				int choice = JOptionPane.showConfirmDialog(NetworkContainer.this, 
-//						"Do you want to close the network \"" + name + "\"?", "Close network", JOptionPane.YES_NO_OPTION);
-//				if(choice == JOptionPane.YES_OPTION) {
-					lastViewer = getViewer(tabIndex);
-					return true;
-//				}
-//				return false;
+				lastViewer = getViewer(tabIndex);
+				return true;
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
 				lastViewer.removeActionUpdateListener(NetworkContainer.this);
 				lastViewer.removeNetworkElementSelectionListener(modelDBDialog);
 				lastViewer.dispose();
-//				getPowerFlowCase().removeNetwork(lastViewer.getNetwork());
-//				if(networkTabs.getSelectedIndex() == networkTabs.getTabCount() - 1)
-//					networkTabs.setSelectedIndex(0);
 				fireActionUpdate();
 			}
 			@Override
 			public void tabOpened(int tabIndex) {
-//				if(tabIndex == networkTabs.getTabCount() - 1)
-//					networkTabs.setSelectedIndex(tabIndex - 1);
 				fireActionUpdate();
 			}
 		});
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
+		getPowerFlowCase().addPowerFlowCaseListener(this);
 		updateOutlines(null, false);
 	}
 	
@@ -108,16 +99,6 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			networkTabs.setSelectedIndex(tabIndex);
 			return;
 		}
-//		for (int i = 0; i < networkTabs.getTabCount(); i++) {
-//			Component comp = networkTabs.getTabComponent(i);
-//			if(comp instanceof PowerFlowViewer) {
-//				Network n = ((PowerFlowViewer) comp).getNetwork();
-//				if(n.equals(network)) {
-//					networkTabs.setSelectedIndex(i);
-//					return;
-//				}
-//			}
-//		}
 		PowerFlowViewer viewer = new PowerFlowViewer(powerFlowCase, network);
 		networkTabs.addNetworkTab(network.getDisplayName(), viewer, true);
 		viewer.addActionUpdateListener(this);
@@ -217,6 +198,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		fireActionUpdate();
 		overviewPane.refreshTree();
 		overviewPane.updateScriptActions();
+		updateTabTitles();
 	}
 	
 	public void repaintNetworkTree() {
@@ -232,7 +214,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			Component comp = networkTabs.getTabComponent(i);
 			if(comp instanceof PowerFlowViewer) {
 				Network n = ((PowerFlowViewer) comp).getNetwork();
-				networkTabs.setTitleAt(i, n.getDisplayName());
+				String dirtySuffix = n.isDirty() ? " *" : "";
+				networkTabs.setTitleAt(i, n.getDisplayName() + dirtySuffix);
 			}
 		}
 	}
@@ -286,22 +269,24 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //			System.out.println("remove outline " + changedID);
 		}
 		ICoordinateConverter converter = new Mercator();
-		for (final ModelData outlineData : getPowerFlowCase().getModelDB().getOutlineClass().getModel()) {
-			Outline oldOutline = getOutline(outlineData.getID());
-			if(oldOutline != null && oldOutline.getOutlineID().equals(changedID) == false)
-				continue;
-//			System.out.println("reload outline " + outlineData.getID());
-			outlinesMap.remove(outlineData.getID());
-			NetworkParameter fileParam = ModelDBUtils.getParameterValue(outlineData, "CSV_DATA_FILE");
-			if(fileParam == null || fileParam.getValue() == null)
-				continue;
-			File csvDataFile = getPowerFlowCase().getAbsolutePath(fileParam.getValue());
-			if(csvDataFile == null)
-				continue;
-			if(csvDataFile.exists() == false || csvDataFile.isDirectory())
-				continue;
-			Outline outline = new Outline(converter, outlineData, csvDataFile);
-			outlinesMap.put(outlineData.getID(), outline);
+		if(getPowerFlowCase().getModelDB().getOutlineClass() != null) {
+			for (final ModelData outlineData : getPowerFlowCase().getModelDB().getOutlineClass().getModel()) {
+				Outline oldOutline = getOutline(outlineData.getID());
+				if(oldOutline != null && oldOutline.getOutlineID().equals(changedID) == false)
+					continue;
+	//			System.out.println("reload outline " + outlineData.getID());
+				outlinesMap.remove(outlineData.getID());
+				NetworkParameter fileParam = ModelDBUtils.getParameterValue(outlineData, "CSV_DATA_FILE");
+				if(fileParam == null || fileParam.getValue() == null)
+					continue;
+				File csvDataFile = getPowerFlowCase().getAbsolutePath(fileParam.getValue());
+				if(csvDataFile == null)
+					continue;
+				if(csvDataFile.exists() == false || csvDataFile.isDirectory())
+					continue;
+				Outline outline = new Outline(converter, outlineData, csvDataFile);
+				outlinesMap.put(outlineData.getID(), outline);
+			}
 		}
 		cachedOutlines = null;
 		if(getCurrentViewer() != null)
@@ -318,10 +303,18 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		return cachedOutlines;
 	}
 
+	@Override
+	public void caseChanged(PowerFlowCase caze) {
+		updateActions();
+	}
+
 	public void dispose() {
 		modelDBDialog.setVisible(false);
 		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
+		getPowerFlowCase().removePowerFlowCaseListener(this);
 		for (int i = 0; i < getViewerCount(); i++) {
+			getViewer(i + 1).removeActionUpdateListener(NetworkContainer.this);
+			getViewer(i + 1).removeNetworkElementSelectionListener(modelDBDialog);
 			getViewer(i + 1).dispose();
 		}
 	}
