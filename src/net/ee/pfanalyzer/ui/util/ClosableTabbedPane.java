@@ -40,7 +40,7 @@ public class ClosableTabbedPane {
 	}
 	
 	public void addTab(String title, Component component, int index, boolean closable) {
-		getTabbedPane().insertTab(title, null, component, "", index);
+		getTabbedPane().insertTab(title, null, component, null, index);
 		getTabbedPane().setTabComponentAt(index, new TabRenderer(closable));
 	}
 	
