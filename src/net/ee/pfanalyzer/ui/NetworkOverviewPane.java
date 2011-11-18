@@ -302,7 +302,8 @@ public class NetworkOverviewPane extends JPanel {
 	void updateScriptActions() {
 		scriptActionPane.removeAll();
 		for (final ModelData script : getPowerFlowCase().getModelDB().getScriptClass().getModel()) {
-			if(selectedNetworks.size() == 0 && ModelDBUtils.isNetworkCreatingScript(script) == false)
+			if((selectedNetworks.size() == 0 && ModelDBUtils.isNetworkCreatingScript(script) == false)
+					|| (selectedNetworks.size() > 1 && ModelDBUtils.isNetworkCreatingScript(script)))
 				continue;
 			String label = script.getLabel();
 			if(label == null || label.isEmpty())
@@ -322,8 +323,8 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	private void executeScript(ModelData script) {
-		Network network = null;
 		if(ModelDBUtils.isNetworkCreatingScript(script)) {
+			Network network = null;
 			if(selectedNetworks.isEmpty()) {
 				network = new Network(getPowerFlowCase().getCaseID());
 				getPowerFlowCase().addNetwork(network);
@@ -331,29 +332,34 @@ public class NetworkOverviewPane extends JPanel {
 				selectNetwork(network);
 			} else if(selectedNetworks.size() == 1) {
 				network = selectedNetworks.get(0);
-				int action = JOptionPane.showOptionDialog(this, 
-						"<html>This script will create a new network but the selected " +
-						"network is not empty.<br>Do you want to overwrite " +
-						"the selected network or create a new network instead?", "Question", 
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
-						null, new String[] {
-								"Overwrite network", "Create new network", "Cancel"
-						}, null);
-				if(action == JOptionPane.YES_OPTION) {
-					network.removeAllElements();
-					network.getParameterList().clear();
-					network.fireNetworkChanged();
-				} else if(action == JOptionPane.NO_OPTION) {
-					network = new Network();
-					getPowerFlowCase().addNetwork(network);
-					refreshTree();
-					selectNetwork(network);
-				} else if(action == JOptionPane.CANCEL_OPTION)
-					return;
+				if(network.isEmpty() == false) {
+					int action = JOptionPane.showOptionDialog(this, 
+							"<html>This script will create a new network but the selected " +
+							"network is not empty.<br>Do you want to overwrite " +
+							"the selected network or create a new network instead?", "Question", 
+							JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
+							null, new String[] {
+									"Overwrite network", "Create new network", "Cancel"
+							}, null);
+					if(action == JOptionPane.YES_OPTION) {
+						network.removeAllElements();
+						network.getParameterList().clear();
+						network.fireNetworkChanged();
+					} else if(action == JOptionPane.NO_OPTION) {
+						network = new Network();
+						getPowerFlowCase().addNetwork(network);
+						refreshTree();
+						selectNetwork(network);
+					} else if(action == JOptionPane.CANCEL_OPTION)
+						return;
+				}
 			} else
 				return;
-		}
-		PowerFlowAnalyzer.getInstance().executeScript(selectedNetworks.toArray(new Network[selectedNetworks.size()]), script);
+			if(network != null)
+				PowerFlowAnalyzer.getInstance().executeScript(network, script);
+		} else
+			PowerFlowAnalyzer.getInstance().executeScript(
+					selectedNetworks.toArray(new Network[selectedNetworks.size()]), script);
 
 //		Network network = getSelectedNetwork();
 //		selectedNetworks
@@ -502,7 +508,8 @@ public class NetworkOverviewPane extends JPanel {
 				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 				if(value instanceof Network) {
 					Network network = (Network) value;
-					setText(network.getDisplayName());
+					String dirtySuffix = network.isDirty() ? " *" : "";
+					setText(network.getDisplayName() + dirtySuffix);
 					if(network.hasFailures())
 						setForeground(Preferences.getFlagFailureColor());
 					else 
