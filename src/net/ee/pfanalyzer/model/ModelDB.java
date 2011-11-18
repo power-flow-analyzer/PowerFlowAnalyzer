@@ -32,6 +32,7 @@ public class ModelDB {
 	private ModelClassData networkClass, scriptClass, configurationClass, outlineClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
+	private boolean isDirty = false;
 	
 	public ModelDB() {
 		this.db = CaseSerializer.readInternalModelDB();
@@ -45,6 +46,14 @@ public class ModelDB {
 	
 	public ModelDBData getData() {
 		return db;
+	}
+	
+	public boolean isDirty() {
+		return isDirty;
+	}
+	
+	public void setDirty(boolean dirty) {
+		isDirty = dirty;
 	}
 	
 	public void refreshModels() {
@@ -123,12 +132,14 @@ public class ModelDB {
 	}
 	
 	public void fireElementChanged(DatabaseChangeEvent event) {
+		setDirty(true);
 		for (IDatabaseChangeListener listener : listeners) {
 			listener.elementChanged(event);
 		}
 	}
 	
 	public void fireParameterChanged(DatabaseChangeEvent event) {
+		setDirty(true);
 		for (IDatabaseChangeListener listener : listeners) {
 			listener.parameterChanged(event);
 		}

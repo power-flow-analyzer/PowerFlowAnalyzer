@@ -20,6 +20,8 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private NetworkContainer viewer;
 	private long maxNetworkID = 0;
 	private long caseID = -1;
+	private List<IPowerFlowCaseListener> listeners = new ArrayList<IPowerFlowCaseListener>();
+	private boolean isDirty = false;
 	
 	public PowerFlowCase(ModelDB modelDB) {
 		pfCase = new CaseData();
@@ -79,6 +81,33 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 //	public List<Network> getAllNetworks() {
 //		return networksAndScenarios;
 //	}
+	
+	public boolean isDirty() {
+		if(isDirty)
+			return true;
+		if(getModelDB().isDirty())
+			return true;
+		for (Network network : networksAndScenarios) {
+			if(network.isDirty())
+				return true;
+		}
+		return false;
+	}
+	
+	public void addPowerFlowCaseListener(IPowerFlowCaseListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void removePowerFlowCaseListener(IPowerFlowCaseListener listener) {
+		listeners.remove(listener);
+	}
+	
+	void dirtyStateChanged() {
+		isDirty = isDirty();
+		for (IPowerFlowCaseListener listener : listeners) {
+			listener.caseChanged(this);
+		}
+	}
 	
 	public NetworkContainer getViewer() {
 		return viewer;
@@ -187,6 +216,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	public Network addNetwork(NetworkData netData) {
 		Network network = addNetworkInternal(netData);
 		pfCase.getNetwork().add(netData);
+		network.setDirty(true);
 		return network;
 	}
 	
@@ -238,6 +268,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		pfCase.getNetwork().add(networkData);
 		network.setData(networkData);
 		network.updateModels();
+		network.setDirty(true);
 //		getNetwork().fireNetworkChanged();
 	}
 	
@@ -281,6 +312,12 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		try {
 			CaseSerializer serializer = new CaseSerializer();
 			serializer.writeCase(pfCase, caseFile);
+			getModelDB().setDirty(false);
+			for (Network network : networksAndScenarios) {
+				network.setDirty(false);
+			}
+			isDirty = false;
+			dirtyStateChanged();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

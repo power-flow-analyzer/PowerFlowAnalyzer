@@ -33,6 +33,7 @@ public class Network extends ParameterSupport {
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
 	private Boolean hasFailures = null;
 	private Boolean wasCalculated = null;
+	private boolean isDirty = false;
 	
 	private double time;
 	
@@ -312,6 +313,7 @@ public class Network extends ParameterSupport {
 	
 	public void fireNetworkChanged() {
 //		System.out.println("fireNetworkChanged");
+		setDirty(true);
 //		updateNetworkData();
 //		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
@@ -322,6 +324,7 @@ public class Network extends ParameterSupport {
 	
 	public void fireNetworkElementAdded(AbstractNetworkElement element) {
 //		System.out.println("fireNetworkElementAdded");
+		setDirty(true);
 		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
 		event.setNetworkElement(element);
@@ -332,6 +335,7 @@ public class Network extends ParameterSupport {
 	
 	public void fireNetworkElementRemoved(AbstractNetworkElement element) {
 //		System.out.println("fireNetworkElementRemoved");
+		setDirty(true);
 //		updateNetworkData();
 		findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
@@ -346,6 +350,7 @@ public class Network extends ParameterSupport {
 		if(event.getNewValue() == null && event.getOldValue() == null
 				|| event.getNewValue() != null && event.getNewValue().equals(event.getOldValue()))
 			return;
+		setDirty(true);
 		if(event.getNetworkElement() != null)
 			updateElement(event.getNetworkElement());
 		// check if combined busses and branches must be updated
@@ -454,6 +459,15 @@ public class Network extends ParameterSupport {
 			wasCalculated = hasParameterValue("SUCCESS");
 		}
 		return wasCalculated;
+	}
+	
+	public boolean isDirty() {
+		return isDirty;
+	}
+	
+	void setDirty(boolean dirty) {
+		isDirty = dirty;
+		getPowerFlowCase().dirtyStateChanged();
 	}
 	
 	public void removeAllElements() {
