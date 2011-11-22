@@ -2,6 +2,10 @@ function [  ] = add_flags_branch( jbranch, branchData )
 %ADD_FLAGS_BUS Summary of this function goes here
 %   Detailed explanation goes here
 
+if parameter_int(jbranch, 'BR_STATUS') == 0
+   return; 
+end
+
 % define Matpower constants
 define_constants;
 
