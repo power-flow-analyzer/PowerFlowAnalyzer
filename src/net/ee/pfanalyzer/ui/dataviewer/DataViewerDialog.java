@@ -40,7 +40,8 @@ public class DataViewerDialog extends BaseDialog {
 		parameterPanel.setParameterMaster(new ParameterMasterViewer(caze, viewer, true));
 		parameterPanel.setShowFullParameterInfo(false);
 		addParameters(viewer.getDataDefinition(), parameterPanel);
-		if(viewer.getModelID().startsWith(NetworkViewer.BASE_NETWORK_VIEWER_ID)) {
+		if(viewer.getModelID().startsWith(NetworkViewer.BASE_NETWORK_VIEWER_ID)
+				&& caze.getModelDB().getOutlineClass() != null) {
 			addOutlineParameters(caze.getModelDB().getOutlineClass(), parameterPanel);
 		}
 		
