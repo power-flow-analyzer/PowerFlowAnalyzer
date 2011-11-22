@@ -30,30 +30,30 @@
                     <display/>
                 </parameter>
                 <parameter ID="RATE_A" type="double" label="MVA Rating A" description="long term rating" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="RATE_B" type="double" label="MVA Rating B" description="short term rating" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="RATE_C" type="double" label="MVA Rating C" description="emergency rating" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="TAP" type="double" label="Transformer off nominal turns ratio" description="taps at &quot;from&quot; bus, &lt;br&gt;impedance at &quot;to&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="SHIFT" type="double" label="Transformer phase shift angle" description="angle in degrees, positive =&gt; delay" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.##"/>
                 </parameter>
-                <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" empty="false">
+                <parameter ID="BR_STATUS" type="integer" label="Initial branch status" restriction="list" value="1" empty="false">
                     <option value="1" label="in-service" ID="1"/>
                     <option value="0" label="out-of-service" ID="0"/>
                     <display/>
                 </parameter>
                 <parameter ID="ANGMIN" type="double" label="Minimum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.#"/>
                 </parameter>
-                <parameter ID="ANGMAX" label="Maximum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)">
-                    <display/>
+                <parameter ID="ANGMAX" type="double" label="Maximum angle difference" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)">
+                    <display decimalFormatPattern="#.#"/>
                 </parameter>
                 <parameter ID="PF" type="double" label="Real power injected at &quot;from&quot; bus end (MW)" empty="true" purpose="result">
                     <display decimalFormatPattern="#.##"/>
@@ -98,19 +98,23 @@
                     <option value="4" label="Isolated" ID="ISOLATED"/>
                     <display/>
                 </parameter>
-                <parameter ID="LATITUDE" type="double" label="Latitude" description="" empty="true"/>
-                <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
-                <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
+                <parameter ID="LATITUDE" type="double" label="Latitude" description="" empty="true">
                     <display/>
+                </parameter>
+                <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true">
+                    <display/>
+                </parameter>
+                <parameter ID="PD" type="double" label="Real Power Demand (MW)" empty="true">
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="QD" type="double" label="Reactive Power Demand (MVAr)" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="GS" type="double" label="Shunt Conductance" description="MV demanded at V = 1.0 p.u." empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="BS" type="double" label="Shunt Susceptance" description="MVAr injected at V = 1.0 p.u." empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="BUS_AREA" type="integer" label="Area" description="Bus Area" empty="true">
                     <display/>
@@ -122,13 +126,13 @@
                     <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="BASE_KV" type="double" label="Base-kV" description="Base voltage (kV)" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.#"/>
                 </parameter>
                 <parameter ID="VMAX" type="double" label="Max. voltage (p.u.)" description="Maximum voltage magnitude" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="VMIN" type="double" label="Min. voltage (p.u.)" description="Minimum voltage magnitude" empty="true">
-                    <display/>
+                    <display decimalFormatPattern="#.###"/>
                 </parameter>
                 <parameter ID="LAM_P" type="double" label="LaM P (u/MW)" description="Lagrange multiplier on real power mismatch" empty="true">
                     <display/>
@@ -154,10 +158,10 @@
                 <parameter ID="GEN_BUS" type="integer" label="Bus Number" restriction="existing parameter value" empty="true">
                     <display elementRestriction="bus" parameterID="BUS_I"/>
                 </parameter>
-                <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true" purpose="result">
+                <parameter ID="PG" type="double" label="Real Power Output (MW)" empty="true" purpose="parameter">
                     <display decimalFormatPattern="#.##"/>
                 </parameter>
-                <parameter ID="QG" type="double" label="Reactive Power Output (MVAr)" empty="true" purpose="result">
+                <parameter ID="QG" type="double" label="Reactive Power Output (MVAr)" empty="true" purpose="parameter">
                     <display decimalFormatPattern="#.##"/>
                 </parameter>
                 <parameter ID="QMAX" type="double" label="Maximum Reactive Power Output (MVAr)" empty="true">
@@ -172,7 +176,7 @@
                 <parameter ID="MBASE" type="double" label="Total MVA Base" description="Total MVA Base of machine, defaults to baseMVA" empty="true">
                     <display/>
                 </parameter>
-                <parameter ID="GEN_STATUS" type="integer" label="Machine Status" restriction="list">
+                <parameter ID="GEN_STATUS" type="integer" label="Machine Status" restriction="list" value="1">
                     <option value="1" label="in-service" ID="1"/>
                     <option value="0" label="out-of-service" ID="0"/>
                     <display/>
