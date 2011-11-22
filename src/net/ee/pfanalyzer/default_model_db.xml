@@ -79,6 +79,9 @@
                 <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
                     <display/>
                 </parameter>
+                <modelClass ID="transformer" label="Transformer" description="">
+                    <model ID="default" label="Default Transformer"/>
+                </modelClass>
                 <model ID="unknown" label="Unknown Branch"/>
             </modelClass>
             <modelClass ID="bus" label="Bus">
