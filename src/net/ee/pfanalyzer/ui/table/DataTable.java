@@ -188,6 +188,8 @@ public class DataTable extends JTable implements INetworkDataViewer {
 				data = ((IDerivedElement<?>) data).getRealElement();
 			for (int i = 0; i < getRowCount(); i++) {
 				if(model.getDataObject(i) == data) {
+					if(getSelectedColumnCount() == 0 && getColumnCount() > 0)
+						setColumnSelectionInterval(0, getColumnCount() - 1);
 					getSelectionModel().setSelectionInterval(i, i);
 					scrollRectToVisible(getCellRect(i, 1, true));
 					break;
