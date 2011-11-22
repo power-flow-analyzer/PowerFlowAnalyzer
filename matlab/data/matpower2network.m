@@ -1,4 +1,4 @@
-function [ jnetwork ] = matpower2network( caze )
+function [ jnetwork ] = matpower2network( caze, jparentNetwork )
 %LOADPFDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -17,7 +17,11 @@ end
 define_constants;
     
 % collect data for visualisation
-jnetwork = create_network();
+if exist('jparentNetwork', 'var') == 0
+    jnetwork = create_network();
+else
+    jnetwork = create_network(jparentNetwork);
+end
 jnetwork.setParameter('BASE_MVA', mpc.baseMVA);
 if exist('mpc.success', 'var')
     jnetwork.setParameter('SUCCESS', mpc.success);
@@ -36,8 +40,12 @@ for i=1:length(mpc.branch(:,1))
 end
 % create generators
 for i=1:length(mpc.gen(:,1))
-    jnetwork.addElement(create_generator(...
-            jnetwork, mpc.gen(i,:), mpc.gencost(i,:)));
+    if exist('mpc.success', 'var')
+        jgenerator = create_generator(jnetwork, mpc.gen(i,:), mpc.gencost(i,:));
+    else
+        jgenerator = create_generator(jnetwork, mpc.gen(i,:));
+    end
+    jnetwork.addElement(jgenerator);
 end
 
 end
