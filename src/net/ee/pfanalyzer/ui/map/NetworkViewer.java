@@ -148,6 +148,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	protected boolean allowDragging = true;
 	protected boolean showTooltips = true;
 	
+	private int dragFactor = 300;
 	private int arrowSize = 10;
 	private int networkMarkerSize = 20;
 	
@@ -262,12 +263,33 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					// scale
 					double wheelRot = -e.getWheelRotation();
 					double scaleLatitude = wheelRot * (maxLatitude - minLatitude) / 10.0; 
-					double scaleLongitude = wheelRot * (maxLongitude - minLongitude) / 10.0; 
+					double scaleLongitude = wheelRot * (maxLongitude - minLongitude) / 10.0;
+//					if(horizontalScale > verticalScale)
+//						scaleLatitude = getLatitudeDifference(internalMinY, internalMaxY);
+//					else
+//						scaleLatitude = getLongitudeDifference(internalMinX, internalMaxX);
+//					int diffX = (int) ((internalMaxX - internalMinX) * horizontalScale + HORIZONTAL_GAP);
+//					double diffLongitude = converter.getLongitude(diffX);
+//					System.out.println("scaleLongitude="+scaleLongitude);
+//					System.out.println("diffLongitude="+diffLongitude);
+//					double centerLong = minLongitude + (maxLongitude - minLongitude) / 2.0;
+//					double centerLat = minLatitude + (maxLatitude - minLatitude) / 2.0;
+//					System.out.println("  minLatitude1="+minLatitude);
+//					System.out.println("  maxLatitude1="+maxLatitude);
+//					System.out.println("  minLongitude1="+minLongitude);
+//					System.out.println("  maxLongitude1="+maxLongitude);
 					minLatitude += scaleLatitude;
 					maxLatitude -= scaleLatitude;
 					minLongitude += scaleLongitude;
 					maxLongitude -= scaleLongitude;
 					// translate
+//					centerLong = minLongitude + (maxLongitude - minLongitude) / 2.0;
+//					centerLat = minLatitude + (maxLatitude - minLatitude) / 2.0;
+//					System.out.println("  minLatitude2="+minLatitude);
+//					System.out.println("  maxLatitude2="+maxLatitude);
+//					System.out.println("  minLongitude2="+minLongitude);
+//					System.out.println("  maxLongitude2="+maxLongitude);
+					
 					if(wheelRot > 0) {
 						double factor = 0.5;
 						int x = e.getX();
@@ -306,13 +328,13 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private double getLatitudeDifference(int y1, int y2) {
 		int diffY = y1 - y2;
 		double latitudeDiff = maxLatitude - minLatitude;
-		return diffY * latitudeDiff / getHeight();
+		return diffY * latitudeDiff / dragFactor;
 	}
 	
 	private double getLongitudeDifference(int x1, int x2) {
 		int diffX = x1 - x2;
 		double longitudeDiff = maxLongitude - minLongitude;
-		return diffX * longitudeDiff / getWidth();
+		return diffX * longitudeDiff / dragFactor;
 	}
 	
 	private void initializeInternalCoordinates() {
@@ -381,7 +403,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			Iterator<Integer> busNumbers = internalBusCoords.keySet().iterator();
 			while(busNumbers.hasNext()) {
 				int busNumber = busNumbers.next();
-				int[] coords = getBusXY(busNumber, horizontalScale, verticalScale);
+				int[] coords = getBusXY(busNumber);
 				if(x == -1 || y == -1)
 					continue;
 				if(Math.abs(coords[0] - x) <= OVAL_HALF_HEIGHT
@@ -408,7 +430,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			Iterator<Integer> busNumbers = internalMarkerCoords.keySet().iterator();
 			while(busNumbers.hasNext()) {
 				int markerIndex = busNumbers.next();
-				double[] coords = getMarkerXYDouble(markerIndex, horizontalScale, verticalScale);
+				double[] coords = getMarkerXYDouble(markerIndex);
 				if(x == -1 || y == -1)
 					continue;
 				if(Math.abs(coords[0] - x) <= networkMarkerSize / 2.0
@@ -422,12 +444,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 				Branch branch = data.getBranches().get(i);
 				int fromBus = branch.getFromBusNumber();
 				int toBus = branch.getToBusNumber();
-				double[] coords1 = getBusXYDouble(fromBus, horizontalScale, verticalScale);
+				double[] coords1 = getBusXYDouble(fromBus);
 				double x1 = coords1[0];//getBusX(fromBus, horizontalScale);
 				double y1 = coords1[1];//getBusY(fromBus, verticalScale);
 				if(x1 == -1 || y1 == -1)
 					continue;
-				double[] coords2 = getBusXYDouble(toBus, horizontalScale, verticalScale);
+				double[] coords2 = getBusXYDouble(toBus);
 				double x2 = coords2[0];//getBusX(toBus, horizontalScale);
 				double y2 = coords2[1];//getBusY(toBus, verticalScale);
 				if(x2 == -1 || y2 == -1)
@@ -494,12 +516,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 				g.setColor(Color.GRAY);
 				List<MarkerElement> markers = data.getMarkers();
 				for (MarkerElement marker : markers) {
-					double[] markerCoords = getMarkerXYDouble(marker.getIndex(), horizontalScale, verticalScale);
+					double[] markerCoords = getMarkerXYDouble(marker.getIndex());
 					double markerX = markerCoords[0];
 					double markerY = markerCoords[1];
 					if(markerX == -1 || markerY == -1)
 						continue;
-					double[] busCoords = getBusXYDouble(marker.getParentBusNumber(), horizontalScale, verticalScale);
+					double[] busCoords = getBusXYDouble(marker.getParentBusNumber());
 					double busX = busCoords[0];
 					double busY = busCoords[1];
 					// set stroke
@@ -544,12 +566,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					}
 					int fromBus = cbranch.getFirstBranch().getFromBusNumber();
 					int toBus = cbranch.getFirstBranch().getToBusNumber();
-					double[] coords1 = getBusXYDouble(fromBus, horizontalScale, verticalScale);
+					double[] coords1 = getBusXYDouble(fromBus);
 					double x1 = coords1[0];//getBusXDouble(fromBus, horizontalScale);
 					double y1 = coords1[1];//getBusYDouble(fromBus, verticalScale);
 					if(x1 == -1 || y1 == -1)
 						continue;
-					double[] coords2 = getBusXYDouble(toBus, horizontalScale, verticalScale);
+					double[] coords2 = getBusXYDouble(toBus);
 					double x2 = coords2[0];//getBusXDouble(toBus, horizontalScale);
 					double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
 					if(x2 == -1 || y2 == -1)
@@ -628,7 +650,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 						else
 							g.setColor(Color.BLACK);
 					}
-					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber(), horizontalScale, verticalScale);
+					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber());
 					double x = coords[0];
 					double y = coords[1];
 					g2d.fill(new Ellipse2D.Double(
@@ -821,12 +843,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		return networkShape.createTransformedShape(transformation);
 	}
 	
-	protected int[] getBusXY(int i, double horizontalScale, double verticalScale) {
-		double[] coords = getBusXYDouble(i, horizontalScale, verticalScale);
+	protected int[] getBusXY(int i) {
+		double[] coords = getBusXYDouble(i);
 		return new int[] { (int) coords[0], (int) coords[1] };
 	}
 	
-	protected double[] getBusXYDouble(int i, double horizontalScale, double verticalScale) {
+	protected double[] getBusXYDouble(int i) {
 		int[] coords = internalBusCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
@@ -837,7 +859,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		return new double[] { x, y };
 	}
 	
-	protected double[] getMarkerXYDouble(int i, double horizontalScale, double verticalScale) {
+	protected double[] getMarkerXYDouble(int i) {
 		int[] coords = internalMarkerCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
@@ -848,7 +870,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		return new double[] { x, y };
 	}
 	
-	protected double getOutlineX(int i, double horizontalScale) {
+	protected double getOutlineX(int i) {
 		return ((internalGermany[i][0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
 	}
 	
@@ -935,7 +957,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
     public Point getToolTipLocation(MouseEvent event) {
     	AbstractNetworkElement element = getObjectFromScreen(event.getX(), event.getY());
     	if(element != null && element instanceof Bus) {
-    		int[] coords = getBusXY(((Bus) element).getBusNumber(), horizontalScale, verticalScale);
+    		int[] coords = getBusXY(((Bus) element).getBusNumber());
     		return new Point(coords[0] + 15, coords[1]);
     	}
 		return super.getToolTipLocation(event);
