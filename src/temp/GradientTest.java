@@ -190,10 +190,9 @@ public class GradientTest extends JFrame {
 		
 		private void drawBackground(Graphics2D g2d) {
 			long startTime = System.currentTimeMillis();
-			if(image == null) {
+			if(image == null)
 				updateBackgroundImage();
-			}
-			if(image != null)
+			else
 				g2d.drawImage(image, 0, 0, middleColor, null);
 
 			g2d.setColor(Color.BLACK);
