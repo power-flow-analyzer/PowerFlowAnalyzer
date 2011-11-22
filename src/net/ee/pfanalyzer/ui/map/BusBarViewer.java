@@ -135,7 +135,7 @@ public class BusBarViewer extends NetworkViewer { //JComponent implements INetwo
 	private void paintBusBar(Graphics2D g2d, BusBarInfo info) {
 		double fontYOffset = g2d.getFontMetrics().getAscent() / 2.0;
 		CombinedBus cbus = info.cbus;//getNetwork().getCombinedBus(i);
-		double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber(), horizontalScale, verticalScale);
+		double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber());
 		double x = coords[0];
 		double y = coords[1];
 		g2d.setStroke(strokesBold[0]);
@@ -188,12 +188,12 @@ public class BusBarViewer extends NetworkViewer { //JComponent implements INetwo
 		g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
 		int fromBus = branch.getFromBusNumber();
 		int toBus = branch.getToBusNumber();
-		double[] coords1 = getBusXYDouble(fromBus, horizontalScale, verticalScale);
+		double[] coords1 = getBusXYDouble(fromBus);
 		double x1 = coords1[0] + relativePosition;
 		double y1 = coords1[1];
 		if(x1 == -1 || y1 == -1)
 			return;
-		double[] coords2 = getBusXYDouble(toBus, horizontalScale, verticalScale);
+		double[] coords2 = getBusXYDouble(toBus);
 		double x4 = coords2[0] + relativePosition;
 		double y4 = coords2[1];
 		if(x4 == -1 || y4 == -1)
