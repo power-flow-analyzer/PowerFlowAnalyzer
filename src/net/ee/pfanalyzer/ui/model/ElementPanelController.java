@@ -67,10 +67,22 @@ public class ElementPanelController extends JPanel implements INetworkElementSel
 			networkPanel.updateNetwork();
 			cardLayout.show(this, NETWORK_CARD);
 		} else if(selection instanceof CombinedBus) {
-			cBusPanel.setCombinedBus((CombinedBus) selection);
+			CombinedBus cbus = (CombinedBus) selection;
+			// show single child bus directly
+			if(cbus.getBusNodes().size() == 1 && cbus.getGenerators().size() == 0) {
+				selectionChanged(cbus.getFirstBus());
+				return;
+			}
+			cBusPanel.setCombinedBus(cbus);
 			cardLayout.show(this, COMBINED_BUS_CARD);
 		} else if(selection instanceof CombinedBranch) {
-			cBranchPanel.setCombinedBranch((CombinedBranch) selection);
+			CombinedBranch cbranch = (CombinedBranch) selection;
+			// show single child branch directly
+			if(cbranch.getBranchCount() == 1) {
+				selectionChanged(cbranch.getBranch(0));
+				return;
+			}
+			cBranchPanel.setCombinedBranch(cbranch);
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
 		} else if(selection instanceof AbstractNetworkElement) {
 			elementPanel.setNetworkElement((AbstractNetworkElement) selection);
