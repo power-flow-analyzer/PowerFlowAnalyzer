@@ -8,7 +8,7 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	public final static double COORDINATE_EPSILON = 0.0001;
 	
 	private List<Generator> generators = new ArrayList<Generator>();
-	private List<Transformer> transformers = new ArrayList<Transformer>();
+//	private List<Transformer> transformers = new ArrayList<Transformer>();
 	private double longitude, lattitude;
 	private Boolean hasFailures = null;
 	private Boolean hasWarnings = null;
@@ -43,13 +43,13 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 		return generators;
 	}
 	
-	public void addTransformer(Transformer t) {
-		transformers.add(t);
-	}
-	
-	public List<Transformer> getTransformers() {
-		return transformers;
-	}
+//	public void addTransformer(Transformer t) {
+//		transformers.add(t);
+//	}
+//	
+//	public List<Transformer> getTransformers() {
+//		return transformers;
+//	}
 
 	public double getLongitude() {
 		return longitude;
@@ -98,12 +98,12 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 					break;
 				}
 			}
-			for (Transformer t : getTransformers()) {
-				if(t.hasFailures()) {
-					hasFailures = true;
-					break;
-				}
-			}
+//			for (Transformer t : getTransformers()) {
+//				if(t.hasFailures()) {
+//					hasFailures = true;
+//					break;
+//				}
+//			}
 		}
 		return hasFailures;
 	}
@@ -124,12 +124,12 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 					break;
 				}
 			}
-			for (Transformer t : getTransformers()) {
-				if(t.hasWarnings()) {
-					hasWarnings = true;
-					break;
-				}
-			}
+//			for (Transformer t : getTransformers()) {
+//				if(t.hasWarnings()) {
+//					hasWarnings = true;
+//					break;
+//				}
+//			}
 		}
 		return hasWarnings;
 	}
