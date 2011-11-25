@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -51,6 +50,9 @@ import net.ee.pfanalyzer.ui.NetworkContainer;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.shape.ElementShapeProvider;
+import net.ee.pfanalyzer.ui.shape.IElementShape;
+import net.ee.pfanalyzer.ui.shape.NetworkShape;
 
 public class NetworkViewer extends JComponent implements INetworkDataViewer, IDatabaseChangeListener {
 
@@ -93,7 +95,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	
 	protected Stroke[] strokesNormal, strokesBold;
 	private Stroke otherStrokeNormal, otherStrokeBold;
-	private GeneralPath arrow_pos, arrow_neg, networkShape;
+	private GeneralPath arrow_pos, arrow_neg;
+	private ElementShapeProvider shapeProvider;
 	private List<Integer> voltageLevels;
 	
 	private void createStrokes(float widthNormal, float widthBold) {
@@ -315,8 +318,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(wheelListener);
 		setFocusable(true);
+		shapeProvider = new ElementShapeProvider();
 		updateArrowSize(arrowSize);
-		updateNetworkShape(networkMarkerSize);
 		getViewerConfiguration().addDatabaseChangeListener(this);
 	}
 	
@@ -525,7 +528,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					double busX = busCoords[0];
 					double busY = busCoords[1];
 					// set stroke
-					if(isSelection(marker) || isHovered(marker))
+					boolean highlighted = isSelection(marker) || isHovered(marker);
+					if(highlighted)
 						g2d.setStroke(strokesBold[0]);
 					else
 						g2d.setStroke(strokesNormal[0]);
@@ -544,7 +548,11 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 						g2d.draw(new Line2D.Double(markerOutlineX, markerOutlineY, busX, busY));
 					}
 					// draw the marker
-					g2d.draw(getNetworkShape(markerX, markerY));
+					Shape[] shapes = shapeProvider.getShape(
+							NetworkShape.ID).getTranslatedShapes(markerX, markerY, 0, 0, highlighted);
+					for (Shape shape : shapes) {
+						g2d.draw(shape);
+					}
 					// draw the marker's name
 					String locationName = marker.getDisplayName(NetworkElement.DISPLAY_NAME);
 					if(locationName != null)
@@ -586,12 +594,19 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 								g.setColor(Color.GRAY);
 						} else
 							g.setColor(Color.RED);
-						g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
-						g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+						boolean highlighted = isSelected || isHovered;
+						IElementShape branchShape = drawShape(branch, g2d, x1, y1, x2, y2, highlighted, 
+								getBranchStroke(branch, highlighted));
 						double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
 						double realInjectionSumTo = cbranch.getToBusRealInjectionSum();
-						if(realInjectionSumFrom != realInjectionSumTo)
-							g2d.fill(getArrowShape(g2d, x1, y1, x2, y2, realInjectionSumFrom > realInjectionSumTo));
+						if(realInjectionSumFrom != realInjectionSumTo && branchShape != null) {
+							double[][] decorationPlaces = branchShape.getAdditionalDecorationsPlace();
+							if(decorationPlaces != null && decorationPlaces.length >= 1 && decorationPlaces[0].length >= 4) {
+								g2d.fill(getArrowShape(g2d, decorationPlaces[0][0], decorationPlaces[0][1], 
+										decorationPlaces[0][2], decorationPlaces[0][3], 
+										realInjectionSumFrom > realInjectionSumTo));
+							}
+						}
 					} else {
 						double branch_space = 5;
 						double alpha = Math.atan((y2-y1)/(x2-x1));
@@ -615,8 +630,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 									g.setColor(Color.GRAY);
 							} else
 								g.setColor(Color.RED);
-							g2d.setStroke(getBranchStroke(branch, isSelected || isHovered));
-							g2d.draw(new Line2D.Double(x1l, y1l, x2l, y2l));
+							boolean highlighted = isSelected || isHovered;
+							drawShape(branch, g2d, x1l, y1l, x2l, y2l, false, getBranchStroke(branch, highlighted));
 						}
 					}
 				}
@@ -653,27 +668,12 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber());
 					double x = coords[0];
 					double y = coords[1];
-					g2d.fill(new Ellipse2D.Double(
-							(int) x - OVAL_HALF_HEIGHT, 
-							(int) y - OVAL_HALF_HEIGHT, 
-							(int) 2.0 * OVAL_HALF_HEIGHT, 
-							(int) 2.0 * OVAL_HALF_HEIGHT));
+					boolean highlighted = isSelected || isHovered;
+					drawShape(cbus.getFirstBus(), g2d, x, y, Double.NaN, Double.NaN, highlighted, null);
 					if(drawBusNames) {
 						String locationName = cbus.getLabel();
 						if(locationName != null)
 							g2d.drawString(locationName, (int) x+15, (int) y+15);
-					}
-					if(isSelected || isHovered) {
-						g2d.draw(new Ellipse2D.Double(
-								(int) x - OVAL_HALF_HEIGHT - 2.0, 
-								(int) y - OVAL_HALF_HEIGHT - 2.0, 
-								(int) 2.0 * OVAL_HALF_HEIGHT + 3.0, 
-								(int) 2.0 * OVAL_HALF_HEIGHT + 3.0));
-						g2d.draw(new Ellipse2D.Double(
-								(int) x - OVAL_HALF_HEIGHT - 3.0, 
-								(int) y - OVAL_HALF_HEIGHT - 3.0, 
-								(int) 2.0 * OVAL_HALF_HEIGHT + 5.0, 
-								(int) 2.0 * OVAL_HALF_HEIGHT + 5.0));
 					}
 					// draw generators
 					if(drawGenerators && cbus.getGenerators().size() > 0) {
@@ -728,6 +728,36 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			g2d.setStroke(new BasicStroke(3));
 			g.drawRect(0, 0, getWidth()-1, getHeight()-1);
 		}
+	}
+	
+	protected IElementShape drawShape(AbstractNetworkElement element, Graphics2D g2d, 
+			double x1, double y1, double x2, double y2, boolean highlighted, Stroke customStroke) {
+		IElementShape elementShape = shapeProvider.getShape(element.getShapeID());
+		if(elementShape != null) {
+			Shape[] shapes = elementShape.getTranslatedShapes(x1, y1, x2, y2, highlighted);
+			if(shapes == null)
+				return elementShape;
+			boolean[] fillShapes = elementShape.fillShape();
+			boolean[] useCustomStrokes = elementShape.useCustomStroke();
+			for (int shapeIndex = 0; shapeIndex < shapes.length; shapeIndex++) {
+				Shape shape = shapes[shapeIndex];
+				if(shape == null)
+					continue;
+				if(customStroke != null && useCustomStrokes.length > shapeIndex && useCustomStrokes[shapeIndex]) {
+					g2d.setStroke(customStroke);
+				} else {
+					if(highlighted)
+						g2d.setStroke(strokesBold[0]);
+					else
+						g2d.setStroke(strokesNormal[0]);
+				}
+				if(fillShapes.length > shapeIndex && fillShapes[shapeIndex])
+					g2d.fill(shape);
+				else
+					g2d.draw(shape);
+			}
+		}
+		return elementShape;
 	}
 	
 	private void drawOutlines(Graphics2D g2d) {
@@ -812,35 +842,6 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		return directionOneToTwo ? 
 				arrow_pos.createTransformedShape(transformation) : 
 				arrow_neg.createTransformedShape(transformation);
-	}
-	
-	private void updateNetworkShape(int size) {
-		networkShape = new GeneralPath();
-		int stepSize = size / 3;
-		
-		double x = -size / 2.0;
-		double y = -size / 2.0;
-		int counter = 0;
-		for (int step = 1; step * stepSize < 2 * size; step++) {
-			boolean upperHalf = counter >= size;
-			if(upperHalf) {
-				networkShape.append(new Line2D.Double(x + counter - size, y, x + size, y + size - counter + size), false);
-				networkShape.append(new Line2D.Double(x + size, y + counter - size, x - size + counter, y + size), false);
-			} else {
-				networkShape.append(new Line2D.Double(x, y + size - counter, x + counter, y + size), false);
-				networkShape.append(new Line2D.Double(x, y + counter, x + counter, y), false);
-			}
-			counter += stepSize;
-		}
-		networkShape.append(new Line2D.Double(x, y, x + size, y), false);// oben
-		networkShape.append(new Line2D.Double(x, y, x, y + size), false);// links
-		networkShape.append(new Line2D.Double(x, y + size, x + size, y + size), false);// unten
-		networkShape.append(new Line2D.Double(x + size, y, x + size, y + size), false);// rechts
-	}
-	
-	private Shape getNetworkShape(double x, double y) {
-		AffineTransform transformation = AffineTransform.getTranslateInstance(x, y);
-		return networkShape.createTransformedShape(transformation);
 	}
 	
 	protected int[] getBusXY(int i) {
