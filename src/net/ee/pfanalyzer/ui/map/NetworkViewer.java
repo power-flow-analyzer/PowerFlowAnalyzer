@@ -10,12 +10,13 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +53,6 @@ import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.shape.ElementShapeProvider;
 import net.ee.pfanalyzer.ui.shape.IElementShape;
-import net.ee.pfanalyzer.ui.shape.NetworkShape;
 
 public class NetworkViewer extends JComponent implements INetworkDataViewer, IDatabaseChangeListener {
 
@@ -161,6 +161,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private double maxLongitude = NetworkViewerController.ZOOM_GERMANY_COORDINATES[3];
 	
 	protected double horizontalScale, verticalScale;
+	protected List<CombinedBus> visibleBusses;
+	protected List<CombinedBranch> visibleBranches;
 	
 	private Object selection, hover;
 	private DataViewerConfiguration viewerConfiguration;
@@ -267,31 +269,11 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					double wheelRot = -e.getWheelRotation();
 					double scaleLatitude = wheelRot * (maxLatitude - minLatitude) / 10.0; 
 					double scaleLongitude = wheelRot * (maxLongitude - minLongitude) / 10.0;
-//					if(horizontalScale > verticalScale)
-//						scaleLatitude = getLatitudeDifference(internalMinY, internalMaxY);
-//					else
-//						scaleLatitude = getLongitudeDifference(internalMinX, internalMaxX);
-//					int diffX = (int) ((internalMaxX - internalMinX) * horizontalScale + HORIZONTAL_GAP);
-//					double diffLongitude = converter.getLongitude(diffX);
-//					System.out.println("scaleLongitude="+scaleLongitude);
-//					System.out.println("diffLongitude="+diffLongitude);
-//					double centerLong = minLongitude + (maxLongitude - minLongitude) / 2.0;
-//					double centerLat = minLatitude + (maxLatitude - minLatitude) / 2.0;
-//					System.out.println("  minLatitude1="+minLatitude);
-//					System.out.println("  maxLatitude1="+maxLatitude);
-//					System.out.println("  minLongitude1="+minLongitude);
-//					System.out.println("  maxLongitude1="+maxLongitude);
 					minLatitude += scaleLatitude;
 					maxLatitude -= scaleLatitude;
 					minLongitude += scaleLongitude;
 					maxLongitude -= scaleLongitude;
 					// translate
-//					centerLong = minLongitude + (maxLongitude - minLongitude) / 2.0;
-//					centerLat = minLatitude + (maxLatitude - minLatitude) / 2.0;
-//					System.out.println("  minLatitude2="+minLatitude);
-//					System.out.println("  maxLatitude2="+maxLatitude);
-//					System.out.println("  minLongitude2="+minLongitude);
-//					System.out.println("  maxLongitude2="+maxLongitude);
 					
 					if(wheelRot > 0) {
 						double factor = 0.5;
@@ -313,6 +295,11 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 				}
 			}
 		};
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				updateVisibleElements();
+			}
+		});
 		controller = new NetworkViewerController(this);
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
@@ -398,9 +385,69 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			int y = converter.getY(GERMANY[i][0]);
 			internalGermany[i] = new int[] { x, y };
 		}
+		updateVisibleElements();
+	}
+	
+	private void updateVisibleElements() {
+		visibleBusses = null;
+		visibleBranches = null;
+	}
+	
+	private void checkVisibleElements() {
+		if(visibleBusses == null)
+			initializeVisibleElements();
+	}
+	
+	private void initializeVisibleElements() {
+		visibleBusses = new ArrayList<CombinedBus>();
+		double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY, maxX = 0, maxY = 0;
+		for (int i = 0; i < data.getCombinedBusCount(); i++) {
+			CombinedBus cbus = data.getCombinedBus(i);
+			double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber());
+			double x = coords[0];
+			double y = coords[1];
+			if(isOutsideView(x, y))
+				continue;
+			minX = Math.min(minX, x);
+			maxX = Math.max(maxX, x);
+			minY = Math.min(minY, y);
+			maxY = Math.max(maxY, y);
+			visibleBusses.add(cbus);
+		}
+		visibleBranches = new ArrayList<CombinedBranch>();
+		for (int i = 0; i < data.getCombinedBranchCount(); i++) {
+			CombinedBranch cbranch = data.getCombinedBranch(i);
+			int fromBus = cbranch.getFirstBranch().getFromBusNumber();
+			int toBus = cbranch.getFirstBranch().getToBusNumber();
+			double[] coords1 = getBusXYDouble(fromBus);
+			double x1 = coords1[0];//getBusXDouble(fromBus, horizontalScale);
+			double y1 = coords1[1];//getBusYDouble(fromBus, verticalScale);
+			if(x1 == -1 || y1 == -1)
+				continue;
+			double[] coords2 = getBusXYDouble(toBus);
+			double x2 = coords2[0];//getBusXDouble(toBus, horizontalScale);
+			double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
+			if(x2 == -1 || y2 == -1)
+				continue;
+			if(isOutsideView(x1, y1) && isOutsideView(x2, y2) && isOutsideView(x1, y1, x2, y2, 6))
+				continue;
+			visibleBranches.add(cbranch);
+		}
+//		System.out.println("Visible combined busses: " + visibleBusses.size());
+//		System.out.println("Visible combined branches: " + visibleBranches.size());
+		// determine factor for size of element shapes
+		double minDim = Math.min(maxX - minX, maxY - minY);
+		int busCount = visibleBusses.size();
+		double shapeSizeFactor;
+		if(busCount > 0 && minDim > 0)
+			shapeSizeFactor = minDim / (30.0 * busCount);
+		else
+			shapeSizeFactor = 1;
+		shapeProvider.setShapeSizeFactor(shapeSizeFactor);
 	}
 	
 	private AbstractNetworkElement getObjectFromScreen(int x, int y) {
+		checkVisibleElements();
 		// check busses
 		if(drawBusNodes) {
 			Iterator<Integer> busNumbers = internalBusCoords.keySet().iterator();
@@ -442,9 +489,9 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			}
 		}
 		// check branches
-		if(drawBranches) {
-			for (int i = 0; i < data.getBranches().size(); i++) {
-				Branch branch = data.getBranches().get(i);
+		if(drawBranches && visibleBranches != null) {
+			for (int i = 0; i < visibleBranches.size(); i++) {
+				Branch branch = visibleBranches.get(i).getFirstBranch();
 				int fromBus = branch.getFromBusNumber();
 				int toBus = branch.getToBusNumber();
 				double[] coords1 = getBusXYDouble(fromBus);
@@ -510,6 +557,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					verticalScale = horizontalScale;
 				}
 			}
+			checkVisibleElements();
 			// draw outlines
 			if(drawOutline) {
 				drawOutlines(g2d);
@@ -533,36 +581,15 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 						g2d.setStroke(strokesBold[0]);
 					else
 						g2d.setStroke(strokesNormal[0]);
-					// draw line between marker and bus
-					if(busX != -1 && busY != -1) {
-						// determine where the line should be connected to the marker
-						double markerOutlineX = markerX;
-						double markerOutlineY = markerY;
-						double xDiff = busX - markerX;
-						double yDiff = busY - markerY;
-						if(xDiff < yDiff || yDiff == 0)
-							markerOutlineX += (Math.signum(xDiff) == 1 ? 1 : -1) * networkMarkerSize / 2.0;
-						else
-							markerOutlineY += (Math.signum(yDiff) == 1 ? 1 : -1) * networkMarkerSize / 2.0;
-						// draw the line
-						g2d.draw(new Line2D.Double(markerOutlineX, markerOutlineY, busX, busY));
-					}
+					String locationName = drawBusNames ? marker.getDisplayName(NetworkElement.DISPLAY_NAME) : null;
 					// draw the marker
-					Shape[] shapes = shapeProvider.getShape(
-							NetworkShape.ID).getTranslatedShapes(markerX, markerY, 0, 0, highlighted);
-					for (Shape shape : shapes) {
-						g2d.draw(shape);
-					}
-					// draw the marker's name
-					String locationName = marker.getDisplayName(NetworkElement.DISPLAY_NAME);
-					if(locationName != null)
-						g2d.drawString(locationName, (int) markerX+15, (int) markerY+15);
+					drawShape(marker, g2d, markerX, markerY, busX, busY, highlighted, locationName, null);
 				}
 			}
 			// draw branches
 			if(drawBranches) {
-				for (int i = 0; i < data.getCombinedBranchCount(); i++) {
-					CombinedBranch cbranch = data.getCombinedBranch(i);
+				for (int i = 0; i < visibleBranches.size(); i++) {
+					CombinedBranch cbranch = visibleBranches.get(i);
 					boolean isSelected = isSelection(cbranch);
 					boolean isHovered = isHovered(cbranch);
 					for (int b = 0; b < cbranch.getBranchCount(); b++) {
@@ -577,13 +604,15 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					double[] coords1 = getBusXYDouble(fromBus);
 					double x1 = coords1[0];//getBusXDouble(fromBus, horizontalScale);
 					double y1 = coords1[1];//getBusYDouble(fromBus, verticalScale);
-					if(x1 == -1 || y1 == -1)
-						continue;
+//					if(x1 == -1 || y1 == -1)
+//						continue;
 					double[] coords2 = getBusXYDouble(toBus);
 					double x2 = coords2[0];//getBusXDouble(toBus, horizontalScale);
 					double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
-					if(x2 == -1 || y2 == -1)
-						continue;
+//					if(x2 == -1 || y2 == -1)
+//						continue;
+//					if(isOutsideView(x1, y1) && isOutsideView(x2, y2) && isOutsideView(x1, y1, x2, y2, 6))
+//						continue;
 					if(drawPowerDirection) {
 						// draw first branch
 						Branch branch = cbranch.getFirstBranch();
@@ -595,7 +624,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 						} else
 							g.setColor(Color.RED);
 						boolean highlighted = isSelected || isHovered;
-						IElementShape branchShape = drawShape(branch, g2d, x1, y1, x2, y2, highlighted, 
+						IElementShape branchShape = drawShape(branch, g2d, x1, y1, x2, y2, highlighted, null, 
 								getBranchStroke(branch, highlighted));
 						double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
 						double realInjectionSumTo = cbranch.getToBusRealInjectionSum();
@@ -631,7 +660,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 							} else
 								g.setColor(Color.RED);
 							boolean highlighted = isSelected || isHovered;
-							drawShape(branch, g2d, x1l, y1l, x2l, y2l, false, getBranchStroke(branch, highlighted));
+							drawShape(branch, g2d, x1l, y1l, x2l, y2l, false, null, getBranchStroke(branch, highlighted));
 						}
 					}
 				}
@@ -639,8 +668,8 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 			g2d.setStroke(defaultStroke);
 			// draw bus nodes
 			if(drawBusNodes) {
-				for (int i = 0; i < data.getCombinedBusCount(); i++) {
-					CombinedBus cbus = data.getCombinedBus(i);
+				for (int i = 0; i < visibleBusses.size(); i++) {
+					CombinedBus cbus = visibleBusses.get(i);
 					boolean hasFailures = cbus.hasFailures();
 					boolean hasWarnings = cbus.hasWarnings();
 					boolean isSlack = false;
@@ -668,55 +697,53 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					double[] coords = getBusXYDouble(cbus.getFirstBus().getBusNumber());
 					double x = coords[0];
 					double y = coords[1];
+//					if(isOutsideView(x, y))
+//						continue;
+					String locationName = drawBusNames ? cbus.getLabel() : null;
 					boolean highlighted = isSelected || isHovered;
-					drawShape(cbus.getFirstBus(), g2d, x, y, Double.NaN, Double.NaN, highlighted, null);
-					if(drawBusNames) {
-						String locationName = cbus.getLabel();
-						if(locationName != null)
-							g2d.drawString(locationName, (int) x+15, (int) y+15);
-					}
-					// draw generators
-					if(drawGenerators && cbus.getGenerators().size() > 0) {
-						for (int gen = 0; gen < cbus.getGenerators().size(); gen++) {
-							Generator generator = cbus.getGenerators().get(gen);
-							if( ! isSelected && isSelection(generator))
-								isSelected = true;
-							if( ! isHovered && isHovered(generator))
-								isHovered = true;
-							
-						}
-						if(hasFailures)
-							g.setColor(Preferences.getFlagFailureColor());
-						else if(hasWarnings)
-							g.setColor(Preferences.getFlagWarningColor());
-						else {
-							if(isSlack)
-								g.setColor(Color.BLUE);
-							else
-								g.setColor(Color.BLACK);
-						}
-						int x_gen = (int) x;//getBusX(busIndex, horizontalScale);
-						int y_gen = (int) y;//getBusY(busIndex, verticalScale);
-						if(x == -1 || y == -1)
-							continue;
-						g2d.drawRect(
-								x_gen - RECTANGLE_HALF_HEIGHT - 1, 
-								y_gen - RECTANGLE_HALF_HEIGHT - 1, 
-								2 * RECTANGLE_HALF_HEIGHT + 2, 
-								2 * RECTANGLE_HALF_HEIGHT + 2);
-						if(isSelected || isHovered) {
-							g2d.drawRect(
-									x_gen - RECTANGLE_HALF_HEIGHT - 2, 
-									y_gen - RECTANGLE_HALF_HEIGHT - 2, 
-									2 * RECTANGLE_HALF_HEIGHT + 4, 
-									2 * RECTANGLE_HALF_HEIGHT + 4);
-							g2d.drawRect(
-									x_gen - RECTANGLE_HALF_HEIGHT - 3, 
-									y_gen - RECTANGLE_HALF_HEIGHT - 3, 
-									2 * RECTANGLE_HALF_HEIGHT + 6, 
-									2 * RECTANGLE_HALF_HEIGHT + 6);
-						}
-					}
+					drawShape(cbus.getFirstBus(), g2d, x, y, Double.NaN, Double.NaN, highlighted, locationName, null);
+//					// draw generators
+//					if(drawGenerators && cbus.getGenerators().size() > 0) {
+//						for (int gen = 0; gen < cbus.getGenerators().size(); gen++) {
+//							Generator generator = cbus.getGenerators().get(gen);
+//							if( ! isSelected && isSelection(generator))
+//								isSelected = true;
+//							if( ! isHovered && isHovered(generator))
+//								isHovered = true;
+//							
+//						}
+//						if(hasFailures)
+//							g.setColor(Preferences.getFlagFailureColor());
+//						else if(hasWarnings)
+//							g.setColor(Preferences.getFlagWarningColor());
+//						else {
+//							if(isSlack)
+//								g.setColor(Color.BLUE);
+//							else
+//								g.setColor(Color.BLACK);
+//						}
+//						int x_gen = (int) x;//getBusX(busIndex, horizontalScale);
+//						int y_gen = (int) y;//getBusY(busIndex, verticalScale);
+//						if(x == -1 || y == -1)
+//							continue;
+//						g2d.drawRect(
+//								x_gen - RECTANGLE_HALF_HEIGHT - 1, 
+//								y_gen - RECTANGLE_HALF_HEIGHT - 1, 
+//								2 * RECTANGLE_HALF_HEIGHT + 2, 
+//								2 * RECTANGLE_HALF_HEIGHT + 2);
+//						if(isSelected || isHovered) {
+//							g2d.drawRect(
+//									x_gen - RECTANGLE_HALF_HEIGHT - 2, 
+//									y_gen - RECTANGLE_HALF_HEIGHT - 2, 
+//									2 * RECTANGLE_HALF_HEIGHT + 4, 
+//									2 * RECTANGLE_HALF_HEIGHT + 4);
+//							g2d.drawRect(
+//									x_gen - RECTANGLE_HALF_HEIGHT - 3, 
+//									y_gen - RECTANGLE_HALF_HEIGHT - 3, 
+//									2 * RECTANGLE_HALF_HEIGHT + 6, 
+//									2 * RECTANGLE_HALF_HEIGHT + 6);
+//						}
+//					}
 				}
 			}
 		} else {
@@ -730,8 +757,23 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 		}
 	}
 	
+	protected boolean isOutsideView(double x1, double y1, double x2, double y2, double count) {
+		double xn = (x2 - x1) / count;
+		double yn = (y2 - y1) / count;
+		for (double i = 1; i < count; i++) {
+			if(isOutsideView(x1 + xn * i, y1 + yn * i) == false)
+				return false;
+		}
+		return true;
+	}
+	
+	protected boolean isOutsideView(double x, double y) {
+		int space = 10;
+		return x < -space || x > getWidth() + space || y < -space || y > getHeight() + space;
+	}
+	
 	protected IElementShape drawShape(AbstractNetworkElement element, Graphics2D g2d, 
-			double x1, double y1, double x2, double y2, boolean highlighted, Stroke customStroke) {
+			double x1, double y1, double x2, double y2, boolean highlighted, String label, Stroke customStroke) {
 		IElementShape elementShape = shapeProvider.getShape(element.getShapeID());
 		if(elementShape != null) {
 			Shape[] shapes = elementShape.getTranslatedShapes(x1, y1, x2, y2, highlighted);
@@ -757,6 +799,9 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					g2d.draw(shape);
 			}
 		}
+		// draw the marker's name
+		if(label != null)
+			g2d.drawString(label, (int) x1+15, (int) y1+15);
 		return elementShape;
 	}
 	
