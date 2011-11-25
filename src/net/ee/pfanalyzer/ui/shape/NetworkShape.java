@@ -10,10 +10,12 @@ public class NetworkShape implements IElementShape {
 	public static String ID = "shape.network";
 
 	private GeneralPath networkShape;
+	private double size;
 	
-	public NetworkShape(int size) {
+	public NetworkShape(double size) {
+		this.size = size;
 		networkShape = new GeneralPath();
-		int stepSize = size / 3;
+		int stepSize = (int) (size / 3.0);
 		
 		double x = -size / 2.0;
 		double y = -size / 2.0;
@@ -37,14 +39,22 @@ public class NetworkShape implements IElementShape {
 	
 	@Override
 	public Shape[] getTranslatedShapes(double x1, double y1, double x2, double y2, boolean highlighted) {
-//		double translateX = x1;
-//		double translateY = y1;
-//		if(Double.isInfinite(x2) == false && Double.isInfinite(y2) == false) {
-//			translateX = x2;
-//			translateY = y2;
-//		}
+		Shape connectionLine = null;
+		if(Double.isInfinite(x2) == false && Double.isInfinite(y2) == false) {
+			// determine where the line should be connected to the marker
+			double markerOutlineX = x1;
+			double markerOutlineY = y1;
+			double xDiff = x2 - x1;
+			double yDiff = y2 - y1;
+			if(xDiff < yDiff || yDiff == 0)
+				markerOutlineX += (Math.signum(xDiff) == 1 ? 1 : -1) * size / 2.0;
+			else
+				markerOutlineY += (Math.signum(yDiff) == 1 ? 1 : -1) * size / 2.0;
+			// create the line
+			connectionLine = new Line2D.Double(markerOutlineX, markerOutlineY, x2, y2);
+		}
 		AffineTransform transformation = AffineTransform.getTranslateInstance(x1, y1);
-		return new Shape[] {networkShape.createTransformedShape(transformation) };
+		return new Shape[] {networkShape.createTransformedShape(transformation), connectionLine };
 	}
 	
 	@Override
