@@ -61,7 +61,7 @@ public class GradientTest extends JFrame {
 	
 	Color maxColor = new Color(255, 0, 0);
 	Color upperHalfColor = new Color(255, 255, 0);
-	Color middleColor = new Color(0, 255, 0);
+	Color middleColor = new Color(255, 255, 255);
 	Color lowerHalfColor = new Color(0, 255, 255);
 	Color minColor = new Color(0, 0, 255);
 	double maxDistance = 70;
