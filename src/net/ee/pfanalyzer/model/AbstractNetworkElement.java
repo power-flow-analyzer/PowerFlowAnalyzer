@@ -113,6 +113,14 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 		return "";
 	}
 	
+	public String getDefaultShapeID() {
+		return "";
+	}
+	
+	public String getShapeID() {
+		return getTextParameter("SHAPE", getDefaultShapeID());
+	}
+	
 	public Network getNetwork() {
 		return network;
 	}
