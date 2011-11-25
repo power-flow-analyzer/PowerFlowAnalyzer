@@ -79,10 +79,16 @@
                 <parameter ID="MU_ANGMAX" type="double" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit (&lt;i&gt;u&lt;/i&gt;/degree)&lt;/html&gt;" empty="true">
                     <display/>
                 </parameter>
+                <parameter ID="SHAPE" type="text" label="Shape" restriction="list" value="shape.branch.default">
+                    <option value="shape.branch.default" label="Default" ID="DEFAULT"/>
+                    <option value="shape.branch.transformer" label="Transformer" ID="TRANSFORMER"/>
+                    <display/>
+                </parameter>
                 <modelClass ID="transformer" label="Transformer" description="">
-                    <model ID="default" label="Default Transformer"/>
+                    <parameter ID="SHAPE" value="shape.branch.transformer"/>
+                    <model ID="default" label="Default Matpower Transformer"/>
                 </modelClass>
-                <model ID="unknown" label="Unknown Branch"/>
+                <model ID="unknown" label="Default Matpower Branch"/>
             </modelClass>
             <modelClass ID="bus" label="Bus">
                 <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
@@ -149,7 +155,15 @@
                 <parameter ID="ZONE" type="integer" label="Zone" empty="true">
                     <display/>
                 </parameter>
-                <model ID="unknown" label="Unknown Bus"/>
+                <parameter ID="SHAPE" type="text" label="Shape" restriction="list" value="shape.bus.default">
+                    <option value="shape.bus.default" label="Default" ID="DEFAULT"/>
+                    <option value="shape.network" label="Network" ID="NETWORK"/>
+                    <display/>
+                </parameter>
+                <model ID="unknown" label="Default Matpower Bus"/>
+                <model ID="network" label="Network Bus">
+                    <parameter ID="SHAPE" value="shape.network"/>
+                </model>
             </modelClass>
             <modelClass ID="generator" label="Generator">
                 <parameter ID="NAME" type="text" label="Name" description="Name of this bus node" empty="true">
@@ -249,7 +263,7 @@
                 <parameter ID="COST" type="double" label="Parameters definining total cost function" description="Parameters definining total cost function f(p) begin in this column, units of f and p are $/hr and MW (or MVAr), respectively" empty="true">
                     <display/>
                 </parameter>
-                <model ID="unknown" label="Unknown Generator"/>
+                <model ID="unknown" label="Default Matpower Generator"/>
             </modelClass>
             <modelClass ID="marker" label="Markers">
                 <parameter ID="NAME" type="text" label="Name" description="Name of this marker" empty="true">
