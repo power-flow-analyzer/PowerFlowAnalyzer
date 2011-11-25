@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.model;
 
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
+import net.ee.pfanalyzer.ui.shape.DefaultBusShape;
 
 public class Bus extends AbstractNetworkElement implements ICoordinatesParameters {
 
@@ -15,6 +16,11 @@ public class Bus extends AbstractNetworkElement implements ICoordinatesParameter
 	@Override
 	public String getDefaultModelID() {
 		return ModelDB.DEFAULT_BUS_MODEL;
+	}
+	
+	@Override
+	public String getDefaultShapeID() {
+		return DefaultBusShape.ID;
 	}
 	
 	public int getBusNumber() {

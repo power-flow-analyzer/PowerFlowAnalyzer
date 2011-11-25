@@ -2,6 +2,7 @@ package net.ee.pfanalyzer.model;
 
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 import net.ee.pfanalyzer.model.matpower.IBranchDataConstants;
+import net.ee.pfanalyzer.ui.shape.DefaultBranchShape;
 
 
 public class Branch extends AbstractNetworkElement implements IBranchDataConstants {
@@ -20,6 +21,11 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	@Override
 	public String getDefaultModelID() {
 		return ModelDB.DEFAULT_BRANCH_MODEL;
+	}
+	
+	@Override
+	public String getDefaultShapeID() {
+		return DefaultBranchShape.ID;
 	}
 	
 	public int getInitialBranchStatus() {
