@@ -4,16 +4,15 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 
 public class TransformerShape implements IElementShape {
 	
 	public static String ID = "shape.branch.transformer";
 	
-	private int m_size;
+	private double m_size;
 	private double[][] decorationsPlaces;
 
-	public TransformerShape(int size) {
+	public TransformerShape(double size) {
 		m_size = size;
 	}
 	
