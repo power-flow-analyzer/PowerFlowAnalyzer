@@ -274,8 +274,17 @@
                 </parameter>
                 <parameter ID="LATITUDE" type="double" label="Latitude" description="" empty="true"/>
                 <parameter ID="LONGITUDE" type="double" label="Longitude" description="" empty="true"/>
+                <parameter ID="SHAPE" type="text" label="Shape" restriction="list" empty="true">
+                    <option value="shape.network" label="Network" ID="NETWORK"/>
+                    <option value="shape.bus.default" label="Bus" ID="BUS"/>
+                    <option value="shape.branch.default" label="Branch" ID="BRANCH"/>
+                    <option value="shape.branch.transformer" label="Transformer" ID="TRANSFORMER"/>
+                    <display/>
+                </parameter>
                 <modelClass ID="connection" label="Connection">
-                    <model ID="network" label="Network"/>
+                    <model ID="network" label="Network">
+                        <parameter ID="SHAPE" value="shape.network"/>
+                    </model>
                     <model ID="tie_line" label="Tie line"/>
                 </modelClass>
             </modelClass>
