@@ -4,9 +4,12 @@ package net.ee.pfanalyzer.ui.shape;
 
 public class ElementShapeProvider {
 	
-	private double networkSize = 25;
-	private double busSize = 16;
-	private double transformerSize = 20;
+	private double networkMaxSize = 25;
+	private double networkMinSize = 16;
+	private double busMaxSize = 16;
+	private double busMinSize = 4;
+	private double transformerMaxSize = 20;
+	private double transformerMinSize = 4;
 	
 	private double shapeSizeFactor = 1;
 	
@@ -18,18 +21,18 @@ public class ElementShapeProvider {
 
 	public IElementShape getShape(String shapeID) {
 		if(NetworkShape.ID.equals(shapeID))
-			return new NetworkShape(getShapeSize(networkSize));
+			return new NetworkShape(getShapeSize(networkMaxSize, networkMinSize));
 		if(DefaultBusShape.ID.equals(shapeID))
-			return new DefaultBusShape(getShapeSize(busSize));
+			return new DefaultBusShape(getShapeSize(busMaxSize, busMinSize));
 		if(DefaultBranchShape.ID.equals(shapeID))
 			return new DefaultBranchShape(-1);
 		if(TransformerShape.ID.equals(shapeID))
-			return new TransformerShape(getShapeSize(transformerSize));
+			return new TransformerShape(getShapeSize(transformerMaxSize, transformerMinSize));
 		return null;
 	}
 	
-	private double getShapeSize(double maxSize) {
-		return Math.max(Math.min(maxSize, shapeSizeFactor * maxSize), 4);
+	private double getShapeSize(double maxSize, double minSize) {
+		return Math.max(Math.min(maxSize, shapeSizeFactor * maxSize), minSize);
 	}
 	
 	public void setShapeSizeFactor(double factor) {
