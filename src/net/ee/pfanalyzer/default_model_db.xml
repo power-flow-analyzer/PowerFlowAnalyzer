@@ -285,7 +285,9 @@
                     <model ID="network" label="Network">
                         <parameter ID="SHAPE" value="shape.network"/>
                     </model>
-                    <model ID="tie_line" label="Tie line"/>
+                    <model ID="tie_line" label="Tie line">
+                        <parameter ID="SHAPE" value="shape.network"/>
+                    </model>
                 </modelClass>
             </modelClass>
             <model ID="unknown" label="Unknown Element">
