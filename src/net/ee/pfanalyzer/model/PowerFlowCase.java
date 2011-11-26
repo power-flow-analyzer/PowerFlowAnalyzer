@@ -8,7 +8,7 @@ import net.ee.pfanalyzer.model.data.CaseData;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.ui.NetworkContainer;
+import net.ee.pfanalyzer.ui.CaseViewer;
 
 public class PowerFlowCase implements IDatabaseChangeListener {
 
@@ -17,7 +17,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private List<Network> networks = new ArrayList<Network>();
 	private List<Network> networksAndScenarios = new ArrayList<Network>();
 	private ModelDB modelDB;
-	private NetworkContainer viewer;
+	private CaseViewer viewer;
 	private long maxNetworkID = 0;
 	private long caseID = -1;
 	private List<IPowerFlowCaseListener> listeners = new ArrayList<IPowerFlowCaseListener>();
@@ -109,7 +109,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		}
 	}
 	
-	public NetworkContainer getViewer() {
+	public CaseViewer getViewer() {
 		return viewer;
 	}
 	
@@ -117,7 +117,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		return pfCase.getDataViewer();
 	}
 
-	public void setViewer(NetworkContainer viewer) {
+	public void setViewer(CaseViewer viewer) {
 		this.viewer = viewer;
 	}
 	

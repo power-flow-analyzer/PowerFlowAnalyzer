@@ -19,7 +19,7 @@ import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 
-public class BusBarViewer extends NetworkViewer { //JComponent implements INetworkDataViewer {
+public class BusBarViewer extends NetworkMapViewer { //JComponent implements INetworkDataViewer {
 	
 	public final static String VIEWER_ID = "viewer.network.busbar";
 

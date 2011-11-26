@@ -13,15 +13,15 @@ import javax.swing.SwingUtilities;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.PowerFlowCase;
-import net.ee.pfanalyzer.ui.PowerFlowViewer;
+import net.ee.pfanalyzer.ui.NetworkViewer;
 
 public class DataViewerContainer extends JPanel {
 	
 	private INetworkDataViewer viewer;
 	private PowerFlowCase powerFlowCase;
-	private PowerFlowViewer powerFlowviewer;
+	private NetworkViewer powerFlowviewer;
 
-	public DataViewerContainer(INetworkDataViewer viewer, PowerFlowViewer powerFlowviewer) {
+	public DataViewerContainer(INetworkDataViewer viewer, NetworkViewer powerFlowviewer) {
 		super(new BorderLayout());
 		this.viewer = viewer;
 		this.powerFlowCase = powerFlowviewer.getPowerFlowCase();

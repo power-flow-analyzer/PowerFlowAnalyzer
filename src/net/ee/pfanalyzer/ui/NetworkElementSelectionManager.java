@@ -7,14 +7,14 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.util.ListUtils;
-import net.ee.pfanalyzer.ui.PowerFlowViewer.ViewerFrame;
+import net.ee.pfanalyzer.ui.NetworkViewer.ViewerFrame;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 
 public class NetworkElementSelectionManager implements INetworkElementSelectionListener {
 
 	public static NetworkElementSelectionManager getInstance(Component component) {
-		if(component instanceof PowerFlowViewer)
-			return ((PowerFlowViewer) component).getSelectionManager();
+		if(component instanceof NetworkViewer)
+			return ((NetworkViewer) component).getSelectionManager();
 		if(component instanceof ViewerFrame)
 			return ((ViewerFrame) component).getPowerFlowViewer().getSelectionManager();
 		if(component.getParent() != null && component.getParent() instanceof Component)

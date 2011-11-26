@@ -49,9 +49,9 @@ import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.preferences.PreferencesInitializer;
-import net.ee.pfanalyzer.ui.NetworkContainer;
+import net.ee.pfanalyzer.ui.CaseViewer;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
-import net.ee.pfanalyzer.ui.PowerFlowViewer;
+import net.ee.pfanalyzer.ui.NetworkViewer;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
 import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
@@ -167,7 +167,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
-				NetworkContainer container = cases.get(tabIndex).getViewer();
+				CaseViewer container = cases.get(tabIndex).getViewer();
 				if(container.getSelectionManager() != null)
 					container.getSelectionManager().removeActionUpdateListener(PowerFlowAnalyzer.this);
 				container.dispose();
@@ -841,7 +841,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			for (Network network : caze.getNetworks(true)) {
 				checkForMissingCoordinates(network);
 			}
-			NetworkContainer viewer = new NetworkContainer(caze);
+			CaseViewer viewer = new CaseViewer(caze);
 			viewer.setWorkingDirectory(getWorkingDirectory());
 			viewer.addActionUpdateListener(this);
 			caze.setViewer(viewer);
@@ -928,13 +928,13 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					"Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	private NetworkContainer getCurrentContainer() {
+	private CaseViewer getCurrentContainer() {
 		if(casesParent.isEmpty())
 			return null;
 		return cases.get(casesParent.getSelectedIndex()).getViewer();
 	}
 	
-	public PowerFlowViewer getCurrentViewer() {
+	public NetworkViewer getCurrentViewer() {
 		if(casesParent.isEmpty())
 			return null;
 		return cases.get(casesParent.getSelectedIndex()).getViewer().getCurrentViewer();

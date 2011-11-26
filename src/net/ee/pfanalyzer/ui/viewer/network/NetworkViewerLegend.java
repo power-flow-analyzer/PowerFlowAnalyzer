@@ -17,9 +17,9 @@ public class NetworkViewerLegend extends JComponent {
 	private final static int X_MARGIN = 20;
 	private final static int X_PADDING = 5;
 	
-	private NetworkViewer viewer;
+	private NetworkMapViewer viewer;
 	
-	NetworkViewerLegend(NetworkViewer viewer) {
+	NetworkViewerLegend(NetworkMapViewer viewer) {
 		this.viewer = viewer;
 	}
 

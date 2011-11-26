@@ -47,14 +47,14 @@ import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.Preferences;
-import net.ee.pfanalyzer.ui.NetworkContainer;
+import net.ee.pfanalyzer.ui.CaseViewer;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.shape.ElementShapeProvider;
 import net.ee.pfanalyzer.ui.shape.IElementShape;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
-public class NetworkViewer extends JComponent implements INetworkDataViewer, IDatabaseChangeListener {
+public class NetworkMapViewer extends JComponent implements INetworkDataViewer, IDatabaseChangeListener {
 
 	public final static String BASE_NETWORK_VIEWER_ID = "viewer.network";
 	public final static String VIEWER_ID = BASE_NETWORK_VIEWER_ID + ".map";
@@ -169,7 +169,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private NetworkViewerController controller;
 	private Component parentContainer;
 
-	public NetworkViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
+	public NetworkMapViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		this.data = data;
 		this.viewerConfiguration = viewerConfiguration;
 		this.parentContainer = parent;
@@ -240,15 +240,15 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 					lastY = -1;
 					Object obj = getObjectFromScreen(e.getX(), e.getY());
 					if(obj != null) {
-						Object combinedObj = NetworkViewer.this.data.getCombinedBus((AbstractNetworkElement) obj);
+						Object combinedObj = NetworkMapViewer.this.data.getCombinedBus((AbstractNetworkElement) obj);
 						if(combinedObj == null)
-							combinedObj = NetworkViewer.this.data.getCombinedBranch((AbstractNetworkElement) obj);
+							combinedObj = NetworkMapViewer.this.data.getCombinedBranch((AbstractNetworkElement) obj);
 						if(combinedObj != null)
 							obj = combinedObj;
 					}
 					if(obj != selection) {
 						selectionChanged(obj);
-						NetworkElementSelectionManager.selectionChanged(NetworkViewer.this, obj);
+						NetworkElementSelectionManager.selectionChanged(NetworkMapViewer.this, obj);
 					}
 				} catch(Exception except) {
 					except.printStackTrace();
@@ -1118,7 +1118,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private void updateOutlines() {
 //		System.out.println("updateOutlines");
 		outlines = new ArrayList<Outline>();
-		NetworkContainer container = getNetworkContainer(parentContainer);
+		CaseViewer container = getNetworkContainer(parentContainer);
 		lastOutlineList = container.getOutlines();
 		for (Outline outline : lastOutlineList) {
 			String paramID = "OUTLINE." + outline.getOutlineID();
@@ -1132,9 +1132,9 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 //		repaint();
 	}
 	
-	private NetworkContainer getNetworkContainer(Component c) {
-		if(c instanceof NetworkContainer)
-			return (NetworkContainer) c;
+	private CaseViewer getNetworkContainer(Component c) {
+		if(c instanceof CaseViewer)
+			return (CaseViewer) c;
 		if(c.getParent() != null)
 			return getNetworkContainer(c.getParent());
 		return null;
@@ -1143,7 +1143,7 @@ public class NetworkViewer extends JComponent implements INetworkDataViewer, IDa
 	private List<Outline> getOutlines() {
 		if(outlines == null)
 			updateOutlines();
-		NetworkContainer container = getNetworkContainer(parentContainer);
+		CaseViewer container = getNetworkContainer(parentContainer);
 		if(container != null && container.getOutlines() != lastOutlineList)
 			updateOutlines();
 		return outlines;

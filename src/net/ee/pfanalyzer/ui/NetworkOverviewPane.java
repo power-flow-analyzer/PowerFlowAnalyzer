@@ -46,7 +46,7 @@ import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 
 public class NetworkOverviewPane extends JPanel {
 	
-	private NetworkContainer parent;
+	private CaseViewer parent;
 	private JTree networkTree;
 	private NetworkTreeModel treeModel;
 	private List<Network> selectedNetworks = new ArrayList<Network>();
@@ -58,7 +58,7 @@ public class NetworkOverviewPane extends JPanel {
 	private JPanel scriptActionPane;
 	private ImportFromScriptDialog importFromScriptDialg;
 	
-	NetworkOverviewPane(NetworkContainer parentContainer) {
+	NetworkOverviewPane(CaseViewer parentContainer) {
 		super(new BorderLayout());
 		this.parent = parentContainer;
 		

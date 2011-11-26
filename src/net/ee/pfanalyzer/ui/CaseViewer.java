@@ -29,7 +29,7 @@ import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
 import net.ee.pfanalyzer.ui.viewer.network.Outline;
 
-public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener, IPowerFlowCaseListener {
+public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChangeListener, IPowerFlowCaseListener {
 
 	private PowerFlowCase powerFlowCase;
 
@@ -42,7 +42,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	private Map<String, Outline> outlinesMap = new HashMap<String, Outline>();
 	private Collection<Outline> cachedOutlines;
 
-	public NetworkContainer(PowerFlowCase caze) {
+	public CaseViewer(PowerFlowCase caze) {
 		super(new BorderLayout());
 		this.powerFlowCase = caze;
 		
@@ -52,7 +52,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 				getPowerFlowCase().getModelDB(), false, "Set Model");
 		
 		networkTabs.setTabListener(new TabListener() {
-			PowerFlowViewer lastViewer;
+			NetworkViewer lastViewer;
 			@Override
 			public boolean tabClosing(int tabIndex) {
 				lastViewer = getViewer(tabIndex);
@@ -60,7 +60,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			}
 			@Override
 			public void tabClosed(int tabIndex) {
-				lastViewer.removeActionUpdateListener(NetworkContainer.this);
+				lastViewer.removeActionUpdateListener(CaseViewer.this);
 				lastViewer.removeNetworkElementSelectionListener(modelDBDialog);
 				lastViewer.dispose();
 				fireActionUpdate();
@@ -80,8 +80,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 	int getNetworkTabIndex(Network network) {
 		for (int i = 0; i < networkTabs.getTabCount(); i++) {
 			Component comp = networkTabs.getTabComponent(i);
-			if(comp instanceof PowerFlowViewer) {
-				Network n = ((PowerFlowViewer) comp).getNetwork();
+			if(comp instanceof NetworkViewer) {
+				Network n = ((NetworkViewer) comp).getNetwork();
 				if(n.equals(network))
 					return i;
 			}
@@ -99,7 +99,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 			networkTabs.setSelectedIndex(tabIndex);
 			return;
 		}
-		PowerFlowViewer viewer = new PowerFlowViewer(powerFlowCase, network);
+		NetworkViewer viewer = new NetworkViewer(powerFlowCase, network);
 		networkTabs.addNetworkTab(network.getDisplayName(), viewer, true);
 		viewer.addActionUpdateListener(this);
 		viewer.addNetworkElementSelectionListener(modelDBDialog);
@@ -129,17 +129,17 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		return powerFlowCase;
 	}
 	
-	public PowerFlowViewer getCurrentViewer() {
+	public NetworkViewer getCurrentViewer() {
 		Component c = networkTabs.getVisibleTabComponent();
-		if(c != null && c instanceof PowerFlowViewer)
-			return (PowerFlowViewer) c;
+		if(c != null && c instanceof NetworkViewer)
+			return (NetworkViewer) c;
 		return null;
 	}
 	
-	public PowerFlowViewer getViewer(Network network) {
+	public NetworkViewer getViewer(Network network) {
 		Component c = networkTabs.getVisibleTabComponent();
-		if(c != null && c instanceof PowerFlowViewer) {
-			PowerFlowViewer viewer = (PowerFlowViewer) c;
+		if(c != null && c instanceof NetworkViewer) {
+			NetworkViewer viewer = (NetworkViewer) c;
 			if(viewer.getNetwork() == network  || viewer.getNetwork().getInternalID() == network.getInternalID())
 				return viewer;
 		}
@@ -150,15 +150,15 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		return networkTabs.getTabCount() - 1;
 	}
 	
-	public PowerFlowViewer getViewer(int index) {
+	public NetworkViewer getViewer(int index) {
 		Component c = networkTabs.getTabComponent(index);
-		if(c != null && c instanceof PowerFlowViewer)
-			return (PowerFlowViewer) c;
+		if(c != null && c instanceof NetworkViewer)
+			return (NetworkViewer) c;
 		return null;
 	}
 	
 	public NetworkElementSelectionManager getSelectionManager() {
-		PowerFlowViewer viewer = getCurrentViewer();
+		NetworkViewer viewer = getCurrentViewer();
 		if(viewer == null)
 			return null;
 		return viewer.getSelectionManager();
@@ -212,8 +212,8 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //		}
 		for (int i = 0; i < networkTabs.getTabCount(); i++) {
 			Component comp = networkTabs.getTabComponent(i);
-			if(comp instanceof PowerFlowViewer) {
-				Network n = ((PowerFlowViewer) comp).getNetwork();
+			if(comp instanceof NetworkViewer) {
+				Network n = ((NetworkViewer) comp).getNetwork();
 				String dirtySuffix = n.isDirty() ? " *" : "";
 				networkTabs.setTitleAt(i, n.getDisplayName() + dirtySuffix);
 			}
@@ -313,7 +313,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
 		getPowerFlowCase().removePowerFlowCaseListener(this);
 		for (int i = 0; i < getViewerCount(); i++) {
-			getViewer(i + 1).removeActionUpdateListener(NetworkContainer.this);
+			getViewer(i + 1).removeActionUpdateListener(CaseViewer.this);
 			getViewer(i + 1).removeNetworkElementSelectionListener(modelDBDialog);
 			getViewer(i + 1).dispose();
 		}
@@ -360,7 +360,7 @@ public class NetworkContainer extends JPanel implements IActionUpdater, IDatabas
 //			}
 //		}
 		
-		public void addNetworkTab(String title, PowerFlowViewer c, boolean closable) {
+		public void addNetworkTab(String title, NetworkViewer c, boolean closable) {
 			addTab(title, c, closable);
 			setSelectedIndex(getTabCount() - 1);
 		}

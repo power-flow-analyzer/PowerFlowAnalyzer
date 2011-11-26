@@ -29,10 +29,10 @@ public class NetworkViewerController extends JPanel implements IDatabaseChangeLi
 	private final static String PROPERTY_INTERACTION_MOVE = "ALLOW_DRAGGING";
 	private final static String PROPERTY_SHOW_TOOLTIPS = "SHOW_TOOLTIPS";
 	
-	private NetworkViewer viewer;
+	private NetworkMapViewer viewer;
 	private NetworkViewerLegend legend;
 	
-	public NetworkViewerController(NetworkViewer viewer) {
+	public NetworkViewerController(NetworkMapViewer viewer) {
 		super(new BorderLayout());
 		this.viewer = viewer;
 		legend = new NetworkViewerLegend(viewer);

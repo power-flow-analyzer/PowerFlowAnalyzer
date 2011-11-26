@@ -18,7 +18,7 @@ import net.ee.pfanalyzer.ui.model.ModelElementPanel;
 import net.ee.pfanalyzer.ui.parameter.ParameterCheckBox;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterViewer;
 import net.ee.pfanalyzer.ui.util.Group;
-import net.ee.pfanalyzer.ui.viewer.network.NetworkViewer;
+import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
 
 public class DataViewerDialog extends BaseDialog {
 	
@@ -40,7 +40,7 @@ public class DataViewerDialog extends BaseDialog {
 		parameterPanel.setParameterMaster(new ParameterMasterViewer(caze, viewer, true));
 		parameterPanel.setShowFullParameterInfo(false);
 		addParameters(viewer.getDataDefinition(), parameterPanel);
-		if(viewer.getModelID().startsWith(NetworkViewer.BASE_NETWORK_VIEWER_ID)
+		if(viewer.getModelID().startsWith(NetworkMapViewer.BASE_NETWORK_VIEWER_ID)
 				&& caze.getModelDB().getOutlineClass() != null) {
 			addOutlineParameters(caze.getModelDB().getOutlineClass(), parameterPanel);
 		}

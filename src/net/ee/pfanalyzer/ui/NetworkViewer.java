@@ -34,10 +34,10 @@ import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.viewer.network.BusBarViewer;
-import net.ee.pfanalyzer.ui.viewer.network.NetworkViewer;
+import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
 import net.ee.pfanalyzer.ui.viewer.table.DataTable;
 
-public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
+public class NetworkViewer extends JPanel implements INetworkElementSelectionListener {
 
 	private PowerFlowCase powerFlowCase;
 	private Network network;
@@ -52,7 +52,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private JLabel networkDescriptionLabel = new JLabel();
 	
-	public PowerFlowViewer(PowerFlowCase caze, Network network) {
+	public NetworkViewer(PowerFlowCase caze, Network network) {
 		super(new BorderLayout());
 		this.powerFlowCase = caze;
 		this.network = network;
@@ -121,8 +121,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			viewer = new DataTable(viewerData, this);
 //		else if("viewer.diagram.bar".equals(viewerData.getModelID()))
 //			viewer = new PowerFlowDiagram(viewerData);
-		else if(NetworkViewer.VIEWER_ID.equals(viewerData.getModelID()))
-			viewer = new NetworkViewer(getNetwork(), viewerData, this);
+		else if(NetworkMapViewer.VIEWER_ID.equals(viewerData.getModelID()))
+			viewer = new NetworkMapViewer(getNetwork(), viewerData, this);
 		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new BusBarViewer(getNetwork(), viewerData, this);
 		if(viewer == null)
@@ -290,7 +290,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			setTabListener(new TabListener() {
 				@Override
 				public boolean tabClosing(int tabIndex) {
-					int choice = JOptionPane.showConfirmDialog(PowerFlowViewer.this, 
+					int choice = JOptionPane.showConfirmDialog(NetworkViewer.this, 
 							"Do you want to remove this viewer?", "Close viewer", JOptionPane.YES_NO_OPTION);
 					return choice == JOptionPane.YES_OPTION;
 				}
@@ -323,7 +323,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 		private void addViewer(INetworkDataViewer viewer) {
 			viewers.add(viewer);
 			addTab(viewer.getViewerConfiguration().getTitle(), 
-					new DataViewerContainer(viewer, PowerFlowViewer.this));
+					new DataViewerContainer(viewer, NetworkViewer.this));
 			
 		}
 		
@@ -392,7 +392,7 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 				}
 			});
 			
-			getContentPane().add(new DataViewerContainer(viewer, PowerFlowViewer.this));
+			getContentPane().add(new DataViewerContainer(viewer, NetworkViewer.this));
 			pack();
 			int width = viewer.getViewerConfiguration().getIntParameter(ModelDBUtils.WIDTH_PARAMETER, 300);
 			int height = viewer.getViewerConfiguration().getIntParameter(ModelDBUtils.HEIGHT_PARAMETER, 300);
@@ -425,8 +425,8 @@ public class PowerFlowViewer extends JPanel implements INetworkElementSelectionL
 			}
 		}
 		
-		PowerFlowViewer getPowerFlowViewer() {
-			return PowerFlowViewer.this;
+		NetworkViewer getPowerFlowViewer() {
+			return NetworkViewer.this;
 		}
 	}
 	
