@@ -4,7 +4,7 @@ import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
-import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 
 public class ParameterMasterViewer implements IParameterMasterElement {
 

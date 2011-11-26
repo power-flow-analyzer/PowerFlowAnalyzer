@@ -10,7 +10,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.ui.map.Outline;
+import net.ee.pfanalyzer.ui.viewer.network.Outline;
 
 public class ParameterColorField extends ParameterValuePanel implements ActionListener {
 	
