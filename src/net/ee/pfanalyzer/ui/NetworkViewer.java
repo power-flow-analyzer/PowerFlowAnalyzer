@@ -34,6 +34,7 @@ import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.viewer.network.BusBarViewer;
+import net.ee.pfanalyzer.ui.viewer.network.ContourDiagramViewer;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
 import net.ee.pfanalyzer.ui.viewer.table.DataTable;
 
@@ -125,6 +126,8 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			viewer = new NetworkMapViewer(getNetwork(), viewerData, this);
 		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new BusBarViewer(getNetwork(), viewerData, this);
+		else if(ContourDiagramViewer.VIEWER_ID.equals(viewerData.getModelID()))
+			viewer = new ContourDiagramViewer(getNetwork(), viewerData, this);
 		if(viewer == null)
 			return;
 		viewer.setData(getNetwork());

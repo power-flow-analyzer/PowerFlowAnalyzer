@@ -64,6 +64,41 @@
                     </parameter>
                     <parameter ID="ICON" value="map.png"/>
                     <model ID="busbar" label="Busbar View" description="Experimental!"/>
+                    <model ID="contour" label="Contour Diagram">
+                        <parameter ID="CONTOUR_MAX_VALUE" type="double" label="Max value" empty="true">
+                            <display section="Contours" group="Values"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MIDDLE_VALUE" type="double" label="Middle value" empty="true">
+                            <display section="Contours" group="Values"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MIN_VALUE" type="double" label="Min value" empty="true">
+                            <display section="Contours" group="Values"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MAX_DISTANCE" type="integer" label="Highlight distance" value="70.0">
+                            <display section="Contours" group="Display"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MAX_REL_DISTANCE" type="double" label="Factor for small values" value="0.93">
+                            <display section="Contours" group="Display"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" value="0.0">
+                            <display section="Contours" group="Display"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MAX_COLOR" type="text" label="Maximum color" restriction="color (RGB)" value="255,0,0">
+                            <display section="Contours" group="Colors"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_UPPER_HALF_COLOR" type="text" label="Upper half color" restriction="color (RGB)" value="255,255,0">
+                            <display section="Contours" group="Colors"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MIDDLE_COLOR" type="text" label="Middle color" restriction="color (RGB)" value="255,255,255">
+                            <display section="Contours" group="Colors"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_LOWER_HALF_COLOR" type="text" label="Lower half color" restriction="color (RGB)" value="0,255,255">
+                            <display section="Contours" group="Colors"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_MIN_COLOR" type="text" label="Minimum color" restriction="color (RGB)" value="0,0,255">
+                            <display section="Contours" group="Colors"/>
+                        </parameter>
+                    </model>
                     <model ID="map" label="Network Map" description=" Creates a new map displaying the network."/>
                 </modelClass>
                 <modelClass ID="table" label="Table">
