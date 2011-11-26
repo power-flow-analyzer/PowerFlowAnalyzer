@@ -2,10 +2,7 @@ package net.ee.pfanalyzer.ui.viewer.network;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,44 +89,24 @@ public class BusBarViewer extends NetworkMapViewer { //JComponent implements INe
 		}
 	}
 
-	protected void paintNetwork(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		// enable anti aliasing
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		Stroke defaultStroke = g2d.getStroke();
-		// fill background
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, getWidth(), getHeight());
-		// real painting
-		if(internalBusCoords != null) {
-			double width = internalMaxX - internalMinX;
-			horizontalScale = ((double) getWidth() - 2 * HORIZONTAL_GAP) / width;
-			double height = internalMaxY - internalMinY;
-			verticalScale = ((double) getHeight() - 2 * VERTICAL_GAP) / height;
-			if(respectAspectRatio) {
-				if(verticalScale < horizontalScale) {
-					horizontalScale = verticalScale;
-				} else {
-					verticalScale = horizontalScale;
+	@Override
+	protected void paintNetwork(Graphics2D g2d) {
+		// draw bus nodes
+		if(drawBusNodes) {
+			for (BusBarInfo info : busBarInfos) {
+				paintBusBar(g2d, info);
+				// draw branches
+				if(drawBranches) {
+					paintBranches(g2d, info);
 				}
 			}
-			// draw bus nodes
-			if(drawBusNodes) {
-				for (BusBarInfo info : busBarInfos) {
-					paintBusBar(g2d, info);
-					// draw branches
-					if(drawBranches) {
-						paintBranches(g2d, info);
-					}
-				}
-			}
+		}
 //			// draw branches
 //			if(drawBranches) {
 //				for (BranchInfo info : branchInfos) {
 //					paintBranches(g2d, info);
 //				}
 //			}
-		}
 	}
 	
 	private void paintBusBar(Graphics2D g2d, BusBarInfo info) {
