@@ -23,19 +23,19 @@ import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
-import net.ee.pfanalyzer.ui.dataviewer.DataViewerConfiguration;
-import net.ee.pfanalyzer.ui.dataviewer.DataViewerContainer;
-import net.ee.pfanalyzer.ui.dataviewer.DataViewerDialog;
-import net.ee.pfanalyzer.ui.dataviewer.INetworkDataViewer;
-import net.ee.pfanalyzer.ui.dataviewer.SelectViewerDialog;
-import net.ee.pfanalyzer.ui.diagram.PowerFlowDiagram;
-import net.ee.pfanalyzer.ui.map.BusBarViewer;
-import net.ee.pfanalyzer.ui.map.NetworkViewer;
 import net.ee.pfanalyzer.ui.model.ElementPanelController;
-import net.ee.pfanalyzer.ui.table.DataTable;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
+import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
+import net.ee.pfanalyzer.ui.viewer.DataViewerDialog;
+import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
+import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
+import net.ee.pfanalyzer.ui.viewer.network.BusBarViewer;
+import net.ee.pfanalyzer.ui.viewer.network.NetworkViewer;
+import net.ee.pfanalyzer.ui.viewer.table.DataTable;
 
 public class PowerFlowViewer extends JPanel implements INetworkElementSelectionListener {
 

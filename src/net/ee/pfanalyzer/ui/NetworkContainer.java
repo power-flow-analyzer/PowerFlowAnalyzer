@@ -24,10 +24,10 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
-import net.ee.pfanalyzer.ui.map.Outline;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
+import net.ee.pfanalyzer.ui.viewer.network.Outline;
 
 public class NetworkContainer extends JPanel implements IActionUpdater, IDatabaseChangeListener, IPowerFlowCaseListener {
 
