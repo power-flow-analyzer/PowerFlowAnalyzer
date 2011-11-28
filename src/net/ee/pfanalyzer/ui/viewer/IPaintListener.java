@@ -5,6 +5,9 @@ import java.awt.Graphics2D;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 
 public interface IPaintListener {
+	
+	public final static int LAYER_CONTOUR = 0;
+	public final static int LAYER_OUTLINES = 10;
 
 	void paint(Graphics2D g2d);
 	
@@ -19,4 +22,6 @@ public interface IPaintListener {
 	boolean isActive();
 	
 	String getPaintID();
+	
+	int getLayer();
 }
