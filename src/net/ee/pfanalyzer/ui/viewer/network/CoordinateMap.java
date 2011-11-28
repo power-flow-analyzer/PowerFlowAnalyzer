@@ -299,7 +299,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 			repaint();
 		} else if(property.equals(PROPERTY_DRAW_OUTLINE)) {
 			drawOutline = Boolean.valueOf(value);
-			repaint();
+			updateBackground();
 		} else if(property.equals(PROPERTY_DRAW_LEGEND)) {
 			setVisible(Boolean.valueOf(value));
 			revalidate();
@@ -329,6 +329,10 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		setSetting(PROPERTY_INTERACTION_ZOOM);
 		setSetting(PROPERTY_INTERACTION_MOVE);
 		setSetting(PROPERTY_SHOW_TOOLTIPS);
+	}
+	
+	protected void updateBackground() {
+		repaint();
 	}
 	
 	protected void setSetting(String parameterID) {

@@ -529,6 +529,12 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				arrow_neg.createTransformedShape(transformation);
 	}
 	
+	@Override
+	protected void updateBackground() {
+		paintManager.updateBackgroundImage();
+		repaint();
+	}
+	
 	List<Integer> getVoltageLevels() {
 		if(voltageLevels == null)
 			updateVoltageLevels();
