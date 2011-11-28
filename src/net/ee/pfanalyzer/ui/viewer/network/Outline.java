@@ -13,6 +13,7 @@ import net.ee.pfanalyzer.math.coordinate.ICoordinateConverter;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
+import net.ee.pfanalyzer.model.util.ParameterUtils;
 
 public class Outline {
 
@@ -42,7 +43,7 @@ public class Outline {
 			NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BORDER_COLOR");
 			if(param == null || param.getValue() == null)
 				return null;
-			borderColor = parseColor(param.getValue());
+			borderColor = ParameterUtils.parseColor(param.getValue());
 		}
 		return borderColor;
 	}
@@ -52,18 +53,9 @@ public class Outline {
 			NetworkParameter param = ModelDBUtils.getParameterValue(outlineData, "BACKGROUND_COLOR");
 			if(param == null || param.getValue() == null)
 				return null;
-			backgroundColor = parseColor(param.getValue());
+			backgroundColor = ParameterUtils.parseColor(param.getValue());
 		}
 		return backgroundColor;
-	}
-	
-	public static Color parseColor(String text) {
-		String[] rgbText = text.split(",");
-		int[] rgb = new int[4];
-		for (int i = 0; i < Math.min(rgb.length, rgbText.length); i++) {
-			rgb[i] = Integer.parseInt(rgbText[i]);
-		}
-		return new Color(rgb[0], rgb[1], rgb[2]);
 	}
 	
 	public int[][] getScreenPoints() {
