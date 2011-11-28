@@ -4,14 +4,27 @@ import java.awt.Color;
 
 public abstract class ColorProvider {
 	
-	double colorSteps = 0.0;
+	private double colorSteps = 0.0;
 	
-	Color maxColor = new Color(255, 0, 0);
-	Color upperHalfColor = new Color(255, 255, 0);
-	Color middleColor = new Color(255, 255, 255);
-	Color lowerHalfColor = new Color(0, 255, 255);
-	Color minColor = new Color(0, 0, 255);
-	int transparency = 185;
+	private Color maxColor = new Color(255, 0, 0);
+	private Color upperHalfColor = new Color(255, 255, 0);
+	private Color middleColor = new Color(255, 255, 255);
+	private Color lowerHalfColor = new Color(0, 255, 255);
+	private Color minColor = new Color(0, 0, 255);
+	private int transparency = 185;
+	
+	protected ColorProvider() {
+	}
+	
+	protected ColorProvider(ColorProvider oldValues) {
+		setColorSteps(oldValues.getColorSteps());
+		setMaxColor(oldValues.getMaxColor());
+		setUpperHalfColor(oldValues.getUpperHalfColor());
+		setMiddleColor(oldValues.getMiddleColor());
+		setLowerHalfColor(oldValues.getLowerHalfColor());
+		setMinColor(oldValues.getMinColor());
+		setTransparency(oldValues.getTransparency());
+	}
 	
 	public int[] getARGB(double min, Color minColor, double max, Color maxColor, double value) {
 		double ratio = getRatio(value / max);
@@ -34,48 +47,120 @@ public abstract class ColorProvider {
 		return temp / colorSteps;
 	}
 	
+	public double getColorSteps() {
+		return colorSteps;
+	}
+
+	public void setColorSteps(double colorSteps) {
+		this.colorSteps = colorSteps;
+	}
+
+	public Color getMaxColor() {
+		return maxColor;
+	}
+
+	public void setMaxColor(Color maxColor) {
+		this.maxColor = maxColor;
+	}
+
+	public Color getUpperHalfColor() {
+		return upperHalfColor;
+	}
+
+	public void setUpperHalfColor(Color upperHalfColor) {
+		this.upperHalfColor = upperHalfColor;
+	}
+
+	public Color getMiddleColor() {
+		return middleColor;
+	}
+
+	public void setMiddleColor(Color middleColor) {
+		this.middleColor = middleColor;
+	}
+
+	public Color getLowerHalfColor() {
+		return lowerHalfColor;
+	}
+
+	public void setLowerHalfColor(Color lowerHalfColor) {
+		this.lowerHalfColor = lowerHalfColor;
+	}
+
+	public Color getMinColor() {
+		return minColor;
+	}
+
+	public void setMinColor(Color minColor) {
+		this.minColor = minColor;
+	}
+
+	public int getTransparency() {
+		return transparency;
+	}
+
+	public void setTransparency(int transparency) {
+		this.transparency = transparency;
+	}
+
 	public static class ComplexColorProvider extends ColorProvider {
+		
+		public ComplexColorProvider() {
+		}
+		
+		public ComplexColorProvider(ColorProvider oldValues) {
+			super(oldValues);
+		}
+		
 		protected int[] getARGB(double ratio) {
 			int[] result = new int[4];
 			if(ratio >= 0) {
 				if(ratio > 0.5) {
-					result[0] = (int) (upperHalfColor.getRed() + (ratio - 0.5) * 2 * (maxColor.getRed() - upperHalfColor.getRed()));
-					result[1] = (int) (upperHalfColor.getGreen() + (ratio - 0.5) * 2 * (maxColor.getGreen() - upperHalfColor.getGreen()));
-					result[2] = (int) (upperHalfColor.getBlue() + (ratio - 0.5) * 2 * (maxColor.getBlue() - upperHalfColor.getBlue()));
+					result[0] = (int) (getUpperHalfColor().getRed() + (ratio - 0.5) * 2 * (getMaxColor().getRed() - getUpperHalfColor().getRed()));
+					result[1] = (int) (getUpperHalfColor().getGreen() + (ratio - 0.5) * 2 * (getMaxColor().getGreen() - getUpperHalfColor().getGreen()));
+					result[2] = (int) (getUpperHalfColor().getBlue() + (ratio - 0.5) * 2 * (getMaxColor().getBlue() - getUpperHalfColor().getBlue()));
 				} else {
-					result[0] = (int) (middleColor.getRed() + ratio * 2.0 * (upperHalfColor.getRed() - middleColor.getRed()));
-					result[1] = (int) (middleColor.getGreen() + ratio * 2.0 * (upperHalfColor.getGreen() - middleColor.getGreen()));
-					result[2] = (int) (middleColor.getBlue() + ratio * 2.0 * (upperHalfColor.getBlue() - middleColor.getBlue()));
+					result[0] = (int) (getMiddleColor().getRed() + ratio * 2.0 * (getUpperHalfColor().getRed() - getMiddleColor().getRed()));
+					result[1] = (int) (getMiddleColor().getGreen() + ratio * 2.0 * (getUpperHalfColor().getGreen() - getMiddleColor().getGreen()));
+					result[2] = (int) (getMiddleColor().getBlue() + ratio * 2.0 * (getUpperHalfColor().getBlue() - getMiddleColor().getBlue()));
 				}
 			} else {
 				if(ratio < -0.5) {
-					result[0] = (int) (lowerHalfColor.getRed() + (-ratio - 0.5) * 2 * (minColor.getRed() - lowerHalfColor.getRed()));
-					result[1] = (int) (lowerHalfColor.getGreen() + (-ratio - 0.5) * 2 * (minColor.getGreen() - lowerHalfColor.getGreen()));
-					result[2] = (int) (lowerHalfColor.getBlue() + (-ratio - 0.5) * 2 * (minColor.getBlue() - lowerHalfColor.getBlue()));
+					result[0] = (int) (getLowerHalfColor().getRed() + (-ratio - 0.5) * 2 * (getMinColor().getRed() - getLowerHalfColor().getRed()));
+					result[1] = (int) (getLowerHalfColor().getGreen() + (-ratio - 0.5) * 2 * (getMinColor().getGreen() - getLowerHalfColor().getGreen()));
+					result[2] = (int) (getLowerHalfColor().getBlue() + (-ratio - 0.5) * 2 * (getMinColor().getBlue() - getLowerHalfColor().getBlue()));
 				} else {
-					result[0] = (int) (middleColor.getRed() - ratio * 2.0 * (lowerHalfColor.getRed() - middleColor.getRed()));
-					result[1] = (int) (middleColor.getGreen() - ratio * 2.0 * (lowerHalfColor.getGreen() - middleColor.getGreen()));
-					result[2] = (int) (middleColor.getBlue() - ratio * 2.0 * (lowerHalfColor.getBlue() - middleColor.getBlue()));
+					result[0] = (int) (getMiddleColor().getRed() - ratio * 2.0 * (getLowerHalfColor().getRed() - getMiddleColor().getRed()));
+					result[1] = (int) (getMiddleColor().getGreen() - ratio * 2.0 * (getLowerHalfColor().getGreen() - getMiddleColor().getGreen()));
+					result[2] = (int) (getMiddleColor().getBlue() - ratio * 2.0 * (getLowerHalfColor().getBlue() - getMiddleColor().getBlue()));
 				}
 			}
-			result[3] = transparency;
+			result[3] = getTransparency();
 			return result;
 		}
 	}
 	
 	public static class SimpleColorProvider extends ColorProvider {
+		
+		public SimpleColorProvider() {
+		}
+		
+		public SimpleColorProvider(ColorProvider oldValues) {
+			super(oldValues);
+		}
+		
 		protected int[] getARGB(double ratio) {
 			int[] result = new int[4];
 			if(ratio >= 0) {
-				result[0] = (int) (middleColor.getRed() + ratio * (maxColor.getRed() - middleColor.getRed()));
-				result[1] = (int) (middleColor.getGreen() + ratio * (maxColor.getGreen() - middleColor.getGreen()));
-				result[2] = (int) (middleColor.getBlue() + ratio * (maxColor.getBlue() - middleColor.getBlue()));
+				result[0] = (int) (getMiddleColor().getRed() + ratio * (getMaxColor().getRed() - getMiddleColor().getRed()));
+				result[1] = (int) (getMiddleColor().getGreen() + ratio * (getMaxColor().getGreen() - getMiddleColor().getGreen()));
+				result[2] = (int) (getMiddleColor().getBlue() + ratio * (getMaxColor().getBlue() - getMiddleColor().getBlue()));
 			} else {
-				result[0] = (int) (middleColor.getRed() - ratio * (minColor.getRed() - middleColor.getRed()));
-				result[1] = (int) (middleColor.getGreen() - ratio * (minColor.getGreen() - middleColor.getGreen()));
-				result[2] = (int) (middleColor.getBlue() - ratio * (minColor.getBlue() - middleColor.getBlue()));
+				result[0] = (int) (getMiddleColor().getRed() - ratio * (getMinColor().getRed() - getMiddleColor().getRed()));
+				result[1] = (int) (getMiddleColor().getGreen() - ratio * (getMinColor().getGreen() - getMiddleColor().getGreen()));
+				result[2] = (int) (getMiddleColor().getBlue() - ratio * (getMinColor().getBlue() - getMiddleColor().getBlue()));
 			}
-			result[3] = transparency;
+			result[3] = getTransparency();
 			return result;
 		}
 	}

@@ -10,21 +10,12 @@ public class ValueGradientContext implements PaintContext {
 	public final static int ACTION_CUT_VALUES = 0;
 	public final static int ACTION_OMIT_VALUES = 1;
 	
-	private int outOfBoundsAction = ACTION_CUT_VALUES;
-	
-	// TODO examples
-	private double maxValue = 1.1;
-	private double middleValue = 1;
-	private double minValue = 0.9;
-	private double maxDistance = 70;
-	private double maxRelDistance = 0.93;
-	
-	private ColorProvider colorProvider;
+	private ContourDiagramSettings settings;
 	private ValuePoint[] points;
 
-	public ValueGradientContext(ValuePoint[] points, ColorProvider colorProvider) {
+	public ValueGradientContext(ValuePoint[] points, ContourDiagramSettings settings) {
 		this.points = points;
-		this.colorProvider = colorProvider;
+		this.settings = settings;
 	}
 
 	public void dispose() {
@@ -35,8 +26,15 @@ public class ValueGradientContext implements PaintContext {
 	}
 
 	public Raster getRaster(int x, int y, int width, int height) {
+		double maxValue = settings.getMaxValue();
+		double minValue = settings.getMinValue();
+		double middleValue = settings.getMiddleValue();
+		double maxDistance = settings.getMaxDistance();
+		double maxRelDistance = settings.getMaxRelDistance();
+		int outOfBoundsAction = settings.getOutOfBoundsAction();
 		WritableRaster raster = getColorModel().createCompatibleWritableRaster(width, height);
-
+		if(settings.isIncomplete())
+			return raster;
 		int[] pixels = new int[width * height * 4];
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
@@ -93,6 +91,6 @@ public class ValueGradientContext implements PaintContext {
 	}
 	
 	public ColorProvider getColorProvider() {
-		return colorProvider;
+		return settings.getColorProvider();
 	}
 }

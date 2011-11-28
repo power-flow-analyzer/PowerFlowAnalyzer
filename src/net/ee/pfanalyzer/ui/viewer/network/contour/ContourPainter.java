@@ -15,11 +15,11 @@ public class ContourPainter implements IPaintListener {
 	
 	private NetworkMapViewer viewer;
 	private boolean isActive = true;
-	private ColorProvider colorProvider;
+	private ContourDiagramSettings settings;
 
-	public ContourPainter(NetworkMapViewer viewer, ColorProvider colorProvider) {
+	public ContourPainter(NetworkMapViewer viewer, ContourDiagramSettings settings) {
 		this.viewer = viewer;
-		this.colorProvider = colorProvider;
+		this.settings = settings;
 	}
 	
 	private ValuePoint[] generatePoints() {
@@ -42,7 +42,7 @@ public class ContourPainter implements IPaintListener {
 	@Override
 	public void paint(Graphics2D g2d) {
 		ValuePoint[] points = generatePoints();
-		g2d.setPaint(new ValueGradientPaint(points, colorProvider));
+		g2d.setPaint(new ValueGradientPaint(points, settings));
 		g2d.fillRect(0, 0, viewer.getWidth(), viewer.getHeight());
 	}
 	

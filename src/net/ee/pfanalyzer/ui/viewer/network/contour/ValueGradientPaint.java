@@ -12,11 +12,11 @@ public class ValueGradientPaint implements Paint {
 	
 	private ValuePoint[] points;
 	private ValueGradientContext context;
-	private ColorProvider colorProvider;
+	private ContourDiagramSettings settings;
 
-	public ValueGradientPaint(ValuePoint[] points, ColorProvider colorProvider) {
+	public ValueGradientPaint(ValuePoint[] points, ContourDiagramSettings settings) {
 		this.points = points;
-		this.colorProvider = colorProvider;
+		this.settings = settings;
 	}
 
 	public PaintContext createContext(ColorModel cm,
@@ -29,7 +29,7 @@ public class ValueGradientPaint implements Paint {
 			transformedPoints[i] = new ValuePoint(points[i], points[i].getValue());
 			at.transform(points[i], transformedPoints[i]);
 		}
-		context = new ValueGradientContext(transformedPoints, colorProvider);
+		context = new ValueGradientContext(transformedPoints, settings);
 		return context;
 	}
 

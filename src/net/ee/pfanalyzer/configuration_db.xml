@@ -69,19 +69,24 @@
                             <display section="Contours" group="Values"/>
                         </parameter>
                         <parameter ID="CONTOUR_MIDDLE_VALUE" type="double" label="Middle value" empty="true">
-                            <display section="Contours" group="Values"/>
+                            <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
                         </parameter>
                         <parameter ID="CONTOUR_MIN_VALUE" type="double" label="Min value" empty="true">
-                            <display section="Contours" group="Values"/>
+                            <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
                         </parameter>
                         <parameter ID="CONTOUR_MAX_DISTANCE" type="integer" label="Highlight distance" value="70.0">
-                            <display section="Contours" group="Display"/>
+                            <display min="0.0" section="Contours" group="Display"/>
                         </parameter>
                         <parameter ID="CONTOUR_MAX_REL_DISTANCE" type="double" label="Factor for small values" value="0.93">
-                            <display section="Contours" group="Display"/>
+                            <display decimalFormatPattern="#.##" increment="0.01" max="1.0" min="0.0" section="Contours" group="Display"/>
                         </parameter>
                         <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" value="0.0">
                             <display section="Contours" group="Display"/>
+                        </parameter>
+                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" restriction="list" value="3">
+                            <option value="3" label="3 Colors" ID="3"/>
+                            <option value="5" label="5 Colors" ID="5"/>
+                            <display section="Contours" group="Colors"/>
                         </parameter>
                         <parameter ID="CONTOUR_MAX_COLOR" type="text" label="Maximum color" restriction="color (RGB)" value="255,0,0">
                             <display section="Contours" group="Colors"/>
@@ -97,6 +102,14 @@
                         </parameter>
                         <parameter ID="CONTOUR_MIN_COLOR" type="text" label="Minimum color" restriction="color (RGB)" value="0,0,255">
                             <display section="Contours" group="Colors"/>
+                        </parameter>
+                        <parameter ID="ACTION_OUT_OF_BOUNDS" type="integer" label="Action for values out of bounds" restriction="list" value="0">
+                            <option value="0" label="Cut values" ID="CUT"/>
+                            <option value="1" label="Omit values" ID="OMIT"/>
+                            <display section="Contours" group="Values"/>
+                        </parameter>
+                        <parameter ID="TRANSPARENCY" type="integer" label="Contrast" value="185.0">
+                            <display increment="10.0" max="255.0" min="0.0" section="Contours" group="Display"/>
                         </parameter>
                     </model>
                     <model ID="map" label="Network Map" description=" Creates a new map displaying the network."/>
