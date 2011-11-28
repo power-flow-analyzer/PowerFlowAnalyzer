@@ -2,19 +2,29 @@ package net.ee.pfanalyzer.ui.viewer.network;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
+import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.data.ModelData;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterUtils;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.network.contour.ColorLegend;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ColorProvider;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ContourDiagramSettings;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ContourPainter;
-import net.ee.pfanalyzer.ui.viewer.network.contour.Legend;
 
 public class ContourDiagramViewer extends NetworkMapViewer {
 	
-	public final static String VIEWER_ID = "viewer.network.contour";
+	public final static String VIEWER_ID = BASE_NETWORK_VIEWER_ID + ".contour";
 	
+	private final static String PROPERTY_ELEMENT_ID_PREFIX = "CONTOUR_ELEMENT_ID_PREFIX";
+	private final static String PROPERTY_PARAMETER_NAME = "CONTOUR_PARAMETER_NAME";
 	private final static String PROPERTY_MAX_VALUE = "CONTOUR_MAX_VALUE";
 	private final static String PROPERTY_MIDDLE_VALUE = "CONTOUR_MIDDLE_VALUE";
 	private final static String PROPERTY_MIN_VALUE = "CONTOUR_MIN_VALUE";
@@ -31,11 +41,14 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 	private final static String PROPERTY_TRANSPARENCY = "TRANSPARENCY";
 	
 	private ContourDiagramSettings settings;
-	private Legend legend;
+	private ColorLegend colorLegend;
+	private JLabel contourLegend;
 	
 	public ContourDiagramViewer(Network network, DataViewerConfiguration configuration, Component parent) {
 		super(network, configuration, parent);
-		getViewerController().add(legend, BorderLayout.WEST);
+		colorLegend = new ColorLegend(settings);
+		getViewerController().add(colorLegend, BorderLayout.WEST);
+		getViewerController().add(contourLegend, BorderLayout.NORTH);
 		paintManager.addPaintListener(new ContourPainter(this, settings));
 	}
 	
@@ -43,7 +56,12 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 	protected void initializeSettings() {
 		super.initializeSettings();
 		settings = new ContourDiagramSettings();
-		legend = new Legend(settings);
+		contourLegend = new JLabel();
+		contourLegend.setOpaque(true);
+		contourLegend.setFont(contourLegend.getFont().deriveFont(Font.BOLD));
+		contourLegend.setHorizontalAlignment(SwingConstants.CENTER);
+		setSetting(PROPERTY_ELEMENT_ID_PREFIX);
+		setSetting(PROPERTY_PARAMETER_NAME);
 		setSetting(PROPERTY_MAX_VALUE);
 		setSetting(PROPERTY_MIN_VALUE);
 		setSetting(PROPERTY_MIDDLE_VALUE);
@@ -58,58 +76,67 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 		setSetting(PROPERTY_COLOR_PROVIDER);
 		setSetting(PROPERTY_TRANSPARENCY);
 		setSetting(PROPERTY_ACTION_OUT_OF_BOUNDS);
+		updateLabel();
 	}
 	
 	@Override
 	protected void setViewerProperty(String property, String value) {
-		if(property.equals(PROPERTY_MAX_VALUE)) {
+		if(property.equals(PROPERTY_ELEMENT_ID_PREFIX)) {
+			settings.setElementIDPrefix(value);
+			updateLabel();
+			updateBackground();
+		} else if(property.equals(PROPERTY_PARAMETER_NAME)) {
+			settings.setParameterName(value);
+			updateLabel();
+			updateBackground();
+		} else if(property.equals(PROPERTY_MAX_VALUE)) {
 			settings.setMaxValue(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MIN_VALUE)) {
 			settings.setMinValue(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MIDDLE_VALUE)) {
 			settings.setMiddleValue(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MAX_DISTANCE)) {
 			settings.setMaxDistance(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MAX_REL_DISTANCE)) {
 			settings.setMaxRelDistance(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_COLOR_STEPS)) {
 			settings.getColorProvider().setColorSteps(parseDouble(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MAX_COLOR)) {
 			settings.getColorProvider().setMaxColor(ParameterUtils.parseColor(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_UPPER_HALF_COLOR)) {
 			settings.getColorProvider().setUpperHalfColor(ParameterUtils.parseColor(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MIDDLE_COLOR)) {
 			settings.getColorProvider().setMiddleColor(ParameterUtils.parseColor(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_LOWER_HALF_COLOR)) {
 			settings.getColorProvider().setLowerHalfColor(ParameterUtils.parseColor(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_MIN_COLOR)) {
 			settings.getColorProvider().setMinColor(ParameterUtils.parseColor(value));
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_COLOR_PROVIDER)) {
 			int intValue = parseInt(value);
-			ColorProvider provider = intValue == 5 ? 
-					new ColorProvider.ComplexColorProvider(settings.getColorProvider()) : 
-						new ColorProvider.SimpleColorProvider(settings.getColorProvider());
+			ColorProvider provider = intValue == 3 ? 
+					new ColorProvider.SimpleColorProvider(settings.getColorProvider()) :
+					new ColorProvider.ComplexColorProvider(settings.getColorProvider());
 			settings.setColorProvider(provider);
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_TRANSPARENCY)) {
 			int transparency = parseInt(value);
 			settings.getColorProvider().setTransparency(transparency);
-			updateSettings();
+			updateBackground();
 		} else if(property.equals(PROPERTY_ACTION_OUT_OF_BOUNDS)) {
 			int action = parseInt(value);
 			settings.setOutOfBoundsAction(action);
-			updateSettings();
+			updateBackground();
 		} else
 			super.setViewerProperty(property, value);
 	}
@@ -134,8 +161,26 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 		return intValue;
 	}
 	
-	private void updateSettings() {
-		paintManager.updateBackgroundImage();
-		legend.repaint();
+	private void updateLabel() {
+		String text = "";
+		if(settings.getElementIDPrefix() != null && settings.getParameterName() != null) {
+			text = "Parameter \"" + settings.getParameterName() + "\"";
+			List<ModelData> possibleModels = getNetwork().getPowerFlowCase().getModelDB().getModels(
+					settings.getElementIDPrefix());
+			if(possibleModels.size() > 0) {
+				NetworkParameter paramDef = ModelDBUtils.getParameterDefinition(
+						possibleModels.get(0), settings.getParameterName());
+				if(paramDef != null && paramDef.getLabel() != null)
+					text = paramDef.getLabel();
+			}
+		}
+		contourLegend.setText(text);
+	}
+	
+	@Override
+	protected void updateBackground() {
+		super.updateBackground();
+		if(colorLegend != null)
+			colorLegend.revalidate();
 	}
 }
