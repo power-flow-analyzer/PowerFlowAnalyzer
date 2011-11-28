@@ -3,8 +3,11 @@ package net.ee.pfanalyzer.ui.viewer.network.contour;
 import java.awt.Graphics2D;
 import java.util.List;
 
+import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.IPaintListener;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
@@ -23,20 +26,34 @@ public class ContourPainter implements IPaintListener {
 	}
 	
 	private ValuePoint[] generatePoints() {
-		String propName = "VM";
-		List<Bus> busses = viewer.getNetwork().getBusses();
-		ValuePoint[] points = new ValuePoint[busses.size()];
+		String elementPrefix = settings.getElementIDPrefix();
+		String propName = settings.getParameterName();
+		List<AbstractNetworkElement> elements = viewer.getNetwork().getElements(elementPrefix);
+		ValuePoint[] points = new ValuePoint[elements.size()];
 		for (int i = 0; i < points.length; i++) {
-			Bus bus = busses.get(i);
-			Double value = bus.getDoubleParameter(propName);
+			AbstractNetworkElement element = elements.get(i);
+			Double value = element.getDoubleParameter(propName);
 			if(value == null)
 				continue;
-			double[] coords = viewer.getBusXYDouble(bus.getBusNumber());
+			int busNumber = getBusNumber(element);
+			if(busNumber == -1)
+				continue;
+			double[] coords = viewer.getBusXYDouble(busNumber);
 			double x = coords[0];
 			double y = coords[1];
 			points[i] = new ValuePoint(x, y, value);
 		}
 		return points;
+	}
+	
+	private int getBusNumber(AbstractNetworkElement element) {
+		if(element instanceof Bus)
+			return ((Bus) element).getBusNumber();
+		if(element instanceof Generator)
+			return ((Generator) element).getBusNumber();
+		if(element instanceof NetworkElement)
+			return ((NetworkElement) element).getParentBusNumber();
+		return -1;
 	}
 	
 	@Override
@@ -73,5 +90,10 @@ public class ContourPainter implements IPaintListener {
 	@Override
 	public void setActive(boolean flag) {
 		isActive = flag;
+	}
+
+	@Override
+	public int getLayer() {
+		return LAYER_CONTOUR;
 	}
 }
