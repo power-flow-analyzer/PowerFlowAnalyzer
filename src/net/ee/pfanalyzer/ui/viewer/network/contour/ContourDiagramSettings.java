@@ -2,6 +2,8 @@ package net.ee.pfanalyzer.ui.viewer.network.contour;
 
 public class ContourDiagramSettings {
 
+	private String elementIDPrefix, parameterName;
+	
 	private double maxValue = Double.NaN;
 	private double middleValue = Double.NaN;
 	private double minValue = Double.NaN;
@@ -12,10 +14,27 @@ public class ContourDiagramSettings {
 	private int outOfBoundsAction = -1;
 	
 	public boolean isIncomplete() {
-		return Double.isNaN(maxValue) || Double.isNaN(minValue) || Double.isNaN(middleValue) 
+		return elementIDPrefix == null || parameterName == null
+			|| Double.isNaN(maxValue) || Double.isNaN(minValue) || Double.isNaN(middleValue) 
 			|| Double.isNaN(maxDistance) || Double.isNaN(maxRelDistance) || outOfBoundsAction == -1
 			|| getColorProvider().getTransparency() == -1
 			|| getOutOfBoundsAction() == -1;
+	}
+
+	public String getElementIDPrefix() {
+		return elementIDPrefix;
+	}
+
+	public void setElementIDPrefix(String elementIDPrefix) {
+		this.elementIDPrefix = elementIDPrefix;
+	}
+
+	public String getParameterName() {
+		return parameterName;
+	}
+
+	public void setParameterName(String parameterName) {
+		this.parameterName = parameterName;
 	}
 
 	public double getMaxValue() {
