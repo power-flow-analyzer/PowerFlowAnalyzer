@@ -65,6 +65,12 @@
                     <parameter ID="ICON" value="map.png"/>
                     <model ID="busbar" label="Busbar View" description="Experimental!"/>
                     <model ID="contour" label="Contour Diagram">
+                        <parameter ID="CONTOUR_ELEMENT_ID_PREFIX" type="text" label="Element ID" restriction="model or class ID" empty="true">
+                            <display section="Contours" group="Values"/>
+                        </parameter>
+                        <parameter ID="CONTOUR_PARAMETER_NAME" type="text" label="Parameter" empty="true">
+                            <display section="Contours" group="Values"/>
+                        </parameter>
                         <parameter ID="CONTOUR_MAX_VALUE" type="double" label="Max value" empty="true">
                             <display section="Contours" group="Values"/>
                         </parameter>
@@ -83,7 +89,7 @@
                         <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" value="0.0">
                             <display section="Contours" group="Display"/>
                         </parameter>
-                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" restriction="list" value="3">
+                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" restriction="list" value="5">
                             <option value="3" label="3 Colors" ID="3"/>
                             <option value="5" label="5 Colors" ID="5"/>
                             <display section="Contours" group="Colors"/>
