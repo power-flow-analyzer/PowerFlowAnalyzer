@@ -2,8 +2,11 @@ package net.ee.pfanalyzer.ui.viewer.network;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
@@ -22,6 +25,7 @@ public class PaintManager {
 	
 	public void addPaintListener(IPaintListener listener) {
 		paintListeners.add(listener);
+		Collections.sort(paintListeners, new PaintListenerComparator());
 	}
 	
 	public void removePaintListener(IPaintListener listener) {
@@ -56,18 +60,24 @@ public class PaintManager {
 	}
 	
 	public void drawBackground(Graphics2D g2d) {
-//		long startTime = System.currentTimeMillis();
 		if(image == null)
 			updateBackgroundImage();
-		else
+		else if(isRunning()) {
+			g2d.setColor(Color.BLACK);
+			String text = "Calculating...";
+			Rectangle2D textBounds = g2d.getFontMetrics().getStringBounds(text, g2d);
+			g2d.drawString(text, (int) (viewer.getWidth() - textBounds.getWidth()) - 5, 
+					(int) (viewer.getHeight() - textBounds.getHeight()));
+		} else
 			g2d.drawImage(image, 0, 0, Color.WHITE, null);// TODO middleColor
-
-//		long stopTime = System.currentTimeMillis();
-//		g2d.drawString("Time: " + (stopTime - startTime) + "ms", 10, viewer.getHeight() - 20);
+	}
+	
+	public boolean isRunning() {
+		return backgroundThread != null;
 	}
 	
 	public void updateBackgroundImage() {
-		if(backgroundThread != null)
+		if(isRunning())
 			backgroundThread.updateImage();
 		else {
 			backgroundThread = new BackgroundThread();
@@ -107,9 +117,10 @@ public class PaintManager {
 				}
 				updateImage = false;
 				createBackgroundImage();
-				viewer.repaint();
+//				viewer.repaint();
 			}
 			backgroundThread = null;
+			viewer.repaint();
 		}
 		
 		private void isRunning() {
@@ -128,6 +139,17 @@ public class PaintManager {
 			synchronized(lock) {
 				updateImage = true;
 			}
+		}
+	}
+	
+	class PaintListenerComparator implements Comparator<IPaintListener> {
+		@Override
+		public int compare(IPaintListener l1, IPaintListener l2) {
+			if(l1.getLayer() == l2.getLayer())
+				return 0;
+			if(l1.getLayer() < l2.getLayer())
+				return -1;
+			return 1;
 		}
 	}
 }
