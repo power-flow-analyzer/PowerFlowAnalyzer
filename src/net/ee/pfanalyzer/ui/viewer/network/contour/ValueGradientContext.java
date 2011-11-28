@@ -77,7 +77,7 @@ public class ValueGradientContext implements PaintContext {
 					}
 				}
 
-				int[] argb = getColorProvider().getARGB(0, null, 1, null, ratio);
+				int[] argb = getColorProvider().getARGB(0, 1, ratio);
 				int pixelIndex = (j * width + i) * 4;
 				pixels[pixelIndex + 0] = argb[0];// red
 				pixels[pixelIndex + 1] = argb[1];// green

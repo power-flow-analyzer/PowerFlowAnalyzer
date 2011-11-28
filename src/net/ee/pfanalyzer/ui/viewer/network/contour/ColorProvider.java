@@ -26,7 +26,7 @@ public abstract class ColorProvider {
 		setTransparency(oldValues.getTransparency());
 	}
 	
-	public int[] getARGB(double min, Color minColor, double max, Color maxColor, double value) {
+	public int[] getARGB(double min, double max, double value) {
 		double ratio = getRatio(value / max);
 		if (ratio > 1.0)
 			ratio = 1.0;
