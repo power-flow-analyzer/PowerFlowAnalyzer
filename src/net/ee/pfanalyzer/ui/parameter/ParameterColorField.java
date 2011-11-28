@@ -10,7 +10,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.data.NetworkParameter;
-import net.ee.pfanalyzer.ui.viewer.network.Outline;
+import net.ee.pfanalyzer.model.util.ParameterUtils;
 
 public class ParameterColorField extends ParameterValuePanel implements ActionListener {
 	
@@ -72,6 +72,6 @@ public class ParameterColorField extends ParameterValuePanel implements ActionLi
 
 	@Override
 	protected void setValue(String value) {
-		color = Outline.parseColor(value);
+		color = ParameterUtils.parseColor(value);
 	}
 }
