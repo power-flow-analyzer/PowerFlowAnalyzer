@@ -133,4 +133,9 @@ public class OutlinePainter implements IPaintListener {
 	public void setActive(boolean flag) {
 		isActive = flag;
 	}
+
+	@Override
+	public int getLayer() {
+		return LAYER_OUTLINES;
+	}
 }
