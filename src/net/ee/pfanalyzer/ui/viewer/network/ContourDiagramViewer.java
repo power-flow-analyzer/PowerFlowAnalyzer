@@ -180,7 +180,9 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 	@Override
 	protected void updateBackground() {
 		super.updateBackground();
-		if(colorLegend != null)
+		if(colorLegend != null) {
 			colorLegend.revalidate();
+			colorLegend.repaint();
+		}
 	}
 }
