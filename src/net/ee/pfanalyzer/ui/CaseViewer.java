@@ -63,6 +63,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 				lastViewer.removeActionUpdateListener(CaseViewer.this);
 				lastViewer.removeNetworkElementSelectionListener(modelDBDialog);
 				lastViewer.dispose();
+				lastViewer = null;
 				fireActionUpdate();
 			}
 			@Override
