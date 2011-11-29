@@ -231,8 +231,7 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			return;
 		// show tab which contains the new selection
 		if(data instanceof AbstractNetworkElement) {
-			if(leftViewers.selectViewer((AbstractNetworkElement) data))
-				return;
+			leftViewers.selectViewer((AbstractNetworkElement) data);
 			bottomViewers.selectViewer((AbstractNetworkElement) data);
 		}
 	}
@@ -315,7 +314,8 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			if(modelID == null || modelID.isEmpty())
 				return false;
 			for (int i = 0; i < viewers.size(); i++) {
-				if(modelID.startsWith(viewers.get(i).getViewerConfiguration().getElementFilter())) {
+				String elementFilter = viewers.get(i).getViewerConfiguration().getElementFilter();
+				if(elementFilter.length() > 0 && modelID.startsWith(elementFilter)) {
 					setSelectedIndex(i);
 					return true;
 				}
