@@ -308,7 +308,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public void removeNetworkChangeListener(INetworkChangeListener listener) {
-		listeners.add(listener);
+		listeners.remove(listener);
 	}
 	
 	public void fireNetworkChanged() {
@@ -480,7 +480,7 @@ public class Network extends ParameterSupport {
 	}
 	
 	public boolean isEmpty() {
-		return getElements().isEmpty();
+		return networkData.getElement().isEmpty();
 	}
 	
 	public List<AbstractNetworkElement> getElements() {
