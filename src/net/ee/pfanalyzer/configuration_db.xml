@@ -63,66 +63,69 @@
                         <display group="Draw"/>
                     </parameter>
                     <parameter ID="ICON" value="map.png"/>
-                    <model ID="busbar" label="Busbar View" description="Experimental!"/>
-                    <model ID="contour" label="Contour Diagram">
-                        <parameter ID="CONTOUR_ELEMENT_ID_PREFIX" type="text" label="Element ID" restriction="model or class ID" empty="true">
+                    <model ID="busbar" label="Busbar View" description="Experimental!">
+                        <parameter ID="ICON" value="hlocchart.png"/>
+                    </model>
+                    <model ID="contour" label="Contour Diagram" description="A geographic map displaying network parameters &lt;br&gt;as colored contours.">
+                        <parameter ID="CONTOUR_ELEMENT_ID_PREFIX" type="text" label="Element Filter" description="Only includes those elements whose model ID starts with this pattern." restriction="model or class ID" empty="true">
                             <display section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="CONTOUR_PARAMETER_NAME" type="text" label="Parameter" empty="true">
+                        <parameter ID="CONTOUR_PARAMETER_NAME" type="text" label="Parameter" description="The ID of a parameter whose values should be drawn." empty="true">
                             <display section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MAX_VALUE" type="double" label="Max value" empty="true">
+                        <parameter ID="CONTOUR_MAX_VALUE" type="double" label="Maximum value" description="The maximum value to be displayed" empty="true">
                             <display section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MIDDLE_VALUE" type="double" label="Middle value" empty="true">
+                        <parameter ID="CONTOUR_MIDDLE_VALUE" type="double" label="Middle value" description="The middle value to be displayed." empty="true">
                             <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MIN_VALUE" type="double" label="Min value" empty="true">
+                        <parameter ID="CONTOUR_MIN_VALUE" type="double" label="Minimum value" description="The minimum value to be displayed" empty="true">
                             <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MAX_DISTANCE" type="integer" label="Highlight distance" value="70.0">
+                        <parameter ID="CONTOUR_MAX_DISTANCE" type="integer" label="Highlight distance" description="Maximum distance for drawing values." value="70.0">
                             <display min="0.0" section="Contours" group="Display"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MAX_REL_DISTANCE" type="double" label="Factor for small values" value="0.93">
+                        <parameter ID="CONTOUR_MAX_REL_DISTANCE" type="double" label="Factor for small values" description="Controls the visibility of small values when they are in proximity of big values." value="0.93">
                             <display decimalFormatPattern="#.##" increment="0.01" max="1.0" min="0.0" section="Contours" group="Display"/>
                         </parameter>
-                        <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" value="0.0">
+                        <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" description="The number of steps in the color legend. &lt;br&gt;Zero means an infinite number of steps." value="0.0">
                             <display section="Contours" group="Display"/>
                         </parameter>
-                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" restriction="list" value="5">
+                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" description="The color scheme to be used." restriction="list" value="5">
                             <option value="3" label="3 Colors" ID="3"/>
                             <option value="5" label="5 Colors" ID="5"/>
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MAX_COLOR" type="text" label="Maximum color" restriction="color (RGB)" value="255,0,0">
+                        <parameter ID="CONTOUR_MAX_COLOR" type="text" label="Maximum color" description="The color for maximum values." restriction="color (RGB)" value="255,0,0">
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="CONTOUR_UPPER_HALF_COLOR" type="text" label="Upper half color" restriction="color (RGB)" value="255,255,0">
+                        <parameter ID="CONTOUR_UPPER_HALF_COLOR" type="text" label="Upper half color" description="The color for values in the middle of the upper half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." restriction="color (RGB)" value="255,255,0">
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MIDDLE_COLOR" type="text" label="Middle color" restriction="color (RGB)" value="255,255,255">
+                        <parameter ID="CONTOUR_MIDDLE_COLOR" type="text" label="Middle color" description="The color for middle values. &lt;br&gt;Note that this color will also be used for drawing the background." restriction="color (RGB)" value="255,255,255">
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="CONTOUR_LOWER_HALF_COLOR" type="text" label="Lower half color" restriction="color (RGB)" value="0,255,255">
+                        <parameter ID="CONTOUR_LOWER_HALF_COLOR" type="text" label="Lower half color" description="The color for values in the middle of the lower half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." restriction="color (RGB)" value="0,255,255">
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="CONTOUR_MIN_COLOR" type="text" label="Minimum color" restriction="color (RGB)" value="0,0,255">
+                        <parameter ID="CONTOUR_MIN_COLOR" type="text" label="Minimum color" description="The color for minimum values." restriction="color (RGB)" value="0,0,255">
                             <display section="Contours" group="Colors"/>
                         </parameter>
-                        <parameter ID="ACTION_OUT_OF_BOUNDS" type="integer" label="Action for values out of bounds" restriction="list" value="0">
+                        <parameter ID="ACTION_OUT_OF_BOUNDS" type="integer" label="Action for values out of bounds" description="Controls how values should be handled when they exceed the maximum/minimum value.&lt;br&gt;They can either be cut to the maximum/minimum value &lt;br&gt;or they can be omitted." restriction="list" value="0">
                             <option value="0" label="Cut values" ID="CUT"/>
                             <option value="1" label="Omit values" ID="OMIT"/>
                             <display section="Contours" group="Values"/>
                         </parameter>
-                        <parameter ID="TRANSPARENCY" type="integer" label="Contrast" value="185.0">
+                        <parameter ID="TRANSPARENCY" type="integer" label="Contrast" description="Sets the contrast of all colors. A higher value means a higher contrast." value="185.0">
                             <display increment="10.0" max="255.0" min="0.0" section="Contours" group="Display"/>
                         </parameter>
+                        <parameter ID="ICON" value="color_management.png"/>
                     </model>
-                    <model ID="map" label="Network Map" description=" Creates a new map displaying the network."/>
+                    <model ID="map" label="Network Map" description="A geographic map displaying the network."/>
                 </modelClass>
                 <modelClass ID="table" label="Table">
                     <parameter ID="POSITION" value="bottom"/>
-                    <model ID="type_filter" label="Data Table" description=" Creates a table containing the parameters &lt;br&gt;of all elements whose model ID matches a given pattern">
+                    <model ID="type_filter" label="Data Table" description="A table containing the parameters of all elements &lt;br&gt;whose model ID matches a given pattern.">
                         <parameter ID="ELEMENT_FILTER" type="text" label="Element filter" description="&lt;html&gt;Only those elements will be displayed&lt;br&gt;whose model ID starts with this pattern." restriction="model or class ID" empty="true">
                             <display/>
                         </parameter>
