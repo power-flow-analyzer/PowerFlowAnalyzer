@@ -16,6 +16,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -97,6 +98,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private final static String ACTION_SELECT_NEXT = "action.select.next";
 	
 	private final static String ACTION_CLOSE_PROGRAM = "action.program.close";
+	private final static String ACTION_DUMP_MEMORY_INFO = "action.info.memory";
 	
 	private final static String ACTION_IMPORT_DB = "action.model.db.import";
 	private final static String ACTION_EXPORT_DB = "action.model.db.export";
@@ -207,6 +209,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
+//		toolbar.addSeparator();
+		toolbar.add(Box.createHorizontalGlue());
+//		toolbar.add(createToolbarButton(ACTION_DUMP_MEMORY_INFO, "Dump memory information", "system_monitor.png", "Memory"));
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
@@ -311,6 +316,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 					exportParameterDB();
 			} else if(e.getActionCommand().equals(ACTION_CLOSE_PROGRAM)) {
 				closeProgram();
+			} else if(e.getActionCommand().equals(ACTION_DUMP_MEMORY_INFO)) {
+				dumpMemoryUsage();
 			}
 		} catch(Exception error) {
 			error.printStackTrace();
@@ -365,6 +372,17 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		};
 		actions.put(actionCommand, action);
 		return action;
+	}
+	
+	private void dumpMemoryUsage() {
+//		for (int i = 0; i < 10; i++) {
+//			System.gc();
+//		}
+		long free = Runtime.getRuntime().freeMemory() / (1024 * 1024);
+		long total = Runtime.getRuntime().totalMemory() / (1024 * 1024);
+		long used = total - free;
+//		System.out.println("Free: " + free + "MB of " + total + "MB");
+		System.out.println("Used: " + used + "MB, free: " + free + "MB");
 	}
 	
 	private void importParameterDB() {
