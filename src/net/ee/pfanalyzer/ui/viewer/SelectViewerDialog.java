@@ -23,7 +23,7 @@ public class SelectViewerDialog extends BaseDialog {
 	
 	public SelectViewerDialog(Window frame) {
 		super(frame, "Select viewer");
-		setText("<html><center><b>Select the viewer type and press OK.");
+		setText("<html><center><b>Select a viewer from the list below");
 		
 		Box contentPane = Box.createVerticalBox();
 		for (final ModelData viewer : PowerFlowAnalyzer.getConfiguration().getModels("viewer")) {
