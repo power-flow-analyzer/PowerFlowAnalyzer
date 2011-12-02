@@ -204,7 +204,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbar.add(createToolbarButton(ACTION_CASE_LAYOUT, "Change layout", "grid.png", "Change layout"));
 //		toolbar.addSeparator();
 //		toolbar.add(createToolbarButton(ACTION_APP_PROPERTIES, "Edit program settings", "widgets.png", "App settings"));
-		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data viewer to this layout", "table_add.png", "New Table"));
+		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data viewer to this layout", "layout_add.png", "New Table"));
 //		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
