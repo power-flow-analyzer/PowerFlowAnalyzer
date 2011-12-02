@@ -41,32 +41,57 @@ public class ColorLegend extends JComponent {
 		if(settings.isIncomplete())
 			return;
 		Graphics2D g2d = (Graphics2D) g;
-		int height = getHeight();
-		int half = (int) (height / 2.0);
+		double maxValue = settings.getMaxValue();
+		double middleValue = settings.getMiddleValue();
+		double minValue = settings.getMinValue();
+		boolean showMax = maxValue != middleValue;
+		boolean showMin = minValue != middleValue;
 		int width = getWidth();
-		for (int i = 0; i < half; i++) {
-			if(i == half/2.0)
-				g2d.setColor(Color.BLACK);
-			else
-				g2d.setColor(settings.getColorProvider().getColor((double) (half - i) / (double) half));
-			g2d.drawLine(0, i, width, i);
+		if(showMax) {
+			int height = showMin ? (int) (getHeight() / 2.0) : getHeight();
+			for (int i = 0; i < height; i++) {
+				if(i == height/2.0)
+					g2d.setColor(Color.BLACK);
+				else
+					g2d.setColor(settings.getColorProvider().getColor((double) (height - i) / (double) height));
+				g2d.drawLine(0, i, width, i);
+			}
 		}
-		for (int i = 0; i < half; i++) {
-			if(i == 0 || i == half/2.0)
-				g2d.setColor(Color.BLACK);
-			else
-				g2d.setColor(settings.getColorProvider().getColor((double) (-i) / (double) half));
-			g2d.drawLine(0, i + half, width, i + half);
+		if(showMin) {
+			int heightOffset = showMax ? (int) (getHeight() / 2.0) : 0;
+			int height = showMax ? (int) (getHeight() / 2.0) : getHeight();
+			for (int i = 0; i < height; i++) {
+				if(i == 0 || i == height/2.0)
+					g2d.setColor(Color.BLACK);
+				else
+					g2d.setColor(settings.getColorProvider().getColor((double) (-i) / (double) height));
+				g2d.drawLine(0, i + heightOffset, width, i + heightOffset);
+			}
 		}
 		g2d.setColor(Color.BLACK);
 		// draw max value
-		String maxText = FORMAT.format(settings.getMaxValue());
-		g2d.drawString(maxText, VALUE_OFFSET, g2d.getFontMetrics().getAscent());
+		if(showMax) {
+			String maxText = FORMAT.format(maxValue);
+			g2d.drawString(maxText, VALUE_OFFSET, g2d.getFontMetrics().getAscent());
+		} else {
+			// draw middle value
+			String middleText = FORMAT.format(middleValue);
+			g2d.drawString(middleText, VALUE_OFFSET, g2d.getFontMetrics().getAscent());
+		}
 		// draw min value
-		String minText = FORMAT.format(settings.getMinValue());
-		g2d.drawString(minText, VALUE_OFFSET, getHeight() - g2d.getFontMetrics().getDescent());
+		if(showMin) {
+			String minText = FORMAT.format(minValue);
+			g2d.drawString(minText, VALUE_OFFSET, getHeight() - g2d.getFontMetrics().getDescent());
+		} else {
+			// draw middle value
+			String middleText = FORMAT.format(middleValue);
+			g2d.drawString(middleText, VALUE_OFFSET, getHeight() - g2d.getFontMetrics().getDescent());
+		}
 		// draw middle value
-		String middleText = FORMAT.format(settings.getMiddleValue());
-		g2d.drawString(middleText, VALUE_OFFSET, getHeight() / 2 + g2d.getFontMetrics().getAscent());
+		if(showMax && showMin) {
+			g2d.setColor(Color.BLACK);
+			String middleText = FORMAT.format(middleValue);
+			g2d.drawString(middleText, VALUE_OFFSET, getHeight() / 2 + g2d.getFontMetrics().getAscent());
+		}
 	}
 }
