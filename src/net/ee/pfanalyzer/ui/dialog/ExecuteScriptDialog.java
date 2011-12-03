@@ -9,9 +9,9 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
-import net.ee.pfanalyzer.ui.model.ModelElementPanel;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetwork;
 import net.ee.pfanalyzer.ui.util.Group;
+import net.ee.pfanalyzer.ui.viewer.element.ModelElementPanel;
 
 public class ExecuteScriptDialog extends BaseDialog {
 

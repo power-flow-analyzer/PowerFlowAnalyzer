@@ -14,10 +14,10 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.dialog.BaseDialog;
-import net.ee.pfanalyzer.ui.model.ModelElementPanel;
 import net.ee.pfanalyzer.ui.parameter.ParameterCheckBox;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterViewer;
 import net.ee.pfanalyzer.ui.util.Group;
+import net.ee.pfanalyzer.ui.viewer.element.ModelElementPanel;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
 
 public class DataViewerDialog extends BaseDialog {

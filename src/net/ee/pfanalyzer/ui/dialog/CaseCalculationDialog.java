@@ -11,9 +11,9 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.ModelClassData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
-import net.ee.pfanalyzer.ui.model.ModelElementPanel;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetwork;
 import net.ee.pfanalyzer.ui.util.Group;
+import net.ee.pfanalyzer.ui.viewer.element.ModelElementPanel;
 
 public class CaseCalculationDialog extends BaseDialog {
 
