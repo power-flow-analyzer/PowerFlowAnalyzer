@@ -23,7 +23,6 @@ import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
-import net.ee.pfanalyzer.ui.model.ElementPanelController;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -33,6 +32,7 @@ import net.ee.pfanalyzer.ui.viewer.DataViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
+import net.ee.pfanalyzer.ui.viewer.element.ElementViewer;
 import net.ee.pfanalyzer.ui.viewer.network.BusBarViewer;
 import net.ee.pfanalyzer.ui.viewer.network.ContourDiagramViewer;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
@@ -44,11 +44,10 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 	private Network network;
 	
 	private NetworkElementSelectionManager selectionManager;
-	private ViewerTabbedPane bottomViewers, leftViewers;
+	private ViewerTabbedPane bottomViewers, leftViewers, rightViewers;
 	private List<ViewerFrame> viewerFrames = new ArrayList<ViewerFrame>();
 	private JSplitPane horizontalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 	private JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	private ElementPanelController panelController;
 
 	private List<IActionUpdater> actionUpdater = new ArrayList<IActionUpdater>();
 	private JLabel networkDescriptionLabel = new JLabel();
@@ -58,13 +57,11 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		this.powerFlowCase = caze;
 		this.network = network;
 		selectionManager = new NetworkElementSelectionManager();
-		panelController = new ElementPanelController(getNetwork());
-		JPanel dataPanel = new JPanel(new BorderLayout());
-		dataPanel.add(panelController, BorderLayout.CENTER);
 		bottomViewers = new ViewerTabbedPane();
 		leftViewers = new ViewerTabbedPane();
+		rightViewers = new ViewerTabbedPane();
 		horizontalSplitPane.setLeftComponent(leftViewers.getComponent());
-		horizontalSplitPane.setRightComponent(dataPanel);
+		horizontalSplitPane.setRightComponent(rightViewers.getComponent());
 		horizontalSplitPane.setContinuousLayout(true);
 		horizontalSplitPane.setOneTouchExpandable(true);
 		horizontalSplitPane.setDividerLocation(300);
@@ -84,17 +81,14 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			addDataViewer(new DataViewerConfiguration(viewerData), false);
 		}
 
-		getNetwork().addNetworkChangeListener(panelController);
-		addNetworkElementSelectionListener(panelController);
 		addNetworkElementSelectionListener(this);
 	}
 	
 	public void dispose() {
-		getNetwork().removeNetworkChangeListener(panelController);
-		removeNetworkElementSelectionListener(panelController);
 		removeNetworkElementSelectionListener(this);
 		leftViewers.dispose();
 		bottomViewers.dispose();
+		rightViewers.dispose();
 		for (ViewerFrame frame : viewerFrames) {
 			frame.closeFrame(false);
 		}
@@ -120,6 +114,8 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		INetworkDataViewer viewer = null;
 		if(DataTable.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new DataTable(viewerData, this);
+		else if(ElementViewer.VIEWER_ID.equals(viewerData.getModelID()))
+			viewer = new ElementViewer(getNetwork(), viewerData, this);
 //		else if("viewer.diagram.bar".equals(viewerData.getModelID()))
 //			viewer = new PowerFlowDiagram(viewerData);
 		else if(NetworkMapViewer.VIEWER_ID.equals(viewerData.getModelID()))
@@ -158,6 +154,8 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			tabPane = bottomViewers;
 		else if(position.equals("left"))
 			tabPane = leftViewers;
+		else if(position.equals("right"))
+			tabPane = rightViewers;
 		else if(position.equals("free"))
 			tabPane = null;
 		else
@@ -213,10 +211,6 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		return network;
 	}
 
-	public ElementPanelController getPanelController() {
-		return panelController;
-	}
-	
 	public void updateNetworkDescription() {
 		networkDescriptionLabel.setText(network.getDescription());
 	}
@@ -233,6 +227,7 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		if(data instanceof AbstractNetworkElement) {
 			leftViewers.selectViewer((AbstractNetworkElement) data);
 			bottomViewers.selectViewer((AbstractNetworkElement) data);
+			rightViewers.selectViewer((AbstractNetworkElement) data);
 		}
 	}
 	
@@ -263,6 +258,7 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 	public void updateTabTitles() {
 		leftViewers.updateTabs("left");
 		bottomViewers.updateTabs("bottom");
+		rightViewers.updateTabs("right");
 		updateFrames();
 		fireActionUpdate();
 	}
