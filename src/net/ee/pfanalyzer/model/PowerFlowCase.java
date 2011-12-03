@@ -127,6 +127,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		if(pfCase.getDataViewer().size() > 0)
 			return;
 		pfCase.getDataViewer().add(createNetworkViewerData("Network"));
+		pfCase.getDataViewer().add(createElementViewerData("Network Navigator"));
 		pfCase.getDataViewer().add(createTableViewerData("Bus Data", "bus"));
 		pfCase.getDataViewer().add(createTableViewerData("Branch Data", "branch"));
 		pfCase.getDataViewer().add(createTableViewerData("Generator Data", "generator"));
@@ -152,6 +153,20 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		p = new NetworkParameter();
 		p.setID("POSITION");
 		p.setValue("left");
+		viewerData.getParameter().add(p);
+		return viewerData;
+	}
+	
+	private DataViewerData createElementViewerData(String title) {
+		DataViewerData viewerData = new DataViewerData();
+		viewerData.setModelID("viewer.element.viewer");
+		NetworkParameter p = new NetworkParameter();
+		p.setID("TITLE");
+		p.setValue(title);
+		viewerData.getParameter().add(p);
+		p = new NetworkParameter();
+		p.setID("POSITION");
+		p.setValue("right");
 		viewerData.getParameter().add(p);
 		return viewerData;
 	}
