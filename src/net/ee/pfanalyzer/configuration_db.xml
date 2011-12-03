@@ -8,6 +8,7 @@
                 </parameter>
                 <parameter ID="POSITION" type="text" label="Position" description="&lt;html&gt;The position of this viewer.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Left: positioned at the left&lt;/li&gt;&lt;li&gt;Bottom: positioned at the bottom&lt;/li&gt;&lt;li&gt;Free: displayed in an external window&lt;/li&gt;&lt;/ul&gt;The default position is &quot;bottom&quot;." restriction="list" empty="true">
                     <option value="left" label="Left" ID="LEFT"/>
+                    <option value="right" label="Right" ID="RIGHT"/>
                     <option value="bottom" label="Bottom" ID="BOTTOM"/>
                     <option value="free" label="Free" ID="FREE"/>
                     <display/>
@@ -21,6 +22,12 @@
                 <parameter ID="HEIGHT" type="integer" label="Height" value="300.0">
                     <display min="10.0"/>
                 </parameter>
+                <modelClass ID="element" label="Element">
+                    <model ID="viewer" label="Element Viewer" description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. ">
+                        <parameter ID="POSITION" value="right"/>
+                        <parameter ID="ICON" value="application_form.png"/>
+                    </model>
+                </modelClass>
                 <modelClass ID="network" label="Network">
                     <parameter ID="POSITION" value="left"/>
                     <parameter ID="ZOOM" type="integer" label="Zoom" restriction="list" value="0" empty="false">
