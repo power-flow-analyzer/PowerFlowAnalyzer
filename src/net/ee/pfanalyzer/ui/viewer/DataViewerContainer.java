@@ -30,8 +30,8 @@ public class DataViewerContainer extends JPanel {
 		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
 		final JButton editButton = PowerFlowAnalyzer.createButton("Edit viewer properties", 
-				"pencil.png", "Edit viewer properties", false);
-		editButton.setMargin(new Insets(2, 2, 1, 1));
+				"wrench.png", "Edit viewer properties", false);
+		editButton.setMargin(new Insets(2, 2, 2, 2));
 		editButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
