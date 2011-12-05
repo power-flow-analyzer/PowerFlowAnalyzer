@@ -7,6 +7,7 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 
 	private List<TYPE> networkElements = new ArrayList<TYPE>();
 	private int index;
+	private String typeLabel;
 	
 	public abstract String getLabel();
 	
@@ -52,5 +53,22 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 			result += element.getDoubleParameter(parameterID, 0);
 		}
 		return result;
+	}
+	
+	public String getDisplayName(int displayFlags) {
+		String text = getLabel();
+		if(getNetworkElementCount() > 1 && (displayFlags & AbstractNetworkElement.DISPLAY_ELEMENT_COUNT) != 0) {
+			String entityLabel = getTypeLabel() != null ? getTypeLabel() : "elements";
+			text += " (" + getNetworkElementCount() + " " + entityLabel + ")";
+		}
+		return text;
+	}
+	
+	public String getTypeLabel() {
+		return typeLabel;
+	}
+	
+	public void setTypeLabel(String typeLabel) {
+		this.typeLabel = typeLabel;
 	}
 }
