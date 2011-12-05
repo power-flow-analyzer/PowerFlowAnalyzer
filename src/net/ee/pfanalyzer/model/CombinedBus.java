@@ -9,13 +9,13 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	
 	private List<Generator> generators = new ArrayList<Generator>();
 //	private List<Transformer> transformers = new ArrayList<Transformer>();
-	private double longitude, lattitude;
+	private double longitude, latitude;
 	private Boolean hasFailures = null;
 	private Boolean hasWarnings = null;
 	
-	public CombinedBus(Bus bus, double longitude, double lattitude) {
+	public CombinedBus(Bus bus, double longitude, double latitude) {
 		this.longitude = longitude;
-		this.lattitude = lattitude;
+		this.latitude = latitude;
 		addBus(bus);
 	}
 	
@@ -56,7 +56,7 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	}
 
 	public double getLatitude() {
-		return lattitude;
+		return latitude;
 	}
 	
 	public boolean hasLongitude(double longitude) {
