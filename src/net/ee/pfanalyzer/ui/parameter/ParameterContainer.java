@@ -162,8 +162,8 @@ public class ParameterContainer extends JPanel {
 		return label;
 	}
 	
-	protected void addElementLink(CombinedNetworkElement<?> element) {
-		currentGroupContainer.addElementLink(element);
+	protected void addElementLink(CombinedNetworkElement<?> element, int displayFlags) {
+		currentGroupContainer.addElementLink(element, displayFlags);
 	}
 	
 	protected void addElementLink(AbstractNetworkElement element, int displayFlags) {
