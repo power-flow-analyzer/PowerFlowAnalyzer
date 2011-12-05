@@ -32,7 +32,8 @@ public class Group extends JPanel {
 			foreground = Preferences.getFlagWarningColor();
 		else
 			foreground = Preferences.getHyperlinkForeground();
-		add(new HyperLinkLabel(element.getLabel(), element, foreground));
+		String label = element.getLabel();// + " (" + element.getNetworkElementCount() + " elements)";
+		add(new HyperLinkLabel(label, element, foreground));
 	}
 	
 	public void addElementLink(AbstractNetworkElement childData, int displayFlags) {
