@@ -14,8 +14,9 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 	
 	public final static int DISPLAY_NAME = 2;
 	public final static int DISPLAY_ADDITIONAL_INFO = 4;
+	public final static int DISPLAY_ELEMENT_COUNT = 8;
 
-	public final static int DISPLAY_DEFAULT = DISPLAY_NAME | DISPLAY_ADDITIONAL_INFO;
+	public final static int DISPLAY_DEFAULT = DISPLAY_NAME | DISPLAY_ADDITIONAL_INFO | DISPLAY_ELEMENT_COUNT;
 	
 	private Network network;
 	private int indexInParent;
