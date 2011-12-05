@@ -8,13 +8,17 @@ import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
+import net.ee.pfanalyzer.model.ElementList;
+import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 
 public class ElementGroupingUtils {
 
 //	private final static String paramName = "BUS_AREA";//TSO
 	
-	public static CombinedBus getCombinedBus(List<CombinedBus> combinedBusList, AbstractNetworkElement data) {
+	public static CombinedBus getCombinedBus(List<CombinedBus> combinedBusList, 
+			AbstractNetworkElement data) {
 		for (CombinedBus cbus : combinedBusList) {
 			if(cbus.contains(data))
 				return cbus;
@@ -55,38 +59,64 @@ public class ElementGroupingUtils {
 		return combinedBusList;
 	}
 	
-//	public static List<CombinedNetworkElement<AbstractNetworkElement>> getCombinedElementsByCoordinates(List<AbstractNetworkElement> busses) {
-//		List<CombinedBus> combinedBusList = new ArrayList<CombinedBus>();
-//		for (int i = 0; i < busses.size(); i++) {
-//			AbstractNetworkElement bus = busses.get(i);
-//			double longitude = bus.getLongitude();
-//			double latitude = bus.getLatitude();
-//			if(Double.isNaN(latitude) || Double.isNaN(longitude)) // no coords set
-//				continue;
-//			boolean found = false;
-////			System.out.println("Bus " + i);
-//			for (CombinedBus cbus : combinedBusList) {
-//				if(cbus.hasLongitude(longitude) && cbus.hasLatitude(latitude)) {
-////					System.out.println("  added to combined bus " + cbus.getIndex());
-//					cbus.addBus(bus);
-//					found = true;
-//					break;
-//				}
-//			}
-//			if(found == false) {
-//				CombinedNetworkElement cbus = new CombinedNetworkElement();
-//				cbus.setIndex(combinedBusList.size());
-//				combinedBusList.add(cbus);
-////				System.out.println("  created new combined bus " + cbus.getIndex());
-//			}
+	
+	public static List<ElementList> getCombinedElementsByCoordinates(
+			List<AbstractNetworkElement> elements, String typeLabel) {
+		List<ElementList> combinedList = new ArrayList<ElementList>();
+		for (int i = 0; i < elements.size(); i++) {
+			AbstractNetworkElement element = elements.get(i);
+			final Bus bus = getParentBus(element);
+			if(bus == null)
+				continue;
+			double longitude = bus.getLongitude();
+			double latitude = bus.getLatitude();
+			if(Double.isNaN(latitude) || Double.isNaN(longitude)) // no coords set
+				continue;
+			boolean found = false;
+			for (ElementList list : combinedList) {
+				Bus addedBus = getParentBus(list.getFirstNetworkElement());
+				double epsilon = 0.0001;
+				if(hasLongitude(addedBus.getLongitude(), longitude, epsilon) 
+						&& hasLatitude(addedBus.getLatitude(), latitude, epsilon)) {
+//					System.out.println("  added to combined element " + cbus.getIndex());
+					list.addNetworkElement(element);
+					found = true;
+					break;
+				}
+			}
+			if(found == false) {
+				ElementList list = new ElementList() {
+					@Override
+					public String getLabel() {
+						String locationName = bus.getName();
+						if(locationName != null)
+							return locationName;
+						else
+							return "Element list";
+					}
+				};
+				list.addNetworkElement(element);
+				list.setIndex(combinedList.size());
+				list.setTypeLabel(typeLabel);
+				combinedList.add(list);
+//				System.out.println("  created new combined element " + cbus.getIndex());
+			}
+		}
+//		int busCount = 0;
+//		for (CombinedBus cbus : combinedBusList) {
+//			busCount += cbus.getNetworkElementCount();
 //		}
-////		int busCount = 0;
-////		for (CombinedBus cbus : combinedBusList) {
-////			busCount += cbus.getNetworkElementCount();
-////		}
-////		System.out.println(combinedBusList.size() + " combined bus nodes found with " + busCount + " elements");
-//		return combinedBusList;
-//	}
+//		System.out.println(combinedBusList.size() + " combined element nodes found with " + busCount + " elements");
+		return combinedList;
+	}
+	
+	public static boolean hasLongitude(double longitude1, double longitude2, double epsilon) {
+		return Math.abs(longitude1 - longitude2) <= epsilon;
+	}
+	
+	public static boolean hasLatitude(double latitude1, double latitude2, double epsilon) {
+		return Math.abs(latitude1 - latitude2) <= epsilon;
+	}
 	
 	public static List<CombinedBranch> getCombinedBranchesByCoordinates(
 			List<Branch> branches, List<CombinedBus> combinedBusList) {
@@ -137,7 +167,8 @@ public class ElementGroupingUtils {
 		return combinedBranchList;
 	}
 	
-	public static List<CombinedBus> getCombinedBussesByParameter(List<Bus> busList, final String paramName) {
+	public static List<CombinedBus> getCombinedBussesByParameter(
+			List<Bus> busList, final String paramName) {
 		List<CombinedBus> list = new ArrayList<CombinedBus>();
 		for (final Bus bus : busList) {
 			boolean added = false;
@@ -155,12 +186,11 @@ public class ElementGroupingUtils {
 					CombinedBus cbus = new CombinedBus(bus, bus.getLongitude(), bus.getLatitude()) {
 						@Override
 						public String getLabel() {
-							String count = getBusNodes().size() + "";
 							String displayValue = bus.getParameterDisplayValue(paramName);
 							if(isNumber(displayValue))
-								return "Area " + displayValue + " (" + count + " busses)";
+								return "Area " + displayValue;
 							else
-								return displayValue + " (" + count + " busses)";
+								return displayValue;
 						}
 					};
 					list.add(cbus);
@@ -169,6 +199,46 @@ public class ElementGroupingUtils {
 		}
 //		Collections.sort(list, new LabelSorter());
 		return list;
+	}
+	
+	public static List<ElementList> getCombinedElementsByParameter(
+			List<AbstractNetworkElement> elementList, final String paramName, String typeLabel) {
+		List<ElementList> combinedList = new ArrayList<ElementList>();
+		for (final AbstractNetworkElement element : elementList) {
+			boolean added = false;
+			String paramValue = getBusParameterValue(element, paramName);
+			if(paramValue != null && paramValue.length() > 0) {
+				for (ElementList list : combinedList) {
+					String addedValue = getBusParameterValue(list.getFirstNetworkElement(), paramName);
+					if(paramValue.equals(addedValue)) {
+						list.addNetworkElement(element);
+						added = true;
+						break;
+					}
+				}
+				if(added == false) {
+					ElementList list = new ElementList() {
+						@Override
+						public String getLabel() {
+							Bus parentBus = getParentBus(element);
+							if(parentBus != null) {
+								String displayValue = parentBus.getParameterDisplayValue(paramName);
+								if(isNumber(displayValue))
+									return "Area " + displayValue;
+								else
+									return displayValue;
+							} else
+								return super.getLabel();
+						}
+					};
+					list.setTypeLabel(typeLabel);
+					list.addNetworkElement(element);
+					combinedList.add(list);
+				}
+			}
+		}
+//		Collections.sort(list, new LabelSorter());
+		return combinedList;
 	}
 		
 	private static boolean isNumber(String text) {
@@ -197,17 +267,12 @@ public class ElementGroupingUtils {
 			boolean added = false;
 			final Bus fromBus = branch.getFromBus();
 			final Bus toBus = branch.getToBus();
-//			if(fromBus == toBus)
-//				continue;
-//			System.out.println("checking branch " + branch.getFromBusNumber());
-//			System.out.println("     " + branch.getToBusNumber());
 			CombinedBus cFromBus = getCombinedBus(combinedBusList, fromBus);
 			CombinedBus cToBus = getCombinedBus(combinedBusList, toBus);
 			if(cFromBus == null || cToBus == null)
 				continue;
 			String fromParamValue = getParameterValue(fromBus, paramName);
 			String toParamValue = getParameterValue(toBus, paramName);
-//			System.out.println("combined busses: " + fromParamValue + ", " + toParamValue);
 			if(fromParamValue != null && fromParamValue.length() > 0
 					&& toParamValue != null && toParamValue.length() > 0) {
 				if(sameArea) {
@@ -222,9 +287,6 @@ public class ElementGroupingUtils {
 					Bus addedToBus = cbranch.getToBus().getFirstBus();
 					String addedFromParamValue = getParameterValue(addedFromBus, paramName);
 					String addedToParamValue = getParameterValue(addedToBus, paramName);
-//					System.out.println("checking");
-//					System.out.println("   " + addedFromParamValue + " with " + fromParamValue);
-//					System.out.println("   " + addedToParamValue + " with " + toParamValue);
 					if((fromParamValue.equals(addedFromParamValue) 
 							&& toParamValue.equals(addedToParamValue)) ||
 							(fromParamValue.equals(addedToParamValue) 
@@ -238,7 +300,7 @@ public class ElementGroupingUtils {
 					CombinedBranch cbranch = new CombinedBranch(cFromBus, cToBus, branch) {
 						@Override
 						public String getLabel() {
-							String count = " (" + getBranchCount() + " branches)";
+//							String count = " (" + getBranchCount() + " branches)";
 							String label = "";
 							String fromDisplayValue = fromBus.getParameterDisplayValue(paramName);
 							if(isNumber(fromDisplayValue))
@@ -253,7 +315,7 @@ public class ElementGroupingUtils {
 								else
 									label += toDisplayValue;
 							}
-							label += count;
+//							label += count;
 							return label;
 						}
 					};
@@ -266,6 +328,14 @@ public class ElementGroupingUtils {
 		return list;
 	}
 	
+	private static String getBusParameterValue(AbstractNetworkElement element, String paramName) {
+		Bus parentBus = getParentBus(element);
+		if(parentBus != null)
+			return getParameterValue(parentBus, paramName);
+		else
+			return null;
+	}
+	
 	private static String getParameterValue(Bus bus, String paramName) {
 		NetworkParameter paramValue = bus.getParameterValue(paramName);
 		if(paramValue != null && paramValue.getValue() != null) {
@@ -276,5 +346,15 @@ public class ElementGroupingUtils {
 				return paramValue.getValue();
 		} else
 			return null;
+	}
+	
+	public static Bus getParentBus(AbstractNetworkElement element) {
+		if(element instanceof Bus)
+			return (Bus) element;
+		if(element instanceof Generator)
+			return ((Generator) element).getBus();
+		if(element instanceof NetworkElement)
+			return ((NetworkElement) element).getParentBus();
+		return null;
 	}
 }
