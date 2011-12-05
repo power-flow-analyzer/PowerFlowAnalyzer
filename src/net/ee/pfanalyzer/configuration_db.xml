@@ -26,6 +26,33 @@
                     <model ID="viewer" label="Element Viewer" description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. ">
                         <parameter ID="POSITION" value="right"/>
                         <parameter ID="ICON" value="application_form.png"/>
+                        <parameter ID="VIEWER_AREA_NAME" type="text" label="Label" value="Area">
+                            <display section="Grouping Attributes" group="Area"/>
+                        </parameter>
+                        <parameter ID="VIEWER_AREA_PARAMETER" type="text" label="Parameter" value="BUS_AREA">
+                            <display section="Grouping Attributes" group="Area"/>
+                        </parameter>
+                        <parameter ID="GROUP_BUS_BY_AREA" type="boolean" label="Group by area" value="true">
+                            <display group="Group Busses"/>
+                        </parameter>
+                        <parameter ID="GROUP_BUS_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                            <display group="Group Busses"/>
+                        </parameter>
+                        <parameter ID="GROUP_BRANCH_BY_AREA" type="boolean" label="Group by area and tie lines" value="true">
+                            <display group="Group Branches"/>
+                        </parameter>
+                        <parameter ID="GROUP_BRANCH_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                            <display group="Group Branches"/>
+                        </parameter>
+                        <parameter ID="GROUP_BRANCH_BY_VOLTAGE" type="boolean" label="Group by voltage level" value="true">
+                            <display group="Group Branches"/>
+                        </parameter>
+                        <parameter ID="GROUP_ELEMENTS_BY_AREA" type="boolean" label="Group by area" value="true">
+                            <display group="Group other elements"/>
+                        </parameter>
+                        <parameter ID="GROUP_ELEMENTS_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                            <display group="Group other elements"/>
+                        </parameter>
                     </model>
                 </modelClass>
                 <modelClass ID="network" label="Network">
