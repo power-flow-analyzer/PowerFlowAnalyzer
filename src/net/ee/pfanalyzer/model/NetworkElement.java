@@ -26,8 +26,12 @@ public class NetworkElement extends AbstractNetworkElement implements ICommonPar
 	@Override
 	public String getDisplayName(int displayFlags) {
 		String name = getName();
-		if(name == null || name.isEmpty())
-			name = "Element " + getIndex();
+		if(name == null || name.isEmpty()) {
+			if(getModel() != null)
+				name = getModel().getLabel();
+			else
+				name = "Element " + getIndex();
+		}
 		return name;
 	}
 	
