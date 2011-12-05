@@ -90,6 +90,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 	public void selectionChanged(Object selection) {
 		if(selection == null) {
 			networkPanel.updateNetwork();
+			setPreferredSize(networkPanel.getPreferredSize());
 			cardLayout.show(this, NETWORK_CARD);
 		} else if(selection instanceof CombinedBus) {
 			CombinedBus cbus = (CombinedBus) selection;
@@ -99,6 +100,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 				return;
 			}
 			cBusPanel.setCombinedBus(cbus);
+			setPreferredSize(cBusPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BUS_CARD);
 		} else if(selection instanceof CombinedBranch) {
 			CombinedBranch cbranch = (CombinedBranch) selection;
@@ -107,12 +109,14 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 				selectionChanged(cbranch.getBranch(0));
 				return;
 			}
-			cBranchPanel.setCombinedBranch(cbranch);
+			cBranchPanel.setCombinedBranch(cbranch, getNetwork().getCombinedBusses());
+			setPreferredSize(cBranchPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
 		} else if(selection instanceof AbstractNetworkElement) {
 			elementPanel.setNetworkElement((AbstractNetworkElement) selection);
+			setPreferredSize(elementPanel.getPreferredSize());
 			cardLayout.show(this, ELEMENT_CARD);
-		} 
+		}
 		doLayout();
 		revalidate();
 		repaint();
