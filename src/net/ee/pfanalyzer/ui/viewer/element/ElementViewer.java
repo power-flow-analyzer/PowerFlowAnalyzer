@@ -10,18 +10,33 @@ import javax.swing.JPanel;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
+import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.model.ElementList;
+import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
+import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
-public class ElementViewer extends JPanel implements INetworkDataViewer {
+public class ElementViewer extends JPanel implements INetworkDataViewer, IDatabaseChangeListener {
 
 	public final static String VIEWER_ID = "viewer.element.viewer";
+	
+	private final static String PROPERTY_VIEWER_AREA_NAME = "VIEWER_AREA_NAME";
+	private final static String PROPERTY_VIEWER_AREA_PARAMETER = "VIEWER_AREA_PARAMETER";
+	private final static String PROPERTY_GROUP_BUS_BY_AREA = "GROUP_BUS_BY_AREA";
+	private final static String PROPERTY_GROUP_BUS_BY_LOCATION = "GROUP_BUS_BY_LOCATION";
+	private final static String PROPERTY_GROUP_BRANCH_BY_AREA = "GROUP_BRANCH_BY_AREA";
+	private final static String PROPERTY_GROUP_BRANCH_BY_LOCATION = "GROUP_BRANCH_BY_LOCATION";
+	private final static String PROPERTY_GROUP_BRANCH_BY_VOLTAGE = "GROUP_BRANCH_BY_VOLTAGE";
+	private final static String PROPERTY_GROUP_ELEMENTS_BY_AREA = "GROUP_ELEMENTS_BY_AREA";
+	private final static String PROPERTY_GROUP_ELEMENTS_BY_LOCATION = "GROUP_ELEMENTS_BY_LOCATION";
 	
 	private final static String NETWORK_CARD = "network";
 	private final static String COMBINED_BUS_CARD = "combined-bus";
 	private final static String COMBINED_BRANCH_CARD = "combined-branch";
+	private final static String ELEMENT_LIST_CARD = "element-list";
 	private final static String ELEMENT_CARD = "element";
 
 	private DataViewerConfiguration viewerConfiguration;
@@ -32,7 +47,13 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 	private CombinedBusPanel cBusPanel;
 	private CombinedBranchPanel cBranchPanel;
 	private ModelElementPanel elementPanel;
+	private ElementListPanel listPanel;
 	private Object oldSelection;
+	
+	String viewerAreaLabel, viewerAreaParameter;
+	boolean groupBusByArea, groupBusByLocation, 
+			groupBranchByArea, groupBranchByLocation, groupBranchByVoltage,
+			groupElementByArea, groupElementByLocation;
 
 	public ElementViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		network = data;
@@ -51,8 +72,32 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 		elementPanel = new ModelElementPanel(this);
 		elementPanel.setShowResultsWhenEditing(false);
 		add(elementPanel, ELEMENT_CARD);
+		listPanel = new ElementListPanel(this, data);
+		add(listPanel, ELEMENT_LIST_CARD);
 		
 		cardLayout.show(this, NETWORK_CARD);
+		
+		initializeSettings();
+		getViewerConfiguration().addDatabaseChangeListener(this);
+	}
+	
+	protected void initializeSettings() {
+		setSetting(PROPERTY_VIEWER_AREA_NAME);
+		setSetting(PROPERTY_VIEWER_AREA_PARAMETER);
+		setSetting(PROPERTY_GROUP_BUS_BY_AREA);
+		setSetting(PROPERTY_GROUP_BUS_BY_LOCATION);
+		setSetting(PROPERTY_GROUP_BRANCH_BY_AREA);
+		setSetting(PROPERTY_GROUP_BRANCH_BY_LOCATION);
+		setSetting(PROPERTY_GROUP_BRANCH_BY_VOLTAGE);
+		setSetting(PROPERTY_GROUP_ELEMENTS_BY_AREA);
+		setSetting(PROPERTY_GROUP_ELEMENTS_BY_LOCATION);
+		reloadCard();
+	}
+	
+	protected void setSetting(String parameterID) {
+		NetworkParameter value = getViewerConfiguration().getParameterValue(parameterID);
+		if(value != null && value.getValue() != null)
+			setViewerProperty(parameterID, value.getValue());
 	}
 	
 	@Override
@@ -112,6 +157,15 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 			cBranchPanel.setCombinedBranch(cbranch, getNetwork().getCombinedBusses());
 			setPreferredSize(cBranchPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
+		} else if(selection instanceof ElementList) {
+			ElementList list = (ElementList) selection;
+			if(list.getNetworkElementCount() == 1) {
+				selectionChanged(list.getFirstNetworkElement());
+				return;
+			}
+			listPanel.setElementList((ElementList) selection);
+			setPreferredSize(listPanel.getPreferredSize());
+			cardLayout.show(this, ELEMENT_LIST_CARD);
 		} else if(selection instanceof AbstractNetworkElement) {
 			elementPanel.setNetworkElement((AbstractNetworkElement) selection);
 			setPreferredSize(elementPanel.getPreferredSize());
@@ -148,6 +202,40 @@ public class ElementViewer extends JPanel implements INetworkDataViewer {
 	
 	@Override
 	public void dispose() {
+		getViewerConfiguration().removeDatabaseChangeListener(this);
+	}
+
+	@Override
+	public void elementChanged(DatabaseChangeEvent event) {
 		
+	}
+
+	@Override
+	public void parameterChanged(DatabaseChangeEvent event) {
+		String property = event.getParameterID();
+		setViewerProperty(property, event.getNewValue());
+		reloadCard();
+	}
+	
+	protected void setViewerProperty(String property, String value) {
+		if(property.equals(PROPERTY_VIEWER_AREA_NAME)) {
+			viewerAreaLabel = value;
+		} else if(property.equals(PROPERTY_VIEWER_AREA_PARAMETER)) {
+			viewerAreaParameter = value;
+		} else if(property.equals(PROPERTY_GROUP_BUS_BY_AREA)) {
+			groupBusByArea = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_BUS_BY_LOCATION)) {
+			groupBusByLocation = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_BRANCH_BY_AREA)) {
+			groupBranchByArea = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_BRANCH_BY_LOCATION)) {
+			groupBranchByLocation = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_BRANCH_BY_VOLTAGE)) {
+			groupBranchByVoltage = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_ELEMENTS_BY_AREA)) {
+			groupElementByArea = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_GROUP_ELEMENTS_BY_LOCATION)) {
+			groupElementByLocation = Boolean.valueOf(value);
+		}
 	}
 }
