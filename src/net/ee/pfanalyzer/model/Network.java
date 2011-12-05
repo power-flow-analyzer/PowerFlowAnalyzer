@@ -10,6 +10,7 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
+import net.ee.pfanalyzer.model.util.ElementGroupingUtils;
 import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
@@ -529,33 +530,11 @@ public class Network extends ParameterSupport {
 	}
 	
 	private void findCombinedElements() {
-		// clear old entries
-		combinedBusList.clear();
-		combinedBranchList.clear();
 		// combine bus nodes
-		for (int i = 0; i < busses.size(); i++) {
-			Bus bus = busses.get(i);
-			double longitude = bus.getLongitude();
-			double lattitude = bus.getLatitude();
-			if(Double.isNaN(lattitude) || Double.isNaN(longitude)) // no coords set
-				continue;
-			boolean found = false;
-//			System.out.println("Bus " + i);
-			for (CombinedBus cbus : combinedBusList) {
-				if(cbus.hasLongitude(longitude) && cbus.hasLatitude(lattitude)) {
-//					System.out.println("  added to combined bus " + cbus.getIndex());
-					cbus.addBus(bus);
-					found = true;
-					break;
-				}
-			}
-			if(found == false) {
-				CombinedBus cbus = new CombinedBus(bus, longitude, lattitude);
-				cbus.setIndex(combinedBusList.size());
-				combinedBusList.add(cbus);
-//				System.out.println("  created new combined bus " + cbus.getIndex());
-			}
-		}
+		combinedBusList = ElementGroupingUtils.getCombinedBussesByCoordinates(busses);
+		// combine branches
+		combinedBranchList = ElementGroupingUtils.getCombinedBranchesByCoordinates(branches, combinedBusList);
+		
 //		// add bus nodes with no coordinates (e.g. generator busses) TODO remove this
 //		for (int i = coords.length; i < busses.size(); i++) {
 //			Bus bus = busses.get(i);
@@ -569,10 +548,6 @@ public class Network extends ParameterSupport {
 //				}
 //			}
 //		}
-		int busCount = 0;
-		for (CombinedBus cbus : combinedBusList) {
-			busCount += cbus.getNetworkElementCount();
-		}
 //		System.out.println(combinedBusList.size() + " combined bus nodes found with " + busCount + " elements");
 		// combine generators
 		for (int i = 0; i < getGeneratorsCount(); i++) {
@@ -582,50 +557,6 @@ public class Network extends ParameterSupport {
 			if(cbus != null)
 				cbus.addGenerator(generator);
 		}
-		// combine branches
-		for (int i = 0; i < getBranchesCount(); i++) {
-			Branch branch = branches.get(i);
-			branch.setInverted(false);
-			Bus fromBus = branch.getFromBus();
-			Bus toBus = branch.getToBus();
-			CombinedBus cFromBus = getCombinedBus(fromBus);
-			CombinedBus cToBus = getCombinedBus(toBus);
-			if(cFromBus == null || cToBus == null)
-				continue;
-//			if(cFromBus == cToBus) {// combined start and end busses are the same -> branch is a transformer!
-//				cFromBus.addTransformer(new Transformer(branch));// TODO Transformers raus?
-//				continue;
-//			}
-//			System.out.println("Branch " + i);
-//			System.out.println("  from bus: " + fromBus.getIndex() + "(" + fromBusIndex + ")");
-//			System.out.println("    combined bus: " + cFromBus.getIndex());
-//			System.out.println("  to bus  : " + toBus.getIndex() + "(" + toBusIndex + ")");
-//			System.out.println("    combined bus: " + cToBus.getIndex());
-			boolean found = false;
-			for (CombinedBranch cbranch : combinedBranchList) {
-				// check if from and to bus are inverted
-				if(cbranch.hasBusNodes(cToBus, cFromBus)) {
-					branch.setInverted(true);
-					CombinedBus tempBus = cFromBus;
-					cFromBus = cToBus;
-					cToBus = tempBus;
-					// branch will be added in the following if block
-				}
-				if(cbranch.hasBusNodes(cFromBus, cToBus)) {
-//					System.out.println("  added to combined branch " + cbranch.getIndex());
-					cbranch.addBranch(branch);
-					found = true;
-					break;
-				}
-			}
-			if(found == false) {
-				CombinedBranch cbranch = new CombinedBranch(cFromBus, cToBus, branch);
-				cbranch.setIndex(combinedBranchList.size());
-				combinedBranchList.add(cbranch);
-//				System.out.println("  created new combined branch " + cbranch.getIndex());
-			}
-		}
-//		System.out.println(combinedBranchList.size() + " combined branches found");
 	}
 	
 	public int getCombinedBusCount() {
@@ -636,16 +567,20 @@ public class Network extends ParameterSupport {
 		return combinedBusList.get(index);
 	}
 	
+	public List<CombinedBus> getCombinedBusses() {
+		return combinedBusList;
+	}
+	
 	public CombinedBus getCombinedBus(AbstractNetworkElement data) {
-		for (CombinedBus cbus : combinedBusList) {
-			if(cbus.contains(data))
-				return cbus;
-		}
-		return null;
+		return ElementGroupingUtils.getCombinedBus(combinedBusList, data);
 	}
 	
 	public int getCombinedBranchCount() {
 		return combinedBranchList.size();
+	}
+	
+	public List<CombinedBranch> getCombinedBranches() {
+		return combinedBranchList;
 	}
 	
 	public CombinedBranch getCombinedBranch(int index) {
