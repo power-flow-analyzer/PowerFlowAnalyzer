@@ -389,6 +389,13 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 					if( ! isHovered && isHovered(bus))
 						isHovered = true;
 				}
+				for (int b = 0; b < cbus.getGenerators().size(); b++) {
+					Generator generator = cbus.getGenerators().get(b);
+					if( ! isSelected && isSelection(generator))
+						isSelected = true;
+					if( ! isHovered && isHovered(generator))
+						isHovered = true;
+				}
 				if(drawFlags && hasFailures)
 					g2d.setColor(Preferences.getFlagFailureColor());
 				else if(drawFlags && hasWarnings)
