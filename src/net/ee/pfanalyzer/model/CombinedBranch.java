@@ -14,6 +14,10 @@ public class CombinedBranch extends CombinedNetworkElement<Branch> {
 		this.toBus = toBus;
 	}
 	
+	public String getTypeLabel() {
+		return "Branches";
+	}
+	
 	public void addBranch(Branch branch) {
 		addNetworkElement(branch);
 	}
