@@ -24,7 +24,7 @@ public class Group extends JPanel {
 		setBorder(border);
 	}
 	
-	public void addElementLink(CombinedNetworkElement<?> element) {
+	public void addElementLink(CombinedNetworkElement<?> element, int displayFlags) {
 		Color foreground;
 		if(element.hasFailures())
 			foreground = Preferences.getFlagFailureColor();
@@ -32,7 +32,7 @@ public class Group extends JPanel {
 			foreground = Preferences.getFlagWarningColor();
 		else
 			foreground = Preferences.getHyperlinkForeground();
-		String label = element.getLabel();// + " (" + element.getNetworkElementCount() + " elements)";
+		String label = element.getDisplayName(displayFlags);
 		add(new HyperLinkLabel(label, element, foreground));
 	}
 	
