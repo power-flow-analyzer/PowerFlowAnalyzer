@@ -18,6 +18,7 @@ import javax.swing.event.MouseInputAdapter;
 import net.ee.pfanalyzer.math.coordinate.Mercator;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Bus;
+import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.MarkerElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
@@ -267,6 +268,18 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	}
 	
 	protected boolean isSelection(Object object) {
+		if(object == null || selection == null)
+			return false;
+		if(selection == object)
+			return true;
+		if(object instanceof CombinedNetworkElement<?> 
+				&& selection instanceof AbstractNetworkElement) {
+			return ((CombinedNetworkElement<?>) object).contains((AbstractNetworkElement) selection);
+		}
+		if(selection instanceof CombinedNetworkElement<?> 
+				&& object instanceof AbstractNetworkElement) {
+			return ((CombinedNetworkElement<?>) selection).contains((AbstractNetworkElement) object);
+}
 		return selection != null && selection == object;
 	}
 	
