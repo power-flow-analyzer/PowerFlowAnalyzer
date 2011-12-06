@@ -9,6 +9,7 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	private int index;
 	private String typeLabel;
 	private Boolean isActive = null;
+	private boolean isUngrouped = false;
 	
 	public abstract String getLabel();
 	
@@ -84,5 +85,13 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	
 	public void setTypeLabel(String typeLabel) {
 		this.typeLabel = typeLabel;
+	}
+
+	public boolean isUngrouped() {
+		return isUngrouped;
+	}
+
+	public void setUngrouped(boolean isUngrouped) {
+		this.isUngrouped = isUngrouped;
 	}
 }
