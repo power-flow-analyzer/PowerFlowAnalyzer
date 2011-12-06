@@ -14,11 +14,13 @@ import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.model.util.ElementGroupingUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.parameter.IParameterMasterElement;
@@ -93,6 +95,8 @@ public class ModelElementPanel extends ParameterContainer {
 		addModelLink(element);
 		// show flags
 		addFlags(element);
+		// add elements connected to this element
+		addConnectedElements(element);
 		// show properties
 		addParameters(element);
 		finishLayout();
@@ -176,5 +180,25 @@ public class ModelElementPanel extends ParameterContainer {
 		}
 		if(flagGroup.getComponentCount() > 0)
 			addElementGroup(flagGroup);
+	}
+	
+	protected void addConnectedElements(AbstractNetworkElement element) {
+		if(isEditable() || element instanceof Bus == false)
+			return; // do not show connections in editing mode and for non-busses
+		Bus bus = (Bus) element;
+		Group connGroup = new Group("Connected Elements");
+		for (AbstractNetworkElement e : element.getNetwork().getElements()) {
+			if(e == element)// do not add itself
+				continue;
+			if(e instanceof Branch) {
+				Branch branch = (Branch) e;
+				if(branch.getFromBus() == bus || branch.getToBus() == bus)
+					connGroup.addElementLink(e, AbstractNetworkElement.DISPLAY_DEFAULT);
+			} else if(ElementGroupingUtils.getParentBus(e) == bus) {
+				connGroup.addElementLink(e, AbstractNetworkElement.DISPLAY_DEFAULT);
+			}
+		}
+		if(connGroup.getComponentCount() > 0)
+			addElementGroup(connGroup);
 	}
 }
