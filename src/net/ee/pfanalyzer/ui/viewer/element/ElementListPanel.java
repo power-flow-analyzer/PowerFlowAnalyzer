@@ -13,7 +13,7 @@ public class ElementListPanel extends AbstractElementPanel {
 		removeAllElements();
 		// set title
 		setTitle(list.getLabel());
-		addElements(list.getNetworkElements(), list.getTypeLabel());
+		addElements(list.getNetworkElements(), list.getTypeLabel(), list.getAttributes());
 		finishLayout();
 	}
 }
