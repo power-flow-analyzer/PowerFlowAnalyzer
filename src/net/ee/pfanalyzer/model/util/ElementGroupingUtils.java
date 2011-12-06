@@ -15,7 +15,13 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 
 public class ElementGroupingUtils {
 
-//	private final static String paramName = "BUS_AREA";//TSO
+	public static List<AbstractNetworkElement> convertGeneratorList(List<Generator> list) {
+		List<AbstractNetworkElement> newList = new ArrayList<AbstractNetworkElement>();
+		for (AbstractNetworkElement element : list) {
+			newList.add(element);
+		}
+		return newList;
+	}
 	
 	public static CombinedBus getCombinedBus(List<CombinedBus> combinedBusList, 
 			AbstractNetworkElement data) {
@@ -251,26 +257,22 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<CombinedBranch> getCombinedBranchesByParameter(
-			List<Branch> branchList, List<CombinedBus> combinedBusList, final String paramName) {
-		return getCombinedBranches(branchList, combinedBusList, true, paramName);
+			List<Branch> branchList, final String paramName) {
+		return getCombinedBranches(branchList, true, paramName);
 	}
 	
 	public static List<CombinedBranch> getCombinedTieLines(
-			List<Branch> branchList, List<CombinedBus> combinedBusList, final String paramName) {
-		return getCombinedBranches(branchList, combinedBusList, false, paramName);
+			List<Branch> branchList, final String paramName) {
+		return getCombinedBranches(branchList, false, paramName);
 	}
 	
 	private static List<CombinedBranch> getCombinedBranches(
-			List<Branch> branchList, List<CombinedBus> combinedBusList, final boolean sameArea, final String paramName) {
+			List<Branch> branchList, final boolean sameArea, final String paramName) {
 		List<CombinedBranch> list = new ArrayList<CombinedBranch>();
 		for (final Branch branch : branchList) {
 			boolean added = false;
 			final Bus fromBus = branch.getFromBus();
 			final Bus toBus = branch.getToBus();
-			CombinedBus cFromBus = getCombinedBus(combinedBusList, fromBus);
-			CombinedBus cToBus = getCombinedBus(combinedBusList, toBus);
-			if(cFromBus == null || cToBus == null)
-				continue;
 			String fromParamValue = getParameterValue(fromBus, paramName);
 			String toParamValue = getParameterValue(toBus, paramName);
 			if(fromParamValue != null && fromParamValue.length() > 0
@@ -297,10 +299,12 @@ public class ElementGroupingUtils {
 					}
 				}
 				if(added == false) {
+					// create new combined busses for this branch
+					CombinedBus cFromBus = new CombinedBus(fromBus);
+					CombinedBus cToBus = new CombinedBus(toBus);
 					CombinedBranch cbranch = new CombinedBranch(cFromBus, cToBus, branch) {
 						@Override
 						public String getLabel() {
-//							String count = " (" + getBranchCount() + " branches)";
 							String label = "";
 							String fromDisplayValue = fromBus.getParameterDisplayValue(paramName);
 							if(isNumber(fromDisplayValue))
@@ -315,7 +319,6 @@ public class ElementGroupingUtils {
 								else
 									label += toDisplayValue;
 							}
-//							label += count;
 							return label;
 						}
 					};
