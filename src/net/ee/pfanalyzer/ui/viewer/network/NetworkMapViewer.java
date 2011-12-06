@@ -99,7 +99,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 	public NetworkMapViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		super(data, viewerConfiguration);
 		this.parentContainer = parent;
-		createStrokes(1.0f, 2.0f);
+		createStrokes(1.0f, 2.5f);
 		paintManager = new PaintManager(this);
 		initializeInternalCoordinates();
 		addComponentListener(new ComponentAdapter() {
@@ -319,16 +319,18 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				double x2 = coords2[0];//getBusXDouble(toBus, horizontalScale);
 				double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
 				if(drawPowerDirection) {
+					boolean highlighted = isSelected || isHovered;
 					// draw first branch
 					Branch branch = cbranch.getFirstBranch();
 					if(drawFlags == false || branch.isCorrect()) {
-						if(branch.isActive())
+						if(fadeOutUnselected && selection != null && highlighted == false)
+							g2d.setColor(Color.LIGHT_GRAY);
+						else if(branch.isActive())
 							g2d.setColor(Color.BLUE);
 						else
 							g2d.setColor(Color.GRAY);
 					} else
 						g2d.setColor(Color.RED);
-					boolean highlighted = isSelected || isHovered;
 					IElementShape branchShape = drawShape(branch, g2d, x1, y1, x2, y2, highlighted, null, 
 							getBranchStroke(branch, highlighted));
 					double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
@@ -396,6 +398,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 					if( ! isHovered && isHovered(generator))
 						isHovered = true;
 				}
+				boolean highlighted = isSelected || isHovered;
 				if(drawFlags && hasFailures)
 					g2d.setColor(Preferences.getFlagFailureColor());
 				else if(drawFlags && hasWarnings)
@@ -403,6 +406,8 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				else {
 					if(isSlack)
 						g2d.setColor(Color.BLUE);
+					else if(fadeOutUnselected && selection != null && highlighted == false)
+						g2d.setColor(Color.GRAY);
 					else
 						g2d.setColor(Color.BLACK);
 				}
@@ -410,7 +415,6 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				double x = coords[0];
 				double y = coords[1];
 				String locationName = drawBusNames ? cbus.getLabel() : null;
-				boolean highlighted = isSelected || isHovered;
 				drawShape(cbus.getFirstBus(), g2d, x, y, Double.NaN, Double.NaN, highlighted, locationName, null);
 //					// draw generators
 //					if(drawGenerators && cbus.getGenerators().size() > 0) {
