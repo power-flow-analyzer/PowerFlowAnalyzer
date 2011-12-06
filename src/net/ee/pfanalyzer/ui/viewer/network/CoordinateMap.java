@@ -62,6 +62,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	protected boolean drawPowerDirection = true;
 	protected boolean drawMarkers = true;
 	protected boolean drawFlags = true;
+	protected boolean fadeOutUnselected = false;
 	
 	protected boolean allowZooming = true;
 	protected boolean allowDragging = true;
@@ -69,7 +70,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	
 	protected double horizontalScale, verticalScale;
 	private int dragFactor = 300;
-	private Object selection, hover;
+	protected Object selection, hover;
 	
 	protected abstract AbstractNetworkElement getObjectFromScreen(int x, int y);
 	
@@ -316,8 +317,10 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		} else if(property.equals(PROPERTY_DRAW_LEGEND)) {
 			setVisible(Boolean.valueOf(value));
 			revalidate();
-		}
-		else if(property.equals(PROPERTY_INTERACTION_ZOOM)) {
+		} else if(property.equals(PROPERTY_FADE_OUT_UNSELECTED)) {
+			fadeOutUnselected = Boolean.valueOf(value);
+			repaint();
+		} else if(property.equals(PROPERTY_INTERACTION_ZOOM)) {
 			allowZooming = Boolean.valueOf(value);
 			repaint();
 		} else if(property.equals(PROPERTY_INTERACTION_MOVE)) {
@@ -342,6 +345,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		setSetting(PROPERTY_INTERACTION_ZOOM);
 		setSetting(PROPERTY_INTERACTION_MOVE);
 		setSetting(PROPERTY_SHOW_TOOLTIPS);
+		setSetting(PROPERTY_FADE_OUT_UNSELECTED);
 	}
 	
 	protected void updateBackground() {
