@@ -1,9 +1,12 @@
 package net.ee.pfanalyzer.model;
 
+import net.ee.pfanalyzer.ui.viewer.element.ElementAttributes;
+
 public class ElementList extends CombinedNetworkElement<AbstractNetworkElement> {
 
 	private Boolean hasFailures = null;
 	private Boolean hasWarnings = null;
+	private ElementAttributes attributes;
 
 	public ElementList() {
 	}
@@ -41,5 +44,13 @@ public class ElementList extends CombinedNetworkElement<AbstractNetworkElement> 
 			}
 		}
 		return hasWarnings;
+	}
+
+	public ElementAttributes getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(ElementAttributes attributes) {
+		this.attributes = attributes;
 	}
 }
