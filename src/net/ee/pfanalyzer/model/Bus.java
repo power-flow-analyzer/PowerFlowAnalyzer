@@ -74,7 +74,9 @@ public class Bus extends AbstractNetworkElement implements ICoordinatesParameter
 	@Override
 	public String getDisplayName(int displayFlags) {
 		String name = getName();
-		String text = name == null ? "Bus " + (getBusNumber()) : name;
+		String text = "Bus " + (getBusNumber());
+		if(name != null)
+			text += " (" + name + ")";
 		if(getBaseVoltage() > 0 && (displayFlags & DISPLAY_ADDITIONAL_INFO) != 0)
 			text += " (" + getBaseVoltage() + " kV)";
 		if(isSlackNode())
