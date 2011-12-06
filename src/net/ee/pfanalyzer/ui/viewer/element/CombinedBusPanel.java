@@ -30,7 +30,8 @@ public class CombinedBusPanel extends AbstractElementPanel {
 		// set title
 		setTitle(cbus.getLabel());
 		addBusElements(cbus);
-		addElements(ElementGroupingUtils.convertGeneratorList(cbus.getGenerators()), "Generators");
+		addElements(ElementGroupingUtils.convertGeneratorList(cbus.getGenerators()), "Generators",
+				GENERATOR_ATTRIBUTES);
 		finishLayout();
 	}
 
