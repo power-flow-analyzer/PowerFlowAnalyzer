@@ -30,6 +30,8 @@ public class Group extends JPanel {
 			foreground = Preferences.getFlagFailureColor();
 		else if(element.hasWarnings())
 			foreground = Preferences.getFlagWarningColor();
+		else if(element.isActive() == false)
+			foreground = Preferences.getDisabledForeground();
 		else
 			foreground = Preferences.getHyperlinkForeground();
 		String label = element.getDisplayName(displayFlags);
