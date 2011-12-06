@@ -2,6 +2,7 @@ package net.ee.pfanalyzer.ui.viewer.element;
 
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.Network;
+import net.ee.pfanalyzer.model.util.ElementGroupingUtils;
 
 public class CombinedBusPanel extends AbstractElementPanel {
 
@@ -29,6 +30,7 @@ public class CombinedBusPanel extends AbstractElementPanel {
 		// set title
 		setTitle(cbus.getLabel());
 		addBusElements(cbus);
+		addElements(ElementGroupingUtils.convertGeneratorList(cbus.getGenerators()), "Generators");
 		finishLayout();
 	}
 
