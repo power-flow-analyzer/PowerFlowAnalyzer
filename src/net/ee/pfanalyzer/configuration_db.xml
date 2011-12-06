@@ -53,6 +53,12 @@
                         <parameter ID="GROUP_ELEMENTS_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
                             <display group="Group other elements"/>
                         </parameter>
+                        <parameter ID="SHOW_NETWORK_PARAMETERS" type="boolean" label="Show global network parameters" value="true">
+                            <display/>
+                        </parameter>
+                        <parameter ID="SHOW_SUMS_OF_VALUES" type="boolean" label="Show sums of elements" value="true">
+                            <display/>
+                        </parameter>
                     </model>
                 </modelClass>
                 <modelClass ID="network" label="Network">
