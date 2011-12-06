@@ -32,6 +32,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	private final static String PROPERTY_GROUP_BRANCH_BY_VOLTAGE = "GROUP_BRANCH_BY_VOLTAGE";
 	private final static String PROPERTY_GROUP_ELEMENTS_BY_AREA = "GROUP_ELEMENTS_BY_AREA";
 	private final static String PROPERTY_GROUP_ELEMENTS_BY_LOCATION = "GROUP_ELEMENTS_BY_LOCATION";
+	private final static String PROPERTY_SHOW_NETWORK_PARAMETERS = "SHOW_NETWORK_PARAMETERS";
+	private final static String PROPERTY_SHOW_SUMS_OF_VALUES = "SHOW_SUMS_OF_VALUES";
 	
 	private final static String NETWORK_CARD = "network";
 	private final static String COMBINED_BUS_CARD = "combined-bus";
@@ -53,7 +55,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	String viewerAreaLabel, viewerAreaParameter;
 	boolean groupBusByArea, groupBusByLocation, 
 			groupBranchByArea, groupBranchByLocation, groupBranchByVoltage,
-			groupElementByArea, groupElementByLocation;
+			groupElementByArea, groupElementByLocation,
+			showNetworkParameters, showSumsOfElements;
 
 	public ElementViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		network = data;
@@ -91,6 +94,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 		setSetting(PROPERTY_GROUP_BRANCH_BY_VOLTAGE);
 		setSetting(PROPERTY_GROUP_ELEMENTS_BY_AREA);
 		setSetting(PROPERTY_GROUP_ELEMENTS_BY_LOCATION);
+		setSetting(PROPERTY_SHOW_NETWORK_PARAMETERS);
+		setSetting(PROPERTY_SHOW_SUMS_OF_VALUES);
 		reloadCard();
 	}
 	
@@ -134,6 +139,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	@Override
 	public void selectionChanged(Object selection) {
 		if(selection == null) {
+			networkPanel.setShowNetworkParameters(showNetworkParameters);
+			networkPanel.setShowSumsOfValues(showSumsOfElements);
 			networkPanel.updateNetwork();
 			setPreferredSize(networkPanel.getPreferredSize());
 			cardLayout.show(this, NETWORK_CARD);
@@ -144,6 +151,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				selectionChanged(cbus.getFirstBus());
 				return;
 			}
+			cBusPanel.setShowSumsOfValues(showSumsOfElements);
 			cBusPanel.setCombinedBus(cbus);
 			setPreferredSize(cBusPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BUS_CARD);
@@ -154,6 +162,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				selectionChanged(cbranch.getBranch(0));
 				return;
 			}
+			cBranchPanel.setShowSumsOfValues(showSumsOfElements);
 			cBranchPanel.setCombinedBranch(cbranch, getNetwork().getCombinedBusses());
 			setPreferredSize(cBranchPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
@@ -163,6 +172,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				selectionChanged(list.getFirstNetworkElement());
 				return;
 			}
+			listPanel.setShowSumsOfValues(showSumsOfElements);
 			listPanel.setElementList((ElementList) selection);
 			setPreferredSize(listPanel.getPreferredSize());
 			cardLayout.show(this, ELEMENT_LIST_CARD);
@@ -236,6 +246,10 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 			groupElementByArea = Boolean.valueOf(value);
 		} else if(property.equals(PROPERTY_GROUP_ELEMENTS_BY_LOCATION)) {
 			groupElementByLocation = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_SHOW_NETWORK_PARAMETERS)) {
+			showNetworkParameters = Boolean.valueOf(value);
+		} else if(property.equals(PROPERTY_SHOW_SUMS_OF_VALUES)) {
+			showSumsOfElements = Boolean.valueOf(value);
 		}
 	}
 }
