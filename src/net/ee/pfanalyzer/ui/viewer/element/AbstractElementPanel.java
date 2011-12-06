@@ -64,10 +64,10 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 		List<CombinedBranch> combinedBranches;
 		if( getElementViewer().groupBranchByArea &&
 				(combinedBranches = ElementGroupingUtils.getCombinedBranchesByParameter(
-				branchList, combinedBusList, getElementViewer().viewerAreaParameter)).size() > 1) {
+				branchList, getElementViewer().viewerAreaParameter)).size() > 1) {
 			addBranchGroup(combinedBranches, "Branches per " + getElementViewer().viewerAreaLabel);
 			combinedBranches = ElementGroupingUtils.getCombinedTieLines(
-					branchList, combinedBusList, getElementViewer().viewerAreaParameter);
+					branchList, getElementViewer().viewerAreaParameter);
 			if(combinedBranches.size() > 0) {
 				addBranchGroup(combinedBranches, "Tie lines");
 			}
@@ -77,7 +77,7 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 			addBranchGroup(combinedBranches, "Branches per Location");
 		} else if( getElementViewer().groupBranchByVoltage &&
 				(combinedBranches = ElementGroupingUtils.getCombinedBranchesByParameter(
-				branchList, combinedBusList, "BASE_KV")).size() > 1 ) {
+				branchList, "BASE_KV")).size() > 1 ) {
 			addBranchGroup(combinedBranches, "Branches per Voltage");
 		} else if(branchList.size() > 0) {
 			addElementGroup("Branch Overview (" + branchList.size() + " branches)");
