@@ -531,7 +531,7 @@ public class Network extends ParameterSupport {
 	
 	private void findCombinedElements() {
 		// combine bus nodes
-		combinedBusList = ElementGroupingUtils.getCombinedBussesByCoordinates(busses);
+		combinedBusList = ElementGroupingUtils.getCombinedBussesByCoordinates(busses, false);
 		// combine branches
 		combinedBranchList = ElementGroupingUtils.getCombinedBranchesByCoordinates(branches, combinedBusList);
 		
