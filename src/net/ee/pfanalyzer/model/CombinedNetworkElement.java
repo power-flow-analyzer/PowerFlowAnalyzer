@@ -8,6 +8,7 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	private List<TYPE> networkElements = new ArrayList<TYPE>();
 	private int index;
 	private String typeLabel;
+	private Boolean isActive = null;
 	
 	public abstract String getLabel();
 	
@@ -62,6 +63,19 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 			text += " (" + getNetworkElementCount() + " " + entityLabel + ")";
 		}
 		return text;
+	}
+	
+	public boolean isActive() {
+		if(isActive == null) {
+			isActive = false;
+			for (AbstractNetworkElement element : getNetworkElements()) {
+				if(element.isActive()) {
+					isActive = true;
+					break;
+				}
+			}
+		}
+		return isActive;
 	}
 	
 	public String getTypeLabel() {
