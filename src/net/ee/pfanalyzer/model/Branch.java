@@ -59,6 +59,14 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 	void setFromBusNumber(int number) {
 		setParameter(PROPERTY_FROM_BUS_NUMBER, number);
 	}
+	
+	public int getFromBusVoltage() {
+		return getFromBus().getBaseVoltage();
+	}
+	
+	public int getToBusVoltage() {
+		return getToBus().getBaseVoltage();
+	}
 
 	public int getToBusNumber() {
 		return getIntParameter(PROPERTY_TO_BUS_NUMBER, -1);
@@ -92,6 +100,17 @@ public class Branch extends AbstractNetworkElement implements IBranchDataConstan
 			if(toBusName == null)
 				toBusName = toBus.getDisplayName(displayFlags);
 		}
-		return "Branch " + (getIndex() + 1) + " (" + fromBusName + " - " + toBusName + ")";
+		String appendix = "";
+		int fromBusVoltage = getFromBusVoltage();
+		int toBusVoltage = getToBusVoltage();
+		if(fromBusVoltage > 0 && toBusVoltage > 0 && (displayFlags & DISPLAY_ADDITIONAL_INFO) != 0) {
+			if(fromBusVoltage == toBusVoltage)
+				appendix = "(" + fromBusVoltage + " kV)";
+			else {
+				fromBusName += "(" + fromBusVoltage + " kV)";
+				toBusName += "(" + toBusVoltage + " kV)";
+			}
+		}
+		return "Branch " + (getIndex() + 1) + " (" + fromBusName + " - " + toBusName + ")" + appendix;
 	}
 }
