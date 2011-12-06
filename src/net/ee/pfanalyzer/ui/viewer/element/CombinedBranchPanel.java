@@ -20,17 +20,4 @@ public class CombinedBranchPanel extends AbstractElementPanel {
 		addBranchElements(cbranch.getBranches(), combinedBusList);
 		finishLayout();
 	}
-
-//	public void setCombinedBranch(CombinedBranch data) {
-//		// remove old elements
-//		removeAllElements();
-//		// set title
-//		setTitle("Power Lines " + data.getLabel());
-//		// add branches
-//		addElementGroup("Branches");
-//		for (int i = 0; i < data.getNetworkElementCount(); i++) {
-//			addElementLink(data.getNetworkElement(i), AbstractNetworkElement.DISPLAY_NAME);
-//		}
-//		finishLayout();
-//	}
 }
