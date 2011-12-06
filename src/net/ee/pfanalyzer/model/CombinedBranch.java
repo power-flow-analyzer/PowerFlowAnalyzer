@@ -81,12 +81,12 @@ public class CombinedBranch extends CombinedNetworkElement<Branch> {
 		if(fromName != null)
 			text += fromName;
 		else
-			text += "Area " + (getIndex() + 1);
+			text += "Combined bus " + (getIndex() + 1);
 		text += " - ";
 		if(toName != null)
 			text += toName;
 		else
-			text += "Area " + (getIndex() + 1);
+			text += "Combined bus " + (getIndex() + 1);
 		return text;
 	}
 	
