@@ -1,6 +1,11 @@
 package net.ee.pfanalyzer.ui.viewer.element;
 
+import java.text.DecimalFormat;
 import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
@@ -10,23 +15,46 @@ import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.ElementList;
 import net.ee.pfanalyzer.model.util.ElementGroupingUtils;
+import net.ee.pfanalyzer.ui.util.Group;
 
 
 public abstract class AbstractElementPanel extends ModelElementPanel {
 
+	private final static DecimalFormat format = new DecimalFormat("#,###.#");
+	
+	protected final static ElementAttributes BUS_ATTRIBUTES = new ElementAttributes(
+			new String[] { "PD", "QD" }, 
+			new String[] { "\u2211 Real Power Demand:", "\u2211 Reactive Power Demand:" }, 
+			new String[] { "MW", "MVAr" });
+	protected final static ElementAttributes GENERATOR_ATTRIBUTES = new ElementAttributes(
+			new String[] { "PG", "QG" }, 
+			new String[] { "\u2211 Real Power Output:", "\u2211 Reactive Power Output:" }, 
+			new String[] { "MW", "MVAr" });
+	protected final static ElementAttributes LOAD_ATTRIBUTES = new ElementAttributes(
+			new String[] { "PD", "QD" }, 
+			new String[] { "\u2211 Real Power Demand:", "\u2211 Reactive Power Demand:" }, 
+			new String[] { "MW", "MVAr" });
+	
+	private boolean showSumsOfValues;
+	
 	public AbstractElementPanel(ElementViewer viewer) {
 		super(viewer);
 	}
 	
 	protected void addBusGroup(List<CombinedBus> combinedBusses, String title) {
-		addElementGroup(title + " (" + combinedBusses.size() + " groups)");
+		Group group = addElementGroup(title + " (" + combinedBusses.size() + " groups)");
 		CombinedBus ungrouped = null;
+		ElementSumCalculator calculator = new ElementSumCalculator(group, 
+				isShowSumsOfValues() ? BUS_ATTRIBUTES : null);
 		for (CombinedBus cbus : combinedBusses) {
 			if(cbus.isUngrouped())
 				ungrouped = cbus;
-			else
+			else {
 				addElementLink(cbus, AbstractNetworkElement.DISPLAY_DEFAULT);
+				calculator.addElement(cbus);
+			}
 		}
+		calculator.finishCalculation();
 		if(ungrouped != null) {
 			addElementGroup("Ungrouped busses");
 			addElementLink(ungrouped, AbstractNetworkElement.DISPLAY_DEFAULT);
@@ -48,15 +76,20 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 //		}
 	}
 	
-	protected void addElementGroup(List<ElementList> combinedElements, String title) {
-		addElementGroup(title + " (" + combinedElements.size() + " groups)");
+	protected void addElementGroup(List<ElementList> combinedElements, String title, ElementAttributes attributes) {
+		Group group = addElementGroup(title + " (" + combinedElements.size() + " groups)");
 		ElementList ungrouped = null;
+		ElementSumCalculator calculator = new ElementSumCalculator(group, 
+				isShowSumsOfValues() ? attributes : null);
 		for (ElementList list : combinedElements) {
 			if(list.isUngrouped())
 				ungrouped = list;
-			else
+			else {
 				addElementLink(list, AbstractNetworkElement.DISPLAY_DEFAULT);
+				calculator.addElement(list);
+			}
 		}
+		calculator.finishCalculation();
 		if(ungrouped != null) {
 			addElementGroup("Ungrouped elements");
 			addElementLink(ungrouped, AbstractNetworkElement.DISPLAY_DEFAULT);
@@ -78,10 +111,14 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 						busList, true)).size() > 1) {
 			addBusGroup(combinedBusses, "Busses per Location");
 		} else if(busList.size() > 0) {
-			addElementGroup("Bus Overview (" + busList.size() + " busses)");
+			Group group = addElementGroup("Bus Overview (" + busList.size() + " busses)");
+			ElementSumCalculator calculator = new ElementSumCalculator(group, 
+					isShowSumsOfValues() ? BUS_ATTRIBUTES : null);
 			for (Bus bus : busList) {
 				addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
+				calculator.addElement(bus);
 			}
+			calculator.finishCalculation();
 		}
 	}
 	
@@ -142,20 +179,90 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 		}
 	}
 	
-	protected void addElements(List<AbstractNetworkElement> elements, String typeLabel) {
+	protected void addElements(List<AbstractNetworkElement> elements, String typeLabel, 
+			ElementAttributes attributes) {
 		List<ElementList> list;
 		if( getElementViewer().groupElementByArea &&
 				(list = ElementGroupingUtils.getCombinedElementsByParameter(
-				elements, getElementViewer().viewerAreaParameter, typeLabel)).size() > 1) {
-			addElementGroup(list, typeLabel + " per " + getElementViewer().viewerAreaLabel);
+				elements, getElementViewer().viewerAreaParameter, typeLabel, attributes)).size() > 1) {
+			addElementGroup(list, typeLabel + " per " + getElementViewer().viewerAreaLabel, attributes);
 		} else if( getElementViewer().groupElementByLocation &&
 				(list = ElementGroupingUtils.getCombinedElementsByCoordinates(
-				elements, typeLabel)).size() > 1 ) {
-			addElementGroup(list, typeLabel + " per Location");
+				elements, typeLabel, attributes)).size() > 1 ) {
+			addElementGroup(list, typeLabel + " per Location", attributes);
 		} else if(elements.size() > 0) {
-			addElementGroup(typeLabel + " (" + elements.size() + " elements)");
+			Group group = addElementGroup(typeLabel + " (" + elements.size() + " elements)");
+			ElementSumCalculator calculator = new ElementSumCalculator(group, 
+					isShowSumsOfValues() ? attributes : null);
 			for (AbstractNetworkElement element : elements) {
 				addElementLink(element, AbstractNetworkElement.DISPLAY_DEFAULT);
+				calculator.addElement(element);
+			}
+			calculator.finishCalculation();
+		}
+	}
+	
+	public boolean isShowSumsOfValues() {
+		return showSumsOfValues;
+	}
+
+	public void setShowSumsOfValues(boolean showSumsOfValues) {
+		this.showSumsOfValues = showSumsOfValues;
+	}
+
+	class ElementSumCalculator {
+		
+		private JComponent parent;
+		private ElementAttributes attributes;
+		private double[] values;
+		
+		ElementSumCalculator(JComponent parent, ElementAttributes attributes) {
+			this.parent = parent;
+			this.attributes = attributes;
+			if(attributes != null)
+				values = new double[attributes.getAttributesCount()];
+		}
+		
+		public void finishCalculation() {
+			if(attributes == null)
+				return;
+			JLabel label = null;
+			int visibleParams = 0;
+			for (int i = 0; i < attributes.getAttributesCount(); i++) {
+				if(values[i] == 0)
+					continue;
+				else {
+					label = new JLabel(attributes.getLabels()[i] + " " 
+							+ format.format(values[i]) + " " + attributes.getUnits()[i]);
+					parent.add(label, visibleParams);
+					visibleParams++;
+				}
+			}
+			if(visibleParams > 0) {
+				if(visibleParams % 2 == 0) {
+					parent.add(Box.createVerticalStrut(5), visibleParams);
+					parent.add(Box.createVerticalStrut(5), visibleParams);
+				} else {
+					parent.add(Box.createVerticalStrut(5), visibleParams);
+					parent.add(Box.createVerticalStrut(5), visibleParams);
+					parent.add(Box.createVerticalStrut(5), visibleParams);
+				}
+			}
+		}
+		
+		public void addElement(AbstractNetworkElement element) {
+			if(attributes == null)
+				return;
+			for (int i = 0; i < attributes.getAttributesCount(); i++) {
+				values[i] += element.getDoubleParameter(attributes.getParameterIDs()[i], 0);
+			}
+		}
+		
+		public void addElement(CombinedNetworkElement<?> element) {
+			if(attributes == null)
+				return;
+			for (int i = 0; i < attributes.getAttributesCount(); i++) {
+				values[i] += element.getSumOfParameters(attributes.getParameterIDs()[i]);
 			}
 		}
 	}
