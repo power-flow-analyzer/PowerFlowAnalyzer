@@ -32,14 +32,18 @@ public class ElementGroupingUtils {
 		return null;
 	}
 	
-	public static List<CombinedBus> getCombinedBussesByCoordinates(List<Bus> busses) {
+	public static List<CombinedBus> getCombinedBussesByCoordinates(List<Bus> busses, boolean includeUngrouped) {
 		List<CombinedBus> combinedBusList = new ArrayList<CombinedBus>();
+		CombinedBus ungrouped = null;
 		for (int i = 0; i < busses.size(); i++) {
 			Bus bus = busses.get(i);
 			double longitude = bus.getLongitude();
 			double latitude = bus.getLatitude();
-			if(Double.isNaN(latitude) || Double.isNaN(longitude)) // no coords set
+			if(Double.isNaN(latitude) || Double.isNaN(longitude)) { // no coords set
+				if(includeUngrouped)
+					ungrouped = addUngroupedBus(ungrouped, bus);
 				continue;
+			}
 			boolean found = false;
 //			System.out.println("Bus " + i);
 			for (CombinedBus cbus : combinedBusList) {
@@ -57,6 +61,8 @@ public class ElementGroupingUtils {
 //				System.out.println("  created new combined bus " + cbus.getIndex());
 			}
 		}
+		if(ungrouped != null)
+			combinedBusList.add(ungrouped);
 //		int busCount = 0;
 //		for (CombinedBus cbus : combinedBusList) {
 //			busCount += cbus.getNetworkElementCount();
@@ -65,6 +71,35 @@ public class ElementGroupingUtils {
 		return combinedBusList;
 	}
 	
+	private static CombinedBus addUngroupedBus(CombinedBus ungrouped, Bus bus) {
+		if(ungrouped == null) {
+			ungrouped = new CombinedBus(bus) {
+				@Override
+				public String getLabel() {
+					return getNetworkElementCount() + " ungrouped elements";
+				}
+			};
+			ungrouped.setUngrouped(true);
+		} else
+			ungrouped.addBus(bus);
+		return ungrouped;
+	}
+	
+	private static CombinedBranch addUngroupedBranch(CombinedBranch ungrouped, Branch branch) {
+		if(ungrouped == null) {
+			CombinedBus cfrom = new CombinedBus(branch.getFromBus());
+			CombinedBus cto = new CombinedBus(branch.getToBus());
+			ungrouped = new CombinedBranch(cfrom, cto, branch) {
+				@Override
+				public String getLabel() {
+					return getNetworkElementCount() + " ungrouped elements";
+				}
+			};
+			ungrouped.setUngrouped(true);
+		} else
+			ungrouped.addBranch(branch);
+		return ungrouped;
+	}
 	
 	public static List<ElementList> getCombinedElementsByCoordinates(
 			List<AbstractNetworkElement> elements, String typeLabel) {
@@ -127,6 +162,7 @@ public class ElementGroupingUtils {
 	public static List<CombinedBranch> getCombinedBranchesByCoordinates(
 			List<Branch> branches, List<CombinedBus> combinedBusList) {
 		List<CombinedBranch> combinedBranchList = new ArrayList<CombinedBranch>();
+		CombinedBranch ungrouped = null;
 		for (int i = 0; i < branches.size(); i++) {
 			Branch branch = branches.get(i);
 			branch.setInverted(false);
@@ -134,8 +170,10 @@ public class ElementGroupingUtils {
 			Bus toBus = branch.getToBus();
 			CombinedBus cFromBus = getCombinedBus(combinedBusList, fromBus);
 			CombinedBus cToBus = getCombinedBus(combinedBusList, toBus);
-			if(cFromBus == null || cToBus == null)
+			if(cFromBus == null || cToBus == null) {
+				ungrouped = addUngroupedBranch(ungrouped, branch);
 				continue;
+			}
 //			if(cFromBus == cToBus) {// combined start and end busses are the same -> branch is a transformer!
 //				cFromBus.addTransformer(new Transformer(branch));// TODO Transformers raus?
 //				continue;
@@ -169,6 +207,8 @@ public class ElementGroupingUtils {
 //				System.out.println("  created new combined branch " + cbranch.getIndex());
 			}
 		}
+		if(ungrouped != null)
+			combinedBranchList.add(ungrouped);
 //		System.out.println(combinedBranchList.size() + " combined branches found");
 		return combinedBranchList;
 	}
@@ -176,6 +216,7 @@ public class ElementGroupingUtils {
 	public static List<CombinedBus> getCombinedBussesByParameter(
 			List<Bus> busList, final String paramName) {
 		List<CombinedBus> list = new ArrayList<CombinedBus>();
+		CombinedBus ungrouped = null;
 		for (final Bus bus : busList) {
 			boolean added = false;
 			String paramValue = getParameterValue(bus, paramName);
@@ -201,8 +242,12 @@ public class ElementGroupingUtils {
 					};
 					list.add(cbus);
 				}
+			} else {
+				ungrouped = addUngroupedBus(ungrouped, bus);
 			}
 		}
+		if(ungrouped != null)
+			list.add(ungrouped);
 //		Collections.sort(list, new LabelSorter());
 		return list;
 	}
@@ -257,18 +302,19 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<CombinedBranch> getCombinedBranchesByParameter(
-			List<Branch> branchList, final String paramName) {
+			List<Branch> branchList, String paramName) {
 		return getCombinedBranches(branchList, true, paramName);
 	}
 	
 	public static List<CombinedBranch> getCombinedTieLines(
-			List<Branch> branchList, final String paramName) {
+			List<Branch> branchList, String paramName) {
 		return getCombinedBranches(branchList, false, paramName);
 	}
 	
-	private static List<CombinedBranch> getCombinedBranches(
-			List<Branch> branchList, final boolean sameArea, final String paramName) {
+	public static List<CombinedBranch> getCombinedBranches(
+			List<Branch> branchList, final boolean sameValuesAtFromAndTo, final String paramName) {
 		List<CombinedBranch> list = new ArrayList<CombinedBranch>();
+		CombinedBranch ungrouped = null;
 		for (final Branch branch : branchList) {
 			boolean added = false;
 			final Bus fromBus = branch.getFromBus();
@@ -277,7 +323,7 @@ public class ElementGroupingUtils {
 			String toParamValue = getParameterValue(toBus, paramName);
 			if(fromParamValue != null && fromParamValue.length() > 0
 					&& toParamValue != null && toParamValue.length() > 0) {
-				if(sameArea) {
+				if(sameValuesAtFromAndTo) {
 					if(fromParamValue.equals(toParamValue) == false)
 						continue;
 				} else { // not the same area -> tie line
@@ -311,7 +357,7 @@ public class ElementGroupingUtils {
 								label += fromDisplayValue + " kV";
 							else
 								label += fromDisplayValue;
-							if(sameArea == false) {
+							if(sameValuesAtFromAndTo == false) {
 								label += " - ";
 								String toDisplayValue = toBus.getParameterDisplayValue(paramName);
 								if(isNumber(toDisplayValue))
@@ -324,8 +370,12 @@ public class ElementGroupingUtils {
 					};
 					list.add(cbranch);
 				}
+			} else {
+				ungrouped = addUngroupedBranch(ungrouped, branch);
 			}
 		}
+		if(ungrouped != null)
+			list.add(ungrouped);
 //		System.out.println(list.size() + " combined branches found");
 //		Collections.sort(list, new LabelSorter());
 		return list;
