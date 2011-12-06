@@ -13,6 +13,12 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	private Boolean hasFailures = null;
 	private Boolean hasWarnings = null;
 	
+	public CombinedBus(Bus bus) {
+		this.longitude = bus.getLongitude();
+		this.latitude  = bus.getLatitude();
+		addBus(bus);
+	}
+	
 	public CombinedBus(Bus bus, double longitude, double latitude) {
 		this.longitude = longitude;
 		this.latitude = latitude;
@@ -81,9 +87,9 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 		if(locationName != null)
 			return locationName;// + " (Area " + (getIndex() + 1) + ")";
 		else if(getNetworkElementCount() == 1)
-			return "Bus " + (getIndex() + 1);
+			return getFirstBus().getDisplayName(AbstractNetworkElement.DISPLAY_NAME);//"Bus " + (getIndex() + 1);
 		else
-			return "Area " + (getIndex() + 1);
+			return "Combined bus " + (getIndex() + 1);
 	}
 	
 	@Override
