@@ -97,6 +97,9 @@
                         <display group="Draw"/>
                     </parameter>
                     <parameter ID="ICON" value="map.png"/>
+                    <parameter ID="FADE_OUT_UNSELECTED" type="boolean" label="Fade out unselected elements" value="false">
+                        <display group="Draw"/>
+                    </parameter>
                     <model ID="busbar" label="Busbar View" description="Experimental!">
                         <parameter ID="ICON" value="hlocchart.png"/>
                     </model>
