@@ -16,6 +16,7 @@ public interface INetworkMapParameters {
 	final static String PROPERTY_DRAW_GENERATORS = "DRAW_GENERATORS";
 	final static String PROPERTY_DRAW_OUTLINE = "DRAW_OUTLINE";
 	final static String PROPERTY_DRAW_LEGEND = "SHOW_LEGEND";
+	final static String PROPERTY_FADE_OUT_UNSELECTED = "FADE_OUT_UNSELECTED";
 
 	final static String PROPERTY_INTERACTION_ZOOM = "ALLOW_ZOOMING";
 	final static String PROPERTY_INTERACTION_MOVE = "ALLOW_DRAGGING";
