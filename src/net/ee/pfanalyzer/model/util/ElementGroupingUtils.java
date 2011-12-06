@@ -12,6 +12,7 @@ import net.ee.pfanalyzer.model.ElementList;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.ui.viewer.element.ElementAttributes;
 
 public class ElementGroupingUtils {
 
@@ -102,7 +103,7 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<ElementList> getCombinedElementsByCoordinates(
-			List<AbstractNetworkElement> elements, String typeLabel) {
+			List<AbstractNetworkElement> elements, String typeLabel, ElementAttributes attributes) {
 		List<ElementList> combinedList = new ArrayList<ElementList>();
 		for (int i = 0; i < elements.size(); i++) {
 			AbstractNetworkElement element = elements.get(i);
@@ -139,6 +140,7 @@ public class ElementGroupingUtils {
 				list.addNetworkElement(element);
 				list.setIndex(combinedList.size());
 				list.setTypeLabel(typeLabel);
+				list.setAttributes(attributes);
 				combinedList.add(list);
 //				System.out.println("  created new combined element " + cbus.getIndex());
 			}
@@ -253,7 +255,7 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<ElementList> getCombinedElementsByParameter(
-			List<AbstractNetworkElement> elementList, final String paramName, String typeLabel) {
+			List<AbstractNetworkElement> elementList, final String paramName, String typeLabel, ElementAttributes attributes) {
 		List<ElementList> combinedList = new ArrayList<ElementList>();
 		for (final AbstractNetworkElement element : elementList) {
 			boolean added = false;
@@ -284,6 +286,7 @@ public class ElementGroupingUtils {
 					};
 					list.setTypeLabel(typeLabel);
 					list.addNetworkElement(element);
+					list.setAttributes(attributes);
 					combinedList.add(list);
 				}
 			}
