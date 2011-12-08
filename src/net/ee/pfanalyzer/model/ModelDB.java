@@ -23,13 +23,12 @@ public class ModelDB {
 	
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";
-	public final static String ROOT_CONFIGURATION_CLASS = "conf";
 	public final static String ROOT_OUTLINE_CLASS = "outline";
 	
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
-	private ModelClassData networkClass, scriptClass, configurationClass, outlineClass;
+	private ModelClassData networkClass, scriptClass, outlineClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	private boolean isDirty = false;
@@ -66,19 +65,38 @@ public class ModelDB {
 				networkClass = clazz;
 			else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 				scriptClass = clazz;
-			else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
-				configurationClass = clazz;
 			else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
 				outlineClass = clazz;
 		}
 		if(networkClass != null)
 			addModelsRecursive(networkClass);
-		if(configurationClass != null)
-			addModelsRecursive(configurationClass);
 //		for (ModelClassData clazz : getData().getModelClass()) {
 //			addModelsRecursive(clazz);
 //		}
 //		System.out.println("    " + models.size() + " models found");
+	}
+	
+	public void replaceTopClass(ModelClassData clazz) {
+		if(ROOT_NETWORK_CLASS.equals(clazz.getID()))
+			replaceTopClass(networkClass, clazz);
+		else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
+			replaceTopClass(scriptClass, clazz);
+		else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
+			replaceTopClass(outlineClass, clazz);
+//		getData().getModelClass().add(clazz);
+	}
+	
+	private void replaceTopClass(ModelClassData oldClazz, ModelClassData newClazz) {
+		if(oldClazz == null) {
+			getData().getModelClass().add(newClazz);
+		} else {
+			for (int i = 0; i < getData().getModelClass().size(); i++) {
+				if(getData().getModelClass().get(i) == oldClazz) {
+					getData().getModelClass().set(i, newClazz);
+					break;
+				}
+			}
+		}
 	}
 	
 	private void addModelsRecursive(AbstractModelElementData element) {
@@ -125,10 +143,6 @@ public class ModelDB {
 	
 	public ModelClassData getOutlineClass() {
 		return outlineClass;
-	}
-	
-	public ModelClassData getConfigurationClass() {
-		return configurationClass;
 	}
 	
 	public void fireElementChanged(DatabaseChangeEvent event) {
