@@ -43,6 +43,7 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.data.CaseData;
+import net.ee.pfanalyzer.model.data.ModelDBData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
@@ -58,6 +59,7 @@ import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
 import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.NewCaseDialog;
 import net.ee.pfanalyzer.ui.dialog.OpenCaseDialog;
+import net.ee.pfanalyzer.ui.dialog.SelectModelClassDialog;
 import net.ee.pfanalyzer.ui.dialog.SelectScriptDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
@@ -131,8 +133,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		PowerFlowAnalyzer app = new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
-		app.setWorkingDirectory(System.getProperty("user.home"));
+//		PowerFlowAnalyzer app = 
+			new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
+//		app.setWorkingDirectory(System.getProperty("user.home"));
 	}
 	
 	public static PowerFlowAnalyzer getInstance() {
@@ -386,6 +389,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void importParameterDB() {
+		if(getCurrentCase() == null)
+			return;
 		NewCaseDialog dialog = new NewCaseDialog(this, "Import parameter database");
 		dialog.showDialog(-1, -1);
 		if(dialog.isCancelPressed())// cancel pressed
@@ -398,14 +403,42 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			database = new ModelDB(CaseSerializer.readModelDB(new File(dialog.getSelectedParameterFile())));
 		if(database == null)
 			return;
-		database.setDirty(true);
-		getCurrentCase().changeModelDB(database);
+		SelectModelClassDialog modelDialog = new SelectModelClassDialog(this, database, 
+				"Import parameter database");
+		modelDialog.showDialog(-1, -1);
+		if(modelDialog.isCancelPressed())// cancel pressed
+			return;
+		ModelDB currentDB = getCurrentCase().getModelDB();
+		if(modelDialog.isNetworkParameterClassSelected())
+			currentDB.replaceTopClass(database.getNetworkClass());
+		if(modelDialog.isScriptClassSelected())
+			currentDB.replaceTopClass(database.getScriptClass());
+		if(modelDialog.isOutlineClassSelected())
+			currentDB.replaceTopClass(database.getOutlineClass());
+		currentDB.refreshModels();
+		currentDB.setDirty(true);
+		getCurrentCase().changeModelDB(currentDB);
 		for (Network net : getCurrentCase().getNetworks(true))
 			net.fireNetworkChanged();
 		getCurrentContainer().reloadModelDBDialog();
 	}
 	
 	private void exportParameterDB() {
+		// open model db class selection dialog
+		ModelDB currentDB = getCurrentCase().getModelDB();
+		SelectModelClassDialog modelDialog = new SelectModelClassDialog(this, 
+				currentDB, "Export parameter database");
+		modelDialog.showDialog(-1, -1);
+		if(modelDialog.isCancelPressed())// cancel pressed
+			return;
+		ModelDBData modelData = new ModelDBData();
+		if(modelDialog.isNetworkParameterClassSelected())
+			modelData.getModelClass().add(currentDB.getNetworkClass());
+		if(modelDialog.isScriptClassSelected())
+			modelData.getModelClass().add(currentDB.getScriptClass());
+		if(modelDialog.isOutlineClassSelected())
+			modelData.getModelClass().add(currentDB.getOutlineClass());
+		// open file chooser dialog
 		JFileChooser fileChooser = new JFileChooser(getWorkingDirectory());
 		fileChooser.setAcceptAllFileFilterUsed(true);
 		fileChooser.setFileFilter(NewCaseDialog.PARAMETER_FILE_FILTER);
@@ -432,7 +465,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			}
 			CaseSerializer serializer = new CaseSerializer();
 			CaseData pfCase = new CaseData();
-			pfCase.setModelDb(getCurrentCase().getModelDB().getData());
+			pfCase.setModelDb(modelData);
 			try {
 				serializer.writeCase(pfCase, selectedFile);
 			} catch (Exception e) {
@@ -915,8 +948,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	public String getWorkingDirectory() {
-		if(workingDirectory == null)
-			return System.getProperty("user.home");
+		if(workingDirectory == null) {
+			if(getCurrentCase() != null && getCurrentCase().getCaseFile() != null)
+				return getCurrentCase().getCaseFile().getParent();
+			else
+				return System.getProperty("user.home");
+		}
 		return workingDirectory;
 	}
 	
