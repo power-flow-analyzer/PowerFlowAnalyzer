@@ -96,6 +96,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //	private final static String ACTION_APP_PROPERTIES = "action.app.properties";
 	private final static String ACTION_EXECUTE_SCRIPT = "action.case.calculate";
 	
+	private final static String ACTION_SELECT_HOME = "action.select.home";
 	private final static String ACTION_SELECT_PREVIOUS = "action.select.previous";
 	private final static String ACTION_SELECT_NEXT = "action.select.next";
 	
@@ -210,6 +211,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.add(createToolbarButton(ACTION_TABLE_ADD, "Add a new data viewer to this layout", "layout_add.png", "New Table"));
 //		toolbar.add(createToolbarButton(ACTION_MAP_PROPERTIES, "Edit map settings", "map_edit.png", "Edit map"));
 		toolbar.addSeparator();
+		toolbar.add(createToolbarButton(ACTION_SELECT_HOME, "Go to network overview", "direction.png", "Home"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
 //		toolbar.addSeparator();
@@ -305,6 +307,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 				createNewElement();
 			} else if(e.getActionCommand().equals(ACTION_NETWORK_REMOVE_ELEMENT)) {
 				removeElement();
+			} else if(e.getActionCommand().equals(ACTION_SELECT_HOME)) {
+				if(getCurrentViewer() != null)
+					getCurrentViewer().getSelectionManager().selectionChanged(null);
 			} else if(e.getActionCommand().equals(ACTION_SELECT_PREVIOUS)) {
 				if(getCurrentViewer() != null)
 					getCurrentViewer().getSelectionManager().showPreviousElement();
@@ -1029,6 +1034,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 //		toolbarButtons.get(ACTION_CASE_LAYOUT).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_MODEL_DB_PROPERTIES).setEnabled(hasCase);
 //		toolbarButtons.get(ACTION_PANEL_PROPERTIES).setEnabled(hasViewer);
+		toolbarButtons.get(ACTION_SELECT_HOME).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_SELECT_PREVIOUS).setEnabled(hasViewer
 				&& getCurrentViewer().getSelectionManager().hasPreviousElement());
 		toolbarButtons.get(ACTION_SELECT_NEXT).setEnabled(hasViewer
