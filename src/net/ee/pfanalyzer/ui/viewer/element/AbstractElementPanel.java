@@ -104,7 +104,7 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 		List<CombinedBus> combinedBusses;
 		if( getElementViewer().groupBusByArea && 
 				(combinedBusses = ElementGroupingUtils.getCombinedBussesByParameter(
-				busList, getElementViewer().viewerAreaParameter)).size() > 1) {
+				busList, getElementViewer().viewerAreaParameter, "Area ", "")).size() > 1) {
 			addBusGroup(combinedBusses, "Busses per " + getElementViewer().viewerAreaLabel);
 		} else if( getElementViewer().groupBusByLocation &&
 				(combinedBusses = ElementGroupingUtils.getCombinedBussesByCoordinates(
@@ -126,12 +126,12 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 		List<CombinedBranch> combinedBranches;
 		if( getElementViewer().groupBranchByArea &&
 				(combinedBranches = ElementGroupingUtils.getCombinedBranchesByParameter(
-				branchList, getElementViewer().viewerAreaParameter)).size() > 1) {
+				branchList, getElementViewer().viewerAreaParameter, "Area ", "")).size() > 1) {
 			CombinedBranch ungrouped = removeUngrouped(combinedBranches);
 			addBranchGroup(combinedBranches, "Branches per " + getElementViewer().viewerAreaLabel);
 			addUngrouped(ungrouped);
 			combinedBranches = ElementGroupingUtils.getCombinedTieLines(
-					branchList, getElementViewer().viewerAreaParameter);
+					branchList, getElementViewer().viewerAreaParameter, "Area ", "");
 			if(combinedBranches.size() > 0) {
 				// should be the same ungrouped branches as before
 				removeUngrouped(combinedBranches);
@@ -145,12 +145,12 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 			addUngrouped(ungrouped);
 		} else if( getElementViewer().groupBranchByVoltage &&
 				(combinedBranches = ElementGroupingUtils.getCombinedBranches(
-				branchList, true, "BASE_KV")).size() > 1 ) {
+				branchList, true, "BASE_KV", "", " kV")).size() > 1 ) {
 			CombinedBranch ungrouped = removeUngrouped(combinedBranches);
 			addBranchGroup(combinedBranches, "Branches per Voltage");
 			addUngrouped(ungrouped);
 			// add branches with differing voltage -> transformers
-			combinedBranches = ElementGroupingUtils.getCombinedBranches(branchList, false, "BASE_KV");
+			combinedBranches = ElementGroupingUtils.getCombinedBranches(branchList, false, "BASE_KV", "", " kV");
 			if(combinedBranches.size() > 0) {
 				// should be the same ungrouped branches as before
 				removeUngrouped(combinedBranches);
@@ -184,7 +184,7 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 		List<ElementList> list;
 		if( getElementViewer().groupElementByArea &&
 				(list = ElementGroupingUtils.getCombinedElementsByParameter(
-				elements, getElementViewer().viewerAreaParameter, typeLabel, attributes)).size() > 1) {
+				elements, getElementViewer().viewerAreaParameter, typeLabel, attributes, "Area ", "")).size() > 1) {
 			addElementGroup(list, typeLabel + " per " + getElementViewer().viewerAreaLabel, attributes);
 		} else if( getElementViewer().groupElementByLocation &&
 				(list = ElementGroupingUtils.getCombinedElementsByCoordinates(

@@ -216,7 +216,7 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<CombinedBus> getCombinedBussesByParameter(
-			List<Bus> busList, final String paramName) {
+			List<Bus> busList, final String paramName, final String labelPrefix, final String labelSuffix) {
 		List<CombinedBus> list = new ArrayList<CombinedBus>();
 		CombinedBus ungrouped = null;
 		for (final Bus bus : busList) {
@@ -237,7 +237,7 @@ public class ElementGroupingUtils {
 						public String getLabel() {
 							String displayValue = bus.getParameterDisplayValue(paramName);
 							if(isNumber(displayValue))
-								return "Area " + displayValue;
+								return labelPrefix + displayValue + labelSuffix;
 							else
 								return displayValue;
 						}
@@ -255,7 +255,8 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<ElementList> getCombinedElementsByParameter(
-			List<AbstractNetworkElement> elementList, final String paramName, String typeLabel, ElementAttributes attributes) {
+			List<AbstractNetworkElement> elementList, final String paramName, String typeLabel, 
+			ElementAttributes attributes, final String labelPrefix, final String labelSuffix) {
 		List<ElementList> combinedList = new ArrayList<ElementList>();
 		for (final AbstractNetworkElement element : elementList) {
 			boolean added = false;
@@ -277,7 +278,7 @@ public class ElementGroupingUtils {
 							if(parentBus != null) {
 								String displayValue = parentBus.getParameterDisplayValue(paramName);
 								if(isNumber(displayValue))
-									return "Area " + displayValue;
+									return labelPrefix + displayValue + labelSuffix;
 								else
 									return displayValue;
 							} else
@@ -305,17 +306,18 @@ public class ElementGroupingUtils {
 	}
 	
 	public static List<CombinedBranch> getCombinedBranchesByParameter(
-			List<Branch> branchList, String paramName) {
-		return getCombinedBranches(branchList, true, paramName);
+			List<Branch> branchList, String paramName, String labelPrefix, String labelSuffix) {
+		return getCombinedBranches(branchList, true, paramName, labelPrefix, labelSuffix);
 	}
 	
 	public static List<CombinedBranch> getCombinedTieLines(
-			List<Branch> branchList, String paramName) {
-		return getCombinedBranches(branchList, false, paramName);
+			List<Branch> branchList, String paramName, String labelPrefix, String labelSuffix) {
+		return getCombinedBranches(branchList, false, paramName, labelPrefix, labelSuffix);
 	}
 	
 	public static List<CombinedBranch> getCombinedBranches(
-			List<Branch> branchList, final boolean sameValuesAtFromAndTo, final String paramName) {
+			List<Branch> branchList, final boolean sameValuesAtFromAndTo, final String paramName,
+			final String labelPrefix, final String labelSuffix) {
 		List<CombinedBranch> list = new ArrayList<CombinedBranch>();
 		CombinedBranch ungrouped = null;
 		for (final Branch branch : branchList) {
@@ -357,14 +359,14 @@ public class ElementGroupingUtils {
 							String label = "";
 							String fromDisplayValue = fromBus.getParameterDisplayValue(paramName);
 							if(isNumber(fromDisplayValue))
-								label += fromDisplayValue + " kV";
+								label += labelPrefix + fromDisplayValue + labelSuffix;
 							else
 								label += fromDisplayValue;
 							if(sameValuesAtFromAndTo == false) {
 								label += " - ";
 								String toDisplayValue = toBus.getParameterDisplayValue(paramName);
 								if(isNumber(toDisplayValue))
-									label += toDisplayValue + " kV";
+									label += labelPrefix + toDisplayValue + labelSuffix;
 								else
 									label += toDisplayValue;
 							}
