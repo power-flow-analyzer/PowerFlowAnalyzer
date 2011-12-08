@@ -23,12 +23,13 @@ public class ModelDB {
 	
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";
+	public final static String ROOT_CONFIGURATION_CLASS = "conf";
 	public final static String ROOT_OUTLINE_CLASS = "outline";
 	
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
-	private ModelClassData networkClass, scriptClass, outlineClass;
+	private ModelClassData networkClass, scriptClass, configurationClass, outlineClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	private boolean isDirty = false;
@@ -65,11 +66,15 @@ public class ModelDB {
 				networkClass = clazz;
 			else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 				scriptClass = clazz;
+			else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
+				configurationClass = clazz;
 			else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
 				outlineClass = clazz;
 		}
 		if(networkClass != null)
 			addModelsRecursive(networkClass);
+		if(configurationClass != null)
+			addModelsRecursive(configurationClass);
 //		for (ModelClassData clazz : getData().getModelClass()) {
 //			addModelsRecursive(clazz);
 //		}
@@ -81,6 +86,8 @@ public class ModelDB {
 			replaceTopClass(networkClass, clazz);
 		else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 			replaceTopClass(scriptClass, clazz);
+		else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
+			replaceTopClass(configurationClass, clazz);
 		else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
 			replaceTopClass(outlineClass, clazz);
 //		getData().getModelClass().add(clazz);
@@ -143,6 +150,10 @@ public class ModelDB {
 	
 	public ModelClassData getOutlineClass() {
 		return outlineClass;
+	}
+	
+	public ModelClassData getConfigurationClass() {
+		return configurationClass;
 	}
 	
 	public void fireElementChanged(DatabaseChangeEvent event) {
