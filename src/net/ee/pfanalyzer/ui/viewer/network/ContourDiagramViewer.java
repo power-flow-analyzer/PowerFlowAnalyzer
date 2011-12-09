@@ -14,6 +14,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterUtils;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ColorLegend;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ColorProvider;
 import net.ee.pfanalyzer.ui.viewer.network.contour.ContourDiagramSettings;
@@ -50,6 +51,23 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 		getViewerController().add(colorLegend, BorderLayout.WEST);
 		getViewerController().add(contourLegend, BorderLayout.NORTH);
 		paintManager.addPaintListener(new ContourPainter(this, settings));
+	}
+	
+	@Override
+	protected INetworkDataViewer createOffscreenViewer() {
+		ContourDiagramViewer viewer = new ContourDiagramViewer(getNetwork(), 
+				getViewerConfiguration(), getNetworkContainer());
+		return viewer;
+	}
+	
+	@Override
+	protected void initializeOffscreenViewer(INetworkDataViewer aViewer, int width, int height) {
+		super.initializeOffscreenViewer(aViewer, width, height);
+		ContourDiagramViewer viewer = (ContourDiagramViewer) aViewer;
+		double widthFactor = (double) width / (double) getWidth();
+		double heightFactor = (double) height / (double) getHeight();
+		double factor = Math.min(widthFactor, heightFactor);
+		viewer.settings.setMaxDistance(factor * this.settings.getMaxDistance());
 	}
 	
 	@Override
