@@ -18,6 +18,7 @@ public class PaintManager {
 	private BufferedImage image;
 	private BackgroundThread backgroundThread;
 	private List<IPaintListener> paintListeners = new ArrayList<IPaintListener>();
+	private boolean isOffscreenPainting = false;
 	
 	public PaintManager(NetworkMapViewer viewer) {
 		this.viewer = viewer;
@@ -60,16 +61,24 @@ public class PaintManager {
 	}
 	
 	public void drawBackground(Graphics2D g2d) {
-		if(image == null)
-			updateBackgroundImage();
-		else if(isRunning()) {
-			g2d.setColor(Color.BLACK);
-			String text = "Calculating...";
-			Rectangle2D textBounds = g2d.getFontMetrics().getStringBounds(text, g2d);
-			g2d.drawString(text, (int) (viewer.getWidth() - textBounds.getWidth()) - 5, 
-					(int) (viewer.getHeight() - textBounds.getHeight()));
-		} else
-			g2d.drawImage(image, 0, 0, Color.WHITE, null);// TODO middleColor
+		if(isOffscreenPainting()) {
+			// draw image directly in offscreen mode
+			// do not create image -> save memory
+			paintListeners(g2d);
+		} else {
+			// determine what to draw
+			if(image == null)
+				updateBackgroundImage();
+			else if(isRunning()) {
+				g2d.setColor(Color.BLACK);
+				String text = "Calculating...";
+				Rectangle2D textBounds = g2d.getFontMetrics().getStringBounds(text, g2d);
+				g2d.drawString(text, (int) (viewer.getWidth() - textBounds.getWidth()) - 5, 
+						(int) (viewer.getHeight() - textBounds.getHeight()));
+			} else {
+				g2d.drawImage(image, 0, 0, Color.WHITE, null);
+			}
+		}
 	}
 	
 	public boolean isRunning() {
@@ -77,11 +86,14 @@ public class PaintManager {
 	}
 	
 	public void updateBackgroundImage() {
-		if(isRunning())
-			backgroundThread.updateImage();
-		else {
-			backgroundThread = new BackgroundThread();
-			backgroundThread.start();
+		// only update something when not in offscreen mode
+		if(isOffscreenPainting() == false) {
+			if(isRunning())
+				backgroundThread.updateImage();
+			else {
+				backgroundThread = new BackgroundThread();
+				backgroundThread.start();
+			}
 		}
 	}
 	
@@ -94,6 +106,18 @@ public class PaintManager {
 		Graphics2D g2d = newImage.createGraphics();
 		paintListeners(g2d);
 		image = newImage;
+	}
+
+	public boolean isOffscreenPainting() {
+		return isOffscreenPainting;
+	}
+
+	public void setOffscreenPainting(boolean isOffscreenPainting) {
+		this.isOffscreenPainting = isOffscreenPainting;
+		if(isOffscreenPainting) {
+			backgroundThread = null;
+			image = null;
+		}
 	}
 
 	class BackgroundThread extends Thread {
@@ -116,11 +140,12 @@ public class PaintManager {
 					// do nothing
 				}
 				updateImage = false;
-				createBackgroundImage();
-//				viewer.repaint();
+				if(isOffscreenPainting() == false)
+					createBackgroundImage();
 			}
 			backgroundThread = null;
-			viewer.repaint();
+			if(isOffscreenPainting() == false)
+				viewer.repaint();
 		}
 		
 		private void isRunning() {
