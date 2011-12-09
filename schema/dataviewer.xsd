@@ -10,6 +10,14 @@
     <complexType name="DataViewerData">
         <sequence>
             <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="dialog" type="mpui:DataViewerDialogData" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="modelID" type="string"/>
+    </complexType>
+    
+    <complexType name="DataViewerDialogData">
+        <sequence>
+            <element name="parameter" type="mpui:NetworkParameter" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="modelID" type="string"/>
     </complexType>
