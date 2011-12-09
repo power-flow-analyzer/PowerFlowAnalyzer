@@ -21,6 +21,7 @@ import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
 public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
@@ -101,6 +102,11 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 //	}
 	
 	@Override
+	public void addViewerActions(DataViewerContainer container) {
+		
+	}
+	
+	@Override
 	public DataViewerConfiguration getViewerConfiguration() {
 		// TODO Auto-generated method stub
 		return null;
@@ -109,6 +115,11 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	@Override
 	public JComponent getComponent() {
 		return this;
+	}
+
+	@Override
+	public void paintViewer(Graphics g) {
+		paintComponent(g);
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.viewer.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
@@ -29,6 +30,7 @@ import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
 public class DataTable extends JTable implements INetworkDataViewer {
@@ -69,6 +71,11 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		
 		// add handler for copy and paste actions
 		new ClipboardHandler(this);
+	}
+	
+	@Override
+	public void addViewerActions(DataViewerContainer container) {
+		
 	}
 	
 	public DataTableModel getTableModel() {
@@ -161,6 +168,11 @@ public class DataTable extends JTable implements INetworkDataViewer {
 	
 	private void filterElements() {
 //		model.setData(getNetwork().getElements(elementID));
+	}
+
+	@Override
+	public void paintViewer(Graphics g) {
+		paintComponent(g);
 	}
 
 	@Override
