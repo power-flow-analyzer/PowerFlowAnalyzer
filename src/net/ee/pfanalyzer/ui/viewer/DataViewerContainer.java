@@ -59,7 +59,7 @@ public class DataViewerContainer extends JPanel {
 	}
 	
 	private void showPropertiesDialog() {
-		DataViewerDialog dialog = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+		DataViewerParameterDialog dialog = new DataViewerParameterDialog(SwingUtilities.getWindowAncestor(this), 
 				"Viewer Properties", getViewer().getViewerConfiguration(), powerFlowCase, false);
 		dialog.showDialog(-1, -1);
 		if(dialog.isOkPressed()) {
