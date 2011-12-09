@@ -116,6 +116,9 @@ public class ParameterContainer extends JPanel {
 						(ParameterMasterViewer) parameterMaster, propertyDefinition, propertyValue);
 			} else if(NetworkParameterValueRestriction.COLOR_RGB.equals(propertyDefinition.getRestriction())) {
 				valuePanel = new ParameterColorField(parameterMaster, propertyDefinition, propertyValue);
+			} else if(NetworkParameterValueRestriction.FILE.equals(propertyDefinition.getRestriction())) {
+				valuePanel = new ParameterFileField(parameterMaster, propertyDefinition, propertyValue, 
+						getFileFilter(propertyDefinition.getID()));
 			} else {
 				if(NetworkParameterType.BOOLEAN.equals(propertyDefinition.getType())) {
 					valuePanel = new ParameterCheckBox(parameterMaster, propertyDefinition, propertyValue);
@@ -134,6 +137,10 @@ public class ParameterContainer extends JPanel {
 			valuePanel.setShowFullParameterInfo(showFullParameterInfo);
 		panel.add(valuePanel);
 		parameterAdded(propertyDefinition);
+	}
+	
+	protected ParameterFileFilter getFileFilter(String parameterID) {
+		return null;
 	}
 	
 	protected void parameterAdded(NetworkParameter parameter) {
