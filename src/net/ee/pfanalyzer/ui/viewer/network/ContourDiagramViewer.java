@@ -54,14 +54,14 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 	}
 	
 	@Override
-	protected INetworkDataViewer createOffscreenViewer() {
+	public INetworkDataViewer createOffscreenViewer() {
 		ContourDiagramViewer viewer = new ContourDiagramViewer(getNetwork(), 
 				getViewerConfiguration(), getNetworkContainer());
 		return viewer;
 	}
 	
 	@Override
-	protected void initializeOffscreenViewer(INetworkDataViewer aViewer, int width, int height) {
+	public void initializeOffscreenViewer(INetworkDataViewer aViewer, int width, int height) {
 		super.initializeOffscreenViewer(aViewer, width, height);
 		ContourDiagramViewer viewer = (ContourDiagramViewer) aViewer;
 		double widthFactor = (double) width / (double) getWidth();
