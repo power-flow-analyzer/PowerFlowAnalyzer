@@ -648,7 +648,8 @@ public class ManageParametersDialog extends BaseDialog {
 							NetworkParameterValueRestriction.LIST,
 							NetworkParameterValueRestriction.MODEL_ID, 
 							NetworkParameterValueRestriction.MODEL_OR_CLASS_ID, 
-							NetworkParameterValueRestriction.COLOR_RGB };
+							NetworkParameterValueRestriction.COLOR_RGB,
+							NetworkParameterValueRestriction.FILE };
 				else
 					return new NetworkParameterValueRestriction[] {
 						NetworkParameterValueRestriction.NONE };
