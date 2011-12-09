@@ -47,6 +47,7 @@
             <enumeration value="model ID"/>
             <enumeration value="model or class ID"/>
             <enumeration value="color (RGB)"/>
+            <enumeration value="file"/>
         </restriction>
     </simpleType>
     
