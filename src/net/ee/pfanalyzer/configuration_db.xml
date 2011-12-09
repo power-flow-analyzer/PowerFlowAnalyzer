@@ -2,6 +2,26 @@
 <power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
     <model-db>
         <modelClass ID="conf" label="Configuration">
+            <modelClass ID="dialog" label="Dialog">
+                <modelClass ID="viewer" label="Viewer Dialog">
+                    <modelClass ID="network" label="Network" description="">
+                        <model ID="export_image" label="Export Image">
+                            <parameter ID="IMAGE_WIDTH" type="integer" label="Image width" description="The width of the output file in pixels" value="600.0">
+                                <display increment="100.0" min="0.0"/>
+                            </parameter>
+                            <parameter ID="IMAGE_HEIGHT" type="integer" label="Image height" description="The height of the output file in pixels" value="800.0">
+                                <display increment="100.0" min="0.0"/>
+                            </parameter>
+                            <parameter ID="IMAGE_COMPRESSION_QUALITY" type="double" label="Compression quality" description="Sets the quality of the JPEG image. &lt;br&gt;Must be between 0 and 1 (both inclusive). &lt;br&gt;A higher value means a higher quality, i.e. a lesser compression." value="1">
+                                <display decimalFormatPattern="#.##" increment="0.1" max="1.0" min="0.0"/>
+                            </parameter>
+                            <parameter ID="IMAGE_FILE" type="text" label="Output file (JPEG)" description="The path of the output file. &lt;br&gt;May be relative to the current power flow case." restriction="file" empty="true">
+                                <display/>
+                            </parameter>
+                        </model>
+                    </modelClass>
+                </modelClass>
+            </modelClass>
             <modelClass ID="viewer" label="Viewer">
                 <parameter ID="TITLE" type="text" label="Title" description="The title of this viewer" empty="true">
                     <display/>
