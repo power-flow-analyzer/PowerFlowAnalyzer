@@ -19,20 +19,15 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.io.MatpowerGUIServer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
@@ -59,6 +54,7 @@ import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
 import net.ee.pfanalyzer.ui.dialog.ExecuteScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.NewCaseDialog;
 import net.ee.pfanalyzer.ui.dialog.OpenCaseDialog;
+import net.ee.pfanalyzer.ui.dialog.ProgressDialog;
 import net.ee.pfanalyzer.ui.dialog.SelectModelClassDialog;
 import net.ee.pfanalyzer.ui.dialog.SelectScriptDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
@@ -737,23 +733,12 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	private void openProgressDialog(final long caseID) {
-		final ProgressDialog progressDialog = new ProgressDialog();
-		new Thread(new Runnable() {
+		new ProgressDialog() {
 			@Override
-			public void run() {
-				try {
-					progressDialog.setVisible(true);
-					Thread.sleep(500);
-					while(success.get(caseID) != null) {
-						Thread.sleep(500);
-					}
-				} catch(InterruptedException e) {
-				} finally {
-					progressDialog.setVisible(false);
-					progressDialog.dispose();
-				}
+			protected boolean showProgressDialog() {
+				return success.get(caseID) != null;
 			}
-		}).start();
+		};
 	}
 	
 	private void closeProgram() {
@@ -1085,28 +1070,5 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			count++;
 		}
 		return result;
-	}
-	
-	class ProgressDialog extends JDialog {
-		
-		private JProgressBar progressBar;
-		
-		ProgressDialog() {
-			super(PowerFlowAnalyzer.this, "Please wait...", false);
-			progressBar = new JProgressBar();
-			progressBar.setIndeterminate(true);
-			JPanel contentPane = new JPanel(new BorderLayout());
-			contentPane.setBorder(new EmptyBorder(10, 50, 20, 50));
-			JLabel l = new JLabel("<html><b>Please wait while the requested operations are executed...");
-			l.setBorder(new EmptyBorder(20, 10, 30, 10));
-			contentPane.add(l, BorderLayout.CENTER);
-			contentPane.add(progressBar, BorderLayout.SOUTH);
-			getContentPane().setLayout(new BorderLayout());
-			getContentPane().add(contentPane, BorderLayout.CENTER);
-			pack();
-			int centerX = PowerFlowAnalyzer.this.getX() + PowerFlowAnalyzer.this.getWidth() / 2;
-			int centerY = PowerFlowAnalyzer.this.getY() + PowerFlowAnalyzer.this.getHeight() / 2;
-			setLocation(centerX - getWidth() / 2, centerY - getHeight() / 2);
-		}
 	}
 }
