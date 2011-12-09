@@ -3,7 +3,11 @@ package net.ee.pfanalyzer.ui.viewer.element;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -17,6 +21,7 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
 public class ElementViewer extends JPanel implements INetworkDataViewer, IDatabaseChangeListener {
@@ -50,6 +55,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	private CombinedBranchPanel cBranchPanel;
 	private ModelElementPanel elementPanel;
 	private ElementListPanel listPanel;
+	private AbstractButton editButton;
+	private boolean isEditable = false;
 	private Object oldSelection;
 	
 	String viewerAreaLabel, viewerAreaParameter;
@@ -106,6 +113,18 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	}
 	
 	@Override
+	public void addViewerActions(DataViewerContainer container) {
+		editButton = container.addAction("Toggle editing mode", 
+				"pencil.png", "Toggle editing mode", true, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isEditable = editButton.isSelected();
+				reloadCard();
+			}
+		});
+	}
+	
+	@Override
 	public DataViewerConfiguration getViewerConfiguration() {
 		return viewerConfiguration;
 	}
@@ -128,6 +147,11 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 	}
 
 	@Override
+	public void paintViewer(Graphics g) {
+		paintComponent(g);
+	}
+
+	@Override
 	public void refresh() {
 		
 	}
@@ -141,6 +165,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 		if(selection == null) {
 			networkPanel.setShowNetworkParameters(showNetworkParameters);
 			networkPanel.setShowSumsOfValues(showSumsOfElements);
+			networkPanel.setEditable(isEditable);
 			networkPanel.updateNetwork();
 			setPreferredSize(networkPanel.getPreferredSize());
 			cardLayout.show(this, NETWORK_CARD);
@@ -152,6 +177,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				return;
 			}
 			cBusPanel.setShowSumsOfValues(showSumsOfElements);
+			cBusPanel.setEditable(isEditable);
 			cBusPanel.setCombinedBus(cbus);
 			setPreferredSize(cBusPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BUS_CARD);
@@ -163,6 +189,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				return;
 			}
 			cBranchPanel.setShowSumsOfValues(showSumsOfElements);
+			cBranchPanel.setEditable(isEditable);
 			cBranchPanel.setCombinedBranch(cbranch, getNetwork().getCombinedBusses());
 			setPreferredSize(cBranchPanel.getPreferredSize());
 			cardLayout.show(this, COMBINED_BRANCH_CARD);
@@ -173,10 +200,12 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 				return;
 			}
 			listPanel.setShowSumsOfValues(showSumsOfElements);
+			listPanel.setEditable(isEditable);
 			listPanel.setElementList((ElementList) selection);
 			setPreferredSize(listPanel.getPreferredSize());
 			cardLayout.show(this, ELEMENT_LIST_CARD);
 		} else if(selection instanceof AbstractNetworkElement) {
+			elementPanel.setEditable(isEditable);
 			elementPanel.setNetworkElement((AbstractNetworkElement) selection);
 			setPreferredSize(elementPanel.getPreferredSize());
 			cardLayout.show(this, ELEMENT_CARD);
