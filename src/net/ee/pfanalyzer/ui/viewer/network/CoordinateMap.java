@@ -36,10 +36,10 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	protected final static int HORIZONTAL_GAP = 20;
 	protected final static int VERTICAL_GAP = 20;
 
-	private double minLatitude = ZOOM_GERMANY_COORDINATES[0];
-	private double maxLatitude = ZOOM_GERMANY_COORDINATES[1];
-	private double minLongitude = ZOOM_GERMANY_COORDINATES[2];
-	private double maxLongitude = ZOOM_GERMANY_COORDINATES[3];
+	protected double minLatitude = ZOOM_GERMANY_COORDINATES[0];
+	protected double maxLatitude = ZOOM_GERMANY_COORDINATES[1];
+	protected double minLongitude = ZOOM_GERMANY_COORDINATES[2];
+	protected double maxLongitude = ZOOM_GERMANY_COORDINATES[3];
 	
 	private DataViewerConfiguration viewerConfiguration;
 	private Network data;
@@ -153,6 +153,10 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		}
 	}
 
+	public void paintViewer(Graphics g) {
+		paintComponent(g);
+	}
+
 	protected void paintComponent(Graphics g) {
 		try {
 			Graphics2D g2d = (Graphics2D) g;
@@ -183,7 +187,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 				g.setColor(Color.BLACK);
 				g.drawString("No coordinate data provided.", 0, getHeight() / 2);
 			}
-			if(hasFocus()) {
+			if(isFocusOwner()) {
 				g.setColor(Color.BLUE);
 				g2d.setStroke(new BasicStroke(3));
 				g.drawRect(0, 0, getWidth()-1, getHeight()-1);
