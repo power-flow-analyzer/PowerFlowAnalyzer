@@ -17,17 +17,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for AbstractNetworkElementData complex type.
+ * <p>Java class for DataViewerDialogData complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="AbstractNetworkElementData">
+ * &lt;complexType name="DataViewerDialogData">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="parameter" type="{http://www.mehg.net/schema/PowerFlowAnalyzer}NetworkParameter" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="flag" type="{http://www.mehg.net/schema/PowerFlowAnalyzer}NetworkFlagData" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="modelID" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
@@ -38,14 +37,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "AbstractNetworkElementData", propOrder = {
-    "parameter",
-    "flag"
+@XmlType(name = "DataViewerDialogData", propOrder = {
+    "parameter"
 })
-public class AbstractNetworkElementData {
+public class DataViewerDialogData {
 
     protected List<NetworkParameter> parameter;
-    protected List<NetworkFlagData> flag;
     @XmlAttribute
     protected String modelID;
 
@@ -76,35 +73,6 @@ public class AbstractNetworkElementData {
             parameter = new ArrayList<NetworkParameter>();
         }
         return this.parameter;
-    }
-
-    /**
-     * Gets the value of the flag property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the flag property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getFlag().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link NetworkFlagData }
-     * 
-     * 
-     */
-    public List<NetworkFlagData> getFlag() {
-        if (flag == null) {
-            flag = new ArrayList<NetworkFlagData>();
-        }
-        return this.flag;
     }
 
     /**
