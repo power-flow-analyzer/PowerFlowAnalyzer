@@ -1,5 +1,7 @@
 package net.ee.pfanalyzer.ui.viewer;
 
+import java.awt.Graphics;
+
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.INetworkChangeListener;
@@ -19,4 +21,8 @@ public interface INetworkDataViewer extends INetworkElementSelectionListener, IN
 	JComponent getComponent();
 	
 	DataViewerConfiguration getViewerConfiguration();
+	
+	void addViewerActions(DataViewerContainer container);
+	
+	void paintViewer(Graphics g);
 }
