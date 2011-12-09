@@ -28,7 +28,7 @@ import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
-import net.ee.pfanalyzer.ui.viewer.DataViewerDialog;
+import net.ee.pfanalyzer.ui.viewer.DataViewerParameterDialog;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
@@ -101,7 +101,7 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		if(dialog1.isCancelPressed())
 			return;
 		DataViewerConfiguration configuration = new DataViewerConfiguration(dialog1.getSelectedViewer());
-		DataViewerDialog dialog2 = new DataViewerDialog(SwingUtilities.getWindowAncestor(this), 
+		DataViewerParameterDialog dialog2 = new DataViewerParameterDialog(SwingUtilities.getWindowAncestor(this), 
 				"Add viewer", configuration, getPowerFlowCase(), true);
 		dialog2.showDialog(-1, -1);
 		if(dialog2.isCancelPressed())
