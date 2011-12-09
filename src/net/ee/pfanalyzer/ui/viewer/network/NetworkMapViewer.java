@@ -7,19 +7,30 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.JComponent;
 
+import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
@@ -35,9 +46,11 @@ import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.CaseViewer;
+import net.ee.pfanalyzer.ui.dialog.ProgressDialog;
 import net.ee.pfanalyzer.ui.shape.ElementShapeProvider;
 import net.ee.pfanalyzer.ui.shape.IElementShape;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
+import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
 public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewer, IDatabaseChangeListener, 
@@ -99,6 +112,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 	public NetworkMapViewer(Network data, DataViewerConfiguration viewerConfiguration, Component parent) {
 		super(data, viewerConfiguration);
 		this.parentContainer = parent;
+		setDoubleBuffered(false);// uses own double buffering
 		createStrokes(1.0f, 2.5f);
 		paintManager = new PaintManager(this);
 		initializeInternalCoordinates();
@@ -117,6 +131,50 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 		paintManager.addPaintListener(new OutlinePainter(this));
 	}
 	
+	@Override
+	public void addViewerActions(DataViewerContainer container) {
+		container.addAction("Repaint map", "arrow_refresh.png", "Repaint", false, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateBackground();
+			}
+		});
+		container.addAction("Export as an image", "camera.png", "Export", false, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportImage();
+			}
+		});
+	}
+	
+	private void exportImage() {
+//		ExportImageDialog dialog = new ExportImageDialog(PowerFlowAnalyzer.getInstance());
+//		dialog.showDialog(-1, -1);
+//		if(dialog.isCancelPressed())// cancel pressed
+//			return;
+		
+		new ExportThread().start();
+	}
+	
+	protected INetworkDataViewer createOffscreenViewer() {
+		NetworkMapViewer viewer = new NetworkMapViewer(getNetwork(), getViewerConfiguration(), 
+				getNetworkContainer());
+		return viewer;
+	}
+	
+	protected void initializeOffscreenViewer(INetworkDataViewer aViewer, int width, int height) {
+		NetworkMapViewer viewer = (NetworkMapViewer) aViewer;
+		viewer.paintManager.setOffscreenPainting(true);
+		viewer.setSize(width, height);
+		// set same view as for this map
+		viewer.perfectFit = false;
+		viewer.minLatitude = this.minLatitude;
+		viewer.maxLatitude = this.maxLatitude;
+		viewer.minLongitude = this.minLongitude;
+		viewer.maxLongitude = this.maxLongitude;
+		viewer.initializeInternalCoordinates();
+	}
+
 	public void dispose() {
 		getViewerController().dispose();
 		getViewerConfiguration().removeDatabaseChangeListener(this);
@@ -713,5 +771,60 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 		if(c.getParent() != null)
 			return getNetworkContainer(c.getParent());
 		return null;
+	}
+	
+	class ExportThread extends Thread {
+		
+		private boolean isExporting = false;
+		
+		@Override
+		public void run() {
+			// show progress dialog
+			isExporting = true;
+			new ProgressDialog() {
+				@Override
+				protected boolean showProgressDialog() {
+					return isExporting;
+				}
+			};
+			// wait a little to give the gui the chance to update
+			// otherwise the viewer will not be properly initialized
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e1) {}
+			// create offscreen viewer
+			INetworkDataViewer viewer = createOffscreenViewer();
+			try {
+				int width = 1000;
+				int height = 1000;
+				float quality = 1.0f;
+				File imageFile = new File(PowerFlowAnalyzer.getInstance().getWorkingDirectory(), "export_quality.jpg");
+				// initialize it
+				initializeOffscreenViewer(viewer, width, height);
+				// create image to draw onto
+				BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = img.createGraphics();
+				// paint the image
+				viewer.paintViewer(g2d);
+				// write image file
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpeg");
+				ImageWriter writer = writers.next();
+				// set compression quality
+				ImageWriteParam param = writer.getDefaultWriteParam();
+				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				param.setCompressionQuality(quality);
+				// write image to file
+				FileImageOutputStream out = new FileImageOutputStream(imageFile);
+				writer.setOutput(out);
+				writer.write(null, new IIOImage(img, null, null), param);
+				writer.dispose();
+			} catch (IOException e) {
+				PowerFlowAnalyzer.getInstance().setError("Cannot write image file: " + e.getMessage());
+				e.printStackTrace();
+			} finally {
+				isExporting = false;
+				viewer.dispose();
+			}
+		}
 	}
 }
