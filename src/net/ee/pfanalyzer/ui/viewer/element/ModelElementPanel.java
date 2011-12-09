@@ -2,17 +2,12 @@ package net.ee.pfanalyzer.ui.viewer.element;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
@@ -46,27 +41,7 @@ public class ModelElementPanel extends ParameterContainer {
 		titleLabel.setFont(titleFont);
 		titleLabel.setBorder(new EmptyBorder(5, 10, 5, 10));
 		
-		JPanel titlePanel = new JPanel(new BorderLayout());
-		titlePanel.setOpaque(false);
-		titlePanel.add(titleLabel, BorderLayout.CENTER);
-		if(getElementViewer() != null) {
-			final JToggleButton editButton = PowerFlowAnalyzer.createToggleButton("Toggle editing mode", 
-					"pencil.png", "Toggle editing mode", false);
-			editButton.setMargin(new Insets(2, 2, 1, 1));
-			editButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setEditable( editButton.isSelected());
-					getElementViewer().reloadCard();
-				}
-			});
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setOpaque(false);
-			buttonPanel.add(editButton);
-			titlePanel.add(buttonPanel, BorderLayout.EAST);
-		}
-		
-		add(titlePanel, BorderLayout.NORTH);
+		add(titleLabel, BorderLayout.NORTH);
 	}
 	
 	public ElementViewer getElementViewer() {
