@@ -7,6 +7,7 @@ import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.data.DataViewerData;
+import net.ee.pfanalyzer.model.data.DataViewerDialogData;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
@@ -17,6 +18,7 @@ public class DataViewerConfiguration extends ParameterSupport {
 	private DataViewerData data;
 	private ModelData dataDefinition;
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
+	private List<DataViewerDialog> dialogs = new ArrayList<DataViewerDialog>();
 	
 	public DataViewerConfiguration(ModelData dataDefinition) {
 		data = new DataViewerData();
@@ -54,6 +56,28 @@ public class DataViewerConfiguration extends ParameterSupport {
 	
 	public String getModelID() {
 		return getData().getModelID();
+	}
+	
+	private void readDialogs() {
+		for (DataViewerDialogData dialog : getData().getDialog()) {
+			dialogs.add(new DataViewerDialog(dialog));
+		}
+	}
+	
+	public DataViewerDialog getDialogData(String dialogID, boolean create) {
+		if(dialogs == null)
+			readDialogs();
+		for (DataViewerDialog dialog : dialogs) {
+			if(dialog.getDialogID().equals(dialogID))
+				return dialog;
+		}
+		if(create) {
+			DataViewerDialog dialog = new DataViewerDialog(dialogID);
+			getData().getDialog().add(dialog.getDialogData());
+			dialogs.add(dialog);
+			return dialog;
+		}
+		return null;
 	}
 	
 	public String getTitle() {
