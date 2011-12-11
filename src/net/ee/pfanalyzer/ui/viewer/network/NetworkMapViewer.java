@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
@@ -95,6 +96,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 	
 	private int arrowSize = 10;
 	private int networkMarkerSize = 20;
+	private float fontSize = -1;
 	
 	protected List<CombinedBus> visibleBusses;
 	protected List<CombinedBranch> visibleBranches;
@@ -157,6 +159,15 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 		File imageFile = new File(imagePath);
 		if(imageFile.isAbsolute() == false)
 			imageFile = new File(PowerFlowAnalyzer.getInstance().getWorkingDirectory(), imagePath);
+		if(imageFile.exists()) {
+			int action = JOptionPane.showConfirmDialog(this, 
+					"The file\n\t\t" + imageFile.getAbsolutePath() + "\nalready exists. " +
+							"Do you want to overwrite it?", "Overwrite?", JOptionPane.YES_NO_OPTION);
+			if(action != JOptionPane.YES_OPTION) {
+				exportImage();
+				return;
+			}
+		}
 		DataViewerImageExport export = new DataViewerImageExport(this, 
 				imageWidth, imageHeight, quality.floatValue(), imageFile);
 		export.exportImage();
@@ -179,6 +190,18 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 		viewer.minLongitude = this.minLongitude;
 		viewer.maxLongitude = this.maxLongitude;
 		viewer.initializeInternalCoordinates();
+		double widthFactor = (double) width / (double) getWidth();
+		double heightFactor = (double) height / (double) getHeight();
+		double factor = Math.min(widthFactor, heightFactor);
+		viewer.horizontal_margin = (int) (this.horizontal_margin * factor);
+		viewer.vertical_margin = (int) (this.vertical_margin * factor);
+		double weightFactor = 0.75;
+		viewer.createStrokes((float) (1.0 * weightFactor * factor), (float) (2.5 * weightFactor * factor));
+		viewer.shapeProvider.setLimitSize(false);
+		viewer.fontSize = (float) (this.getFont().getSize2D() * factor * weightFactor);
+//		viewer.shapeProvider.setShapeSizeFactor(factor);
+		viewer.updateArrowSize((int) (this.arrowSize * factor * weightFactor));
+		viewer.networkMarkerSize = (int) (this.networkMarkerSize * factor);
 	}
 
 	public void dispose() {
@@ -240,13 +263,14 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 //		System.out.println("Visible combined busses: " + visibleBusses.size());
 //		System.out.println("Visible combined branches: " + visibleBranches.size());
 		// determine factor for size of element shapes
-		double minDim = Math.min(maxX - minX, maxY - minY);
+		double minDim = Math.max(maxX - minX, maxY - minY);
 		int busCount = visibleBusses.size();
 		double shapeSizeFactor;
 		if(busCount > 0 && minDim > 0)
-			shapeSizeFactor = minDim / (30.0 * busCount);
+			shapeSizeFactor = ((maxX - minX) * (maxY - minY)) / (5000 * busCount);//minDim / (10.0 * busCount);
 		else
 			shapeSizeFactor = 1;
+//		System.out.println("shapeSizeFactor="+shapeSizeFactor);
 		shapeProvider.setShapeSizeFactor(shapeSizeFactor);
 	}
 	
@@ -569,8 +593,12 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 			}
 		}
 		// draw the marker's name
-		if(label != null)
-			g2d.drawString(label, (int) x1+15, (int) y1+15);
+		if(label != null) {
+			if(fontSize > -1)
+				g2d.setFont(g2d.getFont().deriveFont(fontSize));
+			double offset = elementShape != null ? elementShape.getSize() / 1.5 : 15;
+			g2d.drawString(label, (int) (x1+offset), (int) (y1+offset+g2d.getFont().getSize()/2));
+		}
 		return elementShape;
 	}
 	
