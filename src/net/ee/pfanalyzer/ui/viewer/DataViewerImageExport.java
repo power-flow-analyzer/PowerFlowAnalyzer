@@ -53,7 +53,7 @@ public class DataViewerImageExport implements Runnable {
 		// wait a little to give the gui the chance to update
 		// otherwise the viewer will not be properly initialized
 		try {
-			Thread.sleep(200);
+			Thread.sleep(300);
 		} catch (InterruptedException e1) {}
 		// create offscreen viewer
 		INetworkDataViewer viewer = networkViewer.createOffscreenViewer();
