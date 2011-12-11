@@ -17,6 +17,11 @@ public class TransformerShape implements IElementShape {
 	}
 	
 	@Override
+	public double getSize() {
+		return m_size;
+	}
+	
+	@Override
 	public Shape[] getTranslatedShapes(double x1, double y1, double x2, double y2, boolean highlighted) {
 		if(Double.isInfinite(x2) || Double.isInfinite(y2))
 			return null;

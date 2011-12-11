@@ -13,6 +13,11 @@ public class DefaultBranchShape implements IElementShape {
 	}
 	
 	@Override
+	public double getSize() {
+		return -1;
+	}
+	
+	@Override
 	public Shape[] getTranslatedShapes(double x1, double y1, double x2, double y2, boolean highlighted) {
 		if(Double.isInfinite(x2) || Double.isInfinite(y2))
 			return null;

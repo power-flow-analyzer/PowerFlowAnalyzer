@@ -14,6 +14,11 @@ public class DefaultBusShape implements IElementShape {
 	}
 	
 	@Override
+	public double getSize() {
+		return m_size;
+	}
+	
+	@Override
 	public Shape[] getTranslatedShapes(double x1, double y1, double x2, double y2, boolean highlighted) {
 		double halfSize = m_size / 2.0;
 		Ellipse2D.Double baseShape = new Ellipse2D.Double(
