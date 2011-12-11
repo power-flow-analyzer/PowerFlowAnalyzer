@@ -12,6 +12,7 @@ public class ElementShapeProvider {
 	private double transformerMinSize = 4;
 	
 	private double shapeSizeFactor = 1;
+	private boolean limitSize = true;
 	
 //	private Map<String, IElementShape> shapes = new HashMap<String, IElementShape>();
 	
@@ -32,11 +33,26 @@ public class ElementShapeProvider {
 	}
 	
 	private double getShapeSize(double maxSize, double minSize) {
-		return Math.max(Math.min(maxSize, shapeSizeFactor * maxSize), minSize);
+		if(limitSize)
+			return Math.max(Math.min(maxSize, shapeSizeFactor * maxSize), minSize);
+		else
+			return Math.max(shapeSizeFactor * maxSize, minSize);
 	}
 	
 	public void setShapeSizeFactor(double factor) {
 		shapeSizeFactor = factor;
+	}
+
+	public double getShapeSizeFactor() {
+		return shapeSizeFactor;
+	}
+
+	public void setLimitSize(boolean limitSize) {
+		this.limitSize = limitSize;
+	}
+
+	public boolean isLimitSize() {
+		return limitSize;
 	}
 
 //	public IElementShape getShape(AbstractNetworkElement element, int size, boolean selected) {
