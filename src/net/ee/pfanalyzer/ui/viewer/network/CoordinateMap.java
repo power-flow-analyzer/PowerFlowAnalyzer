@@ -33,8 +33,8 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	private final static Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 	private final static Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 	
-	protected final static int HORIZONTAL_GAP = 20;
-	protected final static int VERTICAL_GAP = 20;
+	protected int horizontal_margin = 20;
+	protected int vertical_margin = 20;
 
 	protected double minLatitude = ZOOM_GERMANY_COORDINATES[0];
 	protected double maxLatitude = ZOOM_GERMANY_COORDINATES[1];
@@ -172,9 +172,9 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 			// real painting
 			if(internalBusCoords != null) {
 				double width = internalMaxX - internalMinX;
-				horizontalScale = ((double) getWidth() - 2 * HORIZONTAL_GAP) / width;
+				horizontalScale = ((double) getWidth() - 2 * horizontal_margin) / width;
 				double height = internalMaxY - internalMinY;
-				verticalScale = ((double) getHeight() - 2 * VERTICAL_GAP) / height;
+				verticalScale = ((double) getHeight() - 2 * vertical_margin) / height;
 				if(respectAspectRatio) {
 					if(verticalScale < horizontalScale) {
 						horizontalScale = verticalScale;
@@ -220,8 +220,8 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 			return new double[] { -1, -1 };
 		if(coords[0] == -1 || coords[1] == -1)
 			return new double[] { -1, -1 };
-		double x = ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
-		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
+		double x = ((coords[0] - internalMinX) * horizontalScale) + horizontal_margin;
+		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - vertical_margin;
 		return new double[] { x, y };
 	}
 	
@@ -231,17 +231,17 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 			return new double[] { -1, -1 };
 		if(coords[0] == -1 || coords[1] == -1)
 			return new double[] { -1, -1 };
-		double x = ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
-		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
+		double x = ((coords[0] - internalMinX) * horizontalScale) + horizontal_margin;
+		double y = getHeight() - ((coords[1] - internalMinY) * verticalScale) - vertical_margin;
 		return new double[] { x, y };
 	}
 	
 	public double getX(int[] coords) {
-		return ((coords[0] - internalMinX) * horizontalScale) + HORIZONTAL_GAP;
+		return ((coords[0] - internalMinX) * horizontalScale) + horizontal_margin;
 	}
 	
 	public double getY(int[] coords) {
-		return getHeight() - ((coords[1] - internalMinY) * verticalScale) - VERTICAL_GAP;
+		return getHeight() - ((coords[1] - internalMinY) * verticalScale) - vertical_margin;
 	}
 
 	public void setView(double[] coordinates) {
