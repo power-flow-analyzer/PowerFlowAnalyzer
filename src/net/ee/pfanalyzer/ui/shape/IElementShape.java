@@ -13,4 +13,6 @@ public interface IElementShape {
 	Shape[] getTranslatedShapes(double x1, double y1, double x2, double y2, boolean highlighted);
 	
 	double[][] getAdditionalDecorationsPlace();
+	
+	double getSize();
 }
