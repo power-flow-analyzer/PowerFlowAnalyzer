@@ -15,7 +15,7 @@ public class NetworkShape implements IElementShape {
 	public NetworkShape(double size) {
 		this.size = size;
 		networkShape = new GeneralPath();
-		int stepSize = (int) (size / 3.0);
+		int stepSize = Math.max(1, (int) (size / 3.0));
 		
 		double x = -size / 2.0;
 		double y = -size / 2.0;
@@ -35,6 +35,11 @@ public class NetworkShape implements IElementShape {
 		networkShape.append(new Line2D.Double(x, y, x, y + size), false);// links
 		networkShape.append(new Line2D.Double(x, y + size, x + size, y + size), false);// unten
 		networkShape.append(new Line2D.Double(x + size, y, x + size, y + size), false);// rechts
+	}
+	
+	@Override
+	public double getSize() {
+		return size;
 	}
 	
 	@Override
