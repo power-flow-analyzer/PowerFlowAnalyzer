@@ -6,19 +6,19 @@ public class Mercator implements ICoordinateConverter {
 	public final static double earth_radius = 6371000;
 	
 	public int getX(double E) {
-		return (int) Math.round( E * earth_radius * Math.PI / 180 );
+		return (int) Math.round( E * earth_radius * Math.PI / 180.0 );
 	}
 
 	public int getY(double N) {
-		return (int) Math.round( Math.log(Math.tan(N * Math.PI / 360 + Math.PI / 4)) * earth_radius );
+		return (int) Math.round( Math.log(Math.tan(N * Math.PI / 360.0 + Math.PI / 4.0)) * earth_radius );
 	}
 	
-	public double getLatitude(int x) {
-		return x * 180 / (earth_radius * Math.PI);
+	public double getLongitude(int x) {
+		return x * 180.0 / (earth_radius * Math.PI);
 	}
 	
-	public double getLongitude(int y) {
-		return 2 * (Math.atan(Math.exp(y / earth_radius)) - Math.PI / 4) / Math.PI * 180;
+	public double getLatitude(int y) {
+		return 2 * (Math.atan(Math.exp(y / earth_radius)) - Math.PI / 4.0) / Math.PI * 180.0;
 	}
 
 	public static void main(String[] args) {
