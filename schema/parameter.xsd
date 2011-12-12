@@ -57,6 +57,7 @@
         <attribute name="min" type="double"/>
         <attribute name="max" type="double"/>
         <attribute name="increment" type="double" default="1"/>
+        <attribute name="unit" type="string"/>
         <attribute name="precision" type="double"/>
         <attribute name="decimalFormatPattern" type="string" default="#.########"/>
         <attribute name="parameterID" type="string"/>
