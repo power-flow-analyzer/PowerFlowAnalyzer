@@ -29,6 +29,19 @@ public class NetworkFlag {
 		getData().setLabel(label);
 	}
 	
+	public void setValue(double value, String valueParameterID) {
+		getData().setValue(value);
+		getData().setValueParameter(valueParameterID);
+	}
+	
+	public Double getValue() {
+		return getData().getValue();
+	}
+	
+	public String getValueParameter() {
+		return getData().getValueParameter();
+	}
+	
 	public void addParameter(String id) {
 		getData().getParameter().add(id);
 	}
