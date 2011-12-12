@@ -22,6 +22,7 @@ import javax.swing.table.TableCellRenderer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.IDerivedElement;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.ParameterException;
@@ -135,7 +136,8 @@ public class DataTable extends JTable implements INetworkDataViewer {
 		AbstractNetworkElement element = getTableModel().getElement(rowIndex);
 		String parameterID = getTableModel().getParameterID(columnIndex);
 		String value = ModelDBUtils.getParameterValue(element, parameterID, roundedValues, 
-				decimalSeparator, exportListValues, removePercentageSymbol, convertBooleanValues);
+				decimalSeparator, exportListValues, removePercentageSymbol, convertBooleanValues,
+				IDisplayConstants.PARAMETER_DISPLAY_VALUE);
 		if(value != null)
 			return value;
 		else
