@@ -538,7 +538,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 //						dispose();
 				}
 			});
-			dialog.showDialog(900, 500);
+			dialog.showDialog(1000, 600);
 		} catch (Exception e) {
 			System.err.println("Cannot read file: " + INPUT_FILE);
 			e.printStackTrace();
