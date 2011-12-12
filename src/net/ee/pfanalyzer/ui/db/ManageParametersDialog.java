@@ -130,11 +130,11 @@ public class ManageParametersDialog extends BaseDialog {
 		
 		splitter.setLeftComponent(treeParent);
 		splitter.setRightComponent(propPanelResizer);
-		splitter.setDividerLocation(200);
+		splitter.setDividerLocation(300);
 		setCenterComponent(splitter, false);
 		showElementProperties(null);
 		updateButtons(null);
-		showDialog(700, 500);
+		showDialog(800, 600);
 	}
 	
 	private void updateButtons(NetworkParameter property) {
@@ -242,6 +242,8 @@ public class ManageParametersDialog extends BaseDialog {
 			if(NetworkParameterValueRestriction.NONE.equals(property.getRestriction())) {
 				if(NetworkParameterType.INTEGER.equals(property.getType())) {
 					valuePanel.setLayout(new GridLayout(0, 2));
+					valuePanel.add(new JLabel("Unit: "));
+					valuePanel.add(new UnitField());
 					valuePanel.add(new JLabel("Minimum value: "));
 					valuePanel.add(new IntegerMinField());
 					valuePanel.add(new JLabel("Maximum value: "));
@@ -250,6 +252,8 @@ public class ManageParametersDialog extends BaseDialog {
 					valuePanel.add(new IntegerIncrementField());
 				} else if(NetworkParameterType.DOUBLE.equals(property.getType())) {
 					valuePanel.setLayout(new GridLayout(0, 2));
+					valuePanel.add(new JLabel("Unit: "));
+					valuePanel.add(new UnitField());
 					valuePanel.add(new JLabel("Minimum value: "));
 					valuePanel.add(new DoubleMinField());
 					valuePanel.add(new JLabel("Maximum value: "));
@@ -875,6 +879,18 @@ public class ManageParametersDialog extends BaseDialog {
 			@Override
 			protected void setValue(String value) {
 				displayOptions.setDecimalFormatPattern(value);
+			}
+		}
+		
+		class UnitField extends StringField {
+			@Override
+			protected String getValue() {
+				return displayOptions.getUnit();
+			}
+
+			@Override
+			protected void setValue(String value) {
+				displayOptions.setUnit(value);
 			}
 		}
 		
