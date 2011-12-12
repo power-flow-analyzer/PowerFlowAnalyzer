@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.parameter;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 
@@ -30,7 +31,7 @@ public class ParameterTextLabel extends ParameterValuePanel {
 		String text;
 		if(propertyDefinition != null && getMasterElement().getParameterSupport() != null)
 			text = ModelDBUtils.getParameterDisplayValue(
-					getMasterElement().getParameterSupport(), propertyDefinition);
+					getMasterElement().getParameterSupport(), propertyDefinition, IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 		else
 			text = value;
 		if(text == null || text.isEmpty())
