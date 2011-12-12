@@ -10,6 +10,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 
@@ -46,7 +47,8 @@ public class ParameterRestrictionValueBox extends ParameterValuePanel implements
 					values.add(getNormalizedParameterValue(parameter.getValue()));
 				else
 					values.add(null);
-				String label = element.getParameterDisplayValue(parameterID) 
+				String label = element.getParameterDisplayValue(parameterID, 
+						IDisplayConstants.PARAMETER_DISPLAY_DEFAULT) 
 						+ " (" + element.getDisplayName(AbstractNetworkElement.DISPLAY_DEFAULT) + ")";
 				labels.add(label);
 			}
