@@ -25,6 +25,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.util.Group;
 
 public class ParameterContainer extends JPanel {
@@ -96,7 +97,7 @@ public class ParameterContainer extends JPanel {
 	protected void addParameter(NetworkParameter propertyDefinition, NetworkParameter propertyValue, Group panel) {
 		if(isParameterAdded(propertyDefinition))
 			return;
-		panel.add(createLabel(propertyDefinition));
+		panel.add(createLabel(propertyDefinition, propertyValue));
 		boolean editParameter = NetworkParameterPurposeRestriction.PARAMETER.equals(
 						propertyDefinition.getPurpose())
 				|| NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
@@ -155,10 +156,10 @@ public class ParameterContainer extends JPanel {
 		return properties.size();
 	}
 	
-	protected JLabel createLabel(NetworkParameter parameter) {
-		JLabel label = new JLabel(getLabel(parameter) + ": ");
-		if(parameter.getDescription() != null && parameter.getDescription().length() > 0)
-			label.setToolTipText(parameter.getDescription());
+	protected JLabel createLabel(NetworkParameter propertyDefinition, NetworkParameter propertyValue) {
+		JLabel label = new JLabel(getLabel(propertyDefinition) + ": ");
+		label.setToolTipText(ModelDBUtils.getParameterDescription(
+				propertyDefinition, propertyValue, true));
 		return label;
 	}
 	
