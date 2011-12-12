@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -38,8 +39,8 @@ public class Group extends JPanel {
 		add(new HyperLinkLabel(label, element, foreground));
 	}
 	
-	public void addElementLink(AbstractNetworkElement childData, int displayFlags) {
-		add(createElementLink(childData, displayFlags));
+	public JComponent addElementLink(AbstractNetworkElement childData, int displayFlags) {
+		return (JComponent) add(createElementLink(childData, displayFlags));
 	}
 	
 	public HyperLinkLabel createElementLink(AbstractNetworkElement childData, int displayFlags) {
