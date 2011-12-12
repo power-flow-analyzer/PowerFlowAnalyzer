@@ -13,8 +13,8 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterPurposeRestriction;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueDisplay;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterUtils;
-import net.ee.pfanalyzer.ui.util.HTMLUtil;
 
 public abstract class ParameterValuePanel extends JPanel {
 	
@@ -121,20 +121,8 @@ public abstract class ParameterValuePanel extends JPanel {
 			setValue(value);
 		}
 		// set the tooltip text for the value panel
-		String tooltipText = "<html>";
-		if(showFullParameterInfo) {
-			tooltipText += "Parameter ID: " + propertyDefinition.getID();
-			tooltipText += "<br>Raw value: " + (value == null ? "&lt;empty&gt;" : value);
-		}
-		if(propertyDefinition.getDescription() != null && propertyDefinition.getDescription().length() > 0) {
-			if(showFullParameterInfo)
-				tooltipText += "<br><br>";
-			tooltipText += HTMLUtil.removeHTMLTags(propertyDefinition.getDescription());
-		}
-		if(tooltipText.length() > 6)
-			getValuePanel().setToolTipText(tooltipText);
-		else
-			getValuePanel().setToolTipText(null);
+		String tooltipText = ModelDBUtils.getParameterDescription(propertyDefinition, value, showFullParameterInfo);
+		getValuePanel().setToolTipText(tooltipText);
 	}
 	
 	protected String getNormalizedParameterValue(String value) {
