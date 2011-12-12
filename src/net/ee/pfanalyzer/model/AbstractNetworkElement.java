@@ -10,13 +10,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterSupport;
 
-public abstract class AbstractNetworkElement extends ParameterSupport {
-	
-	public final static int DISPLAY_NAME = 2;
-	public final static int DISPLAY_ADDITIONAL_INFO = 4;
-	public final static int DISPLAY_ELEMENT_COUNT = 8;
-
-	public final static int DISPLAY_DEFAULT = DISPLAY_NAME | DISPLAY_ADDITIONAL_INFO | DISPLAY_ELEMENT_COUNT;
+public abstract class AbstractNetworkElement extends ParameterSupport implements IDisplayConstants {
 	
 	private Network network;
 	private int indexInParent;
@@ -85,10 +79,10 @@ public abstract class AbstractNetworkElement extends ParameterSupport {
 //		return null;
 //	}
 	
-	public String getParameterDisplayValue(String parameterID) {
+	public String getParameterDisplayValue(String parameterID, int displayFlags) {
 		NetworkParameter param = getParameterDefinition(parameterID);
 		if(param != null) {
-			return ModelDBUtils.getParameterDisplayValue(this, param);
+			return ModelDBUtils.getParameterDisplayValue(this, param, displayFlags);
 		}
 		return getTextParameter(parameterID);
 	}
