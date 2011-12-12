@@ -7,8 +7,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.model.util.ModelDBUtils;
 
 public class DataTableModel extends AbstractTableModel {
 
@@ -41,20 +43,8 @@ public class DataTableModel extends AbstractTableModel {
 				if(parameters.contains(parameter.getID()) == false) {
 					parameters.add(parameter.getID());
 					columnNames.add(parameter.getID());
-					NetworkParameter param = element.getParameterDefinition(parameter.getID());
-					String description = "<html>";
-					if(param != null) {
-						if(param.getLabel() != null)
-							description += param.getLabel() + "<br>";
-						else
-							description += "&lt;no label defined&gt;" + "<br>";
-						if(param.getDescription() != null)
-							description += param.getDescription();
-						else
-							description += "&lt;no description defined&gt;";
-					} else {
-						description += "Undefined Parameter: " + parameter.getID();
-					}
+					String description = ModelDBUtils.getParameterDescription(
+							element, parameter.getID(), null, true);
 					columnDescriptions.add(description);
 				}
 			}
@@ -97,7 +87,8 @@ public class DataTableModel extends AbstractTableModel {
 			return element.getDisplayName(AbstractNetworkElement.DISPLAY_NAME);
 		} else {
 			String parameterID = parameters.get(columnIndex);
-			return element.getParameterDisplayValue(parameterID);
+			return element.getParameterDisplayValue(parameterID, 
+					IDisplayConstants.PARAMETER_DISPLAY_VALUE);
 		}
 	}
 	
