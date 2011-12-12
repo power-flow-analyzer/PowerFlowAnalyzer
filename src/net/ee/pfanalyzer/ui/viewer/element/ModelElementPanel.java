@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
@@ -84,7 +85,8 @@ public class ModelElementPanel extends ParameterContainer {
 		Group propGroup = new Group("Unknown Parameters");
 		for (NetworkParameter parameter : element.getParameterList()) {
 			NetworkParameter paramDef = element.getParameterDefinition(parameter.getID());
-			String value = element.getParameterDisplayValue(parameter.getID());
+			String value = element.getParameterDisplayValue(parameter.getID(), 
+					IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 			if(paramDef != null) {
 				addParameter(paramDef, parameter, propGroup);
 			} else {
@@ -118,15 +120,16 @@ public class ModelElementPanel extends ParameterContainer {
 				if(busNumber != -1)
 					bus = element.getNetwork().getBus(busNumber);// TODO verallgemeinern
 				if(bus != null && bus != element) {
-					panel.add(new JLabel(getLabel(paramDef) + ": "));
-					panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT);
+					panel.add(createLabel(paramDef, propertyValue));
+					panel.addElementLink(bus, AbstractNetworkElement.DISPLAY_DEFAULT).setToolTipText(
+							ModelDBUtils.getParameterDescription(paramDef, propertyValue, true));
 					parameterAdded(paramDef);
 					return;
 				}
 			}
 		}
 		// hide empty values
-		String displayValue = ModelDBUtils.getParameterDisplayValue(element, paramDef);
+		String displayValue = ModelDBUtils.getParameterDisplayValue(element, paramDef, IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 		if(isEditable() || element == null || displayValue != null && displayValue.length() > 0)
 			super.addParameter(paramDef, propertyValue, panel);
 	}
@@ -147,8 +150,20 @@ public class ModelElementPanel extends ParameterContainer {
 				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
 						flag.isFailure(), flag.isWarning());
 				JPanel resizer = new JPanel(new BorderLayout());
-				resizer.add(progressBar, BorderLayout.CENTER);
-//				resizer.add(new JLabel(" " + (int) Math.floor(percentage) + "% "), BorderLayout.EAST);
+				resizer.add(progressBar, BorderLayout.EAST);
+				String value = null;
+				if(flag.getValueParameter() != null) {
+					if(flag.getValue() == null)
+						value = ModelDBUtils.getParameterDisplayValue(childData, flag.getValueParameter(), 
+								IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
+					else
+						value = ModelDBUtils.getParameterDisplayValue(flag.getValue().toString(), 
+								childData.getParameterDefinition(flag.getValueParameter()), 
+								IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
+				} else if(flag.getValue() != null)
+					value = flag.getValue().toString();
+				if(value != null)
+					resizer.add(new JLabel(value + " "), BorderLayout.WEST);
 				flagGroup.add(resizer);
 			} else
 				flagGroup.add(new JLabel("unknown (" + percentage + "%)"));
