@@ -11,18 +11,23 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputAdapter;
 
+import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.math.coordinate.Mercator;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.Branch;
 import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.model.MarkerElement;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
+import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
@@ -32,6 +37,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	
 	private final static Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
 	private final static Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
+	private final static Cursor MOVE_CURSOR = new Cursor(Cursor.MOVE_CURSOR);
 	
 	protected int horizontal_margin = 20;
 	protected int vertical_margin = 20;
@@ -44,7 +50,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	private DataViewerConfiguration viewerConfiguration;
 	private Network data;
 	
-	private Mercator converter;
+	protected Mercator converter;
 	protected Map<Integer, int[]> internalBusCoords = new HashMap<Integer, int[]>();
 	protected Map<Integer, int[]> internalMarkerCoords = new HashMap<Integer, int[]>();
 	protected int internalMinX = 0;
@@ -71,6 +77,8 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	protected double horizontalScale, verticalScale;
 	private int dragFactor = 300;
 	protected Object selection, hover;
+	protected boolean editingMode = false;
+	protected DraggingObject draggingObject;
 	
 	protected abstract AbstractNetworkElement getObjectFromScreen(int x, int y);
 	
@@ -207,6 +215,16 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		int diffX = x1 - x2;
 		double longitudeDiff = maxLongitude - minLongitude;
 		return diffX * longitudeDiff / dragFactor;
+	}
+	
+	protected double getLatitude(double y) {
+		double coord = (getHeight() - y - vertical_margin) / verticalScale + internalMinY;
+		return converter.getLatitude((int) coord);
+	}
+	
+	protected double getLongitude(double x) {
+		double coord = (x - horizontal_margin) / horizontalScale + internalMinX;
+		return converter.getLongitude((int) coord);
 	}
 	
 	protected int[] getBusXY(int i) {
@@ -369,9 +387,12 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		public void mouseMoved(MouseEvent e) {
 			try {
 				AbstractNetworkElement obj = getObjectFromScreen(e.getX(), e.getY());
-				if(obj != null)
-					setCursor(HAND_CURSOR);
-				else
+				if(obj != null) {
+					if(editingMode && ! (obj instanceof Branch))
+						setCursor(MOVE_CURSOR);
+					else
+						setCursor(HAND_CURSOR);
+				} else
 					setCursor(DEFAULT_CURSOR);
 				if(hover != obj) {
 					hover = obj;
@@ -390,19 +411,33 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
-			if(allowDragging == false)
-				return;
 			try {
-				changeZoom();
-				if(lastX > -1 && lastY > -1) {
-					double diffLat = getLatitudeDifference(lastY, e.getY());
-					minLatitude -= diffLat;
-					maxLatitude -= diffLat;
-					double diffLong = getLongitudeDifference(lastX, e.getX());
-					minLongitude += diffLong;
-					maxLongitude += diffLong;
-					initializeInternalCoordinates();
+				if(editingMode) {
+					double longitude = getLongitude(e.getX());
+					double latitude = getLatitude(e.getY());
+					if(draggingObject == null) {
+						AbstractNetworkElement element = getObjectFromScreen(e.getX(), e.getY());
+						if(element != null && ! (element instanceof Branch))
+						draggingObject = new DraggingObject(element, longitude, latitude);
+					} else {
+						draggingObject.longitude = longitude;
+						draggingObject.latitude = latitude;
+					}
 					repaint();
+				} else {
+					if(allowDragging == false)
+						return;
+					changeZoom();
+					if(lastX > -1 && lastY > -1) {
+						double diffLat = getLatitudeDifference(lastY, e.getY());
+						minLatitude -= diffLat;
+						maxLatitude -= diffLat;
+						double diffLong = getLongitudeDifference(lastX, e.getX());
+						minLongitude += diffLong;
+						maxLongitude += diffLong;
+						initializeInternalCoordinates();
+						repaint();
+					}
 				}
 				lastX = e.getX();
 				lastY = e.getY();
@@ -438,6 +473,75 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 				}
 			} catch(Exception except) {
 				except.printStackTrace();
+			}
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if(draggingObject != null) {
+				if(draggingObject.draggingElement != null) {
+					// check if the target coordinates belong to another element
+					AbstractNetworkElement targetObject = getObjectFromScreen(e.getX(), e.getY());
+					if(targetObject instanceof Branch)
+						targetObject = null;
+					if(targetObject != null) {
+						int action = JOptionPane.showConfirmDialog(PowerFlowAnalyzer.getInstance(), 
+								"Do you want to combine the elements?", "Combine?", JOptionPane.YES_NO_CANCEL_OPTION);
+						if(action == JOptionPane.YES_OPTION) {
+							if(targetObject instanceof Bus) {
+								draggingObject.longitude = ((Bus) targetObject).getLongitude();
+								draggingObject.latitude  = ((Bus) targetObject).getLatitude();
+							} else if(targetObject instanceof MarkerElement) {
+								draggingObject.longitude = ((MarkerElement) targetObject).getLongitude();
+								draggingObject.latitude  = ((MarkerElement) targetObject).getLatitude();
+							}
+						} else if(action == JOptionPane.CANCEL_OPTION) {
+							draggingObject = null;
+							repaint();
+							return;
+						}
+					}
+					// find a combined bus for the dragged element
+					Object obj = getNetwork().getCombinedBus(draggingObject.draggingElement);
+					// take the element itself instead
+					if(obj == null)
+						obj = draggingObject.draggingElement;
+					// gather all elements belonging to this element
+					Vector<AbstractNetworkElement> elements2move = new Vector<AbstractNetworkElement>();
+					if(obj instanceof AbstractNetworkElement) {
+						elements2move.add((AbstractNetworkElement) obj);
+					} else if(obj instanceof CombinedNetworkElement<?>) {
+						for (AbstractNetworkElement element : ((CombinedNetworkElement<?>) obj).getNetworkElements()) {
+							elements2move.add(element);
+						}
+					}
+					// show a dialog for selecting the elements to be moved
+					if(elements2move.size() > 1) {
+						ElementSelectionDialog dialog = new ElementSelectionDialog(
+								PowerFlowAnalyzer.getInstance(), elements2move, 
+								"Move Network Elements", "Select the network elements you want to move");
+						if(dialog.isCancelPressed() || dialog.getSelectedElements().isEmpty()) {
+							draggingObject = null;
+							repaint();
+							return;
+						}
+						elements2move = new Vector<AbstractNetworkElement>(dialog.getSelectedElements());
+					}
+					// move all elements
+					for (AbstractNetworkElement element : elements2move) {
+						if(element instanceof Bus) {
+							((Bus) element).setLongitude(draggingObject.longitude);
+							((Bus) element).setLatitude(draggingObject.latitude);
+						} else if(element instanceof MarkerElement) {
+							((MarkerElement) element).setLongitude(draggingObject.longitude);
+							((MarkerElement) element).setLatitude(draggingObject.latitude);
+						}
+					}
+					// propagate the changes
+					getNetwork().fireNetworkChanged(true);
+				}
+				draggingObject = null;
+				repaint();
 			}
 		}
 	}
@@ -481,5 +585,18 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 				except.printStackTrace();
 			}
 		}
+	}
+	
+	class DraggingObject {
+		
+		AbstractNetworkElement draggingElement;
+		double longitude, latitude;
+		
+		public DraggingObject(AbstractNetworkElement draggingElement, double longitude, double latitude) {
+			this.draggingElement = draggingElement;
+			this.longitude = longitude;
+			this.latitude = latitude;
+		}
+		
 	}
 }

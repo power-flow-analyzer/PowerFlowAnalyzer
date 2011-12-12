@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
@@ -133,6 +134,14 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateBackground();
+			}
+		});
+		container.addAction("Toggle editing mode - allows to move elements", 
+				"pencil.png", "Toggle editing mode", true, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AbstractButton editButton = (AbstractButton) e.getSource();
+				editingMode = editButton.isSelected();
 			}
 		});
 		container.addAction("Export as an image", "camera.png", "Export", false, new ActionListener() {
@@ -547,6 +556,15 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 //						}
 //					}
 			}
+		}
+		if(draggingObject != null) {
+			int[] coords = new int[] {
+					converter.getX(draggingObject.longitude),
+					converter.getY(draggingObject.latitude)
+			};
+			double x = getX(coords);
+			double y = getY(coords);
+			drawShape(draggingObject.draggingElement, g2d, x, y, Double.NaN, Double.NaN, true, "Drag", null);
 		}
 	}
 	
