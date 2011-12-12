@@ -10,6 +10,7 @@ import net.ee.pfanalyzer.model.CombinedBranch;
 import net.ee.pfanalyzer.model.CombinedBus;
 import net.ee.pfanalyzer.model.ElementList;
 import net.ee.pfanalyzer.model.Generator;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.NetworkElement;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.viewer.element.ElementAttributes;
@@ -235,7 +236,8 @@ public class ElementGroupingUtils {
 					CombinedBus cbus = new CombinedBus(bus, bus.getLongitude(), bus.getLatitude()) {
 						@Override
 						public String getLabel() {
-							String displayValue = bus.getParameterDisplayValue(paramName);
+							String displayValue = bus.getParameterDisplayValue(paramName, 
+									IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 							if(isNumber(displayValue))
 								return labelPrefix + displayValue + labelSuffix;
 							else
@@ -276,7 +278,8 @@ public class ElementGroupingUtils {
 						public String getLabel() {
 							Bus parentBus = getParentBus(element);
 							if(parentBus != null) {
-								String displayValue = parentBus.getParameterDisplayValue(paramName);
+								String displayValue = parentBus.getParameterDisplayValue(paramName, 
+										IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 								if(isNumber(displayValue))
 									return labelPrefix + displayValue + labelSuffix;
 								else
@@ -357,14 +360,16 @@ public class ElementGroupingUtils {
 						@Override
 						public String getLabel() {
 							String label = "";
-							String fromDisplayValue = fromBus.getParameterDisplayValue(paramName);
+							String fromDisplayValue = fromBus.getParameterDisplayValue(paramName, 
+									IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 							if(isNumber(fromDisplayValue))
 								label += labelPrefix + fromDisplayValue + labelSuffix;
 							else
 								label += fromDisplayValue;
 							if(sameValuesAtFromAndTo == false) {
 								label += " - ";
-								String toDisplayValue = toBus.getParameterDisplayValue(paramName);
+								String toDisplayValue = toBus.getParameterDisplayValue(paramName, 
+										IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 								if(isNumber(toDisplayValue))
 									label += labelPrefix + toDisplayValue + labelSuffix;
 								else
