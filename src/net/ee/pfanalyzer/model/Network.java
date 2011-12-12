@@ -313,10 +313,15 @@ public class Network extends ParameterSupport {
 	}
 	
 	public void fireNetworkChanged() {
+		fireNetworkChanged(false);
+	}
+	
+	public void fireNetworkChanged(boolean updateCombinedElements) {
 //		System.out.println("fireNetworkChanged");
 		setDirty(true);
 //		updateNetworkData();
-//		findCombinedElements();
+		if(updateCombinedElements)
+			findCombinedElements();
 		NetworkChangeEvent event = new NetworkChangeEvent(this);
 		for (INetworkChangeListener listener : listeners) {
 			listener.networkChanged(event);
