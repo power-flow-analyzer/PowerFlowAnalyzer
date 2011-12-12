@@ -2,8 +2,11 @@ package net.ee.pfanalyzer.model.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
+import net.ee.pfanalyzer.model.IDisplayConstants;
 import net.ee.pfanalyzer.model.ModelDB;
 import net.ee.pfanalyzer.model.ParameterException;
 import net.ee.pfanalyzer.model.data.AbstractModelElementData;
@@ -13,6 +16,7 @@ import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.data.NetworkParameterType;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueOption;
 import net.ee.pfanalyzer.model.data.NetworkParameterValueRestriction;
+import net.ee.pfanalyzer.ui.util.HTMLUtil;
 import net.ee.pfanalyzer.ui.util.SwingUtils;
 
 public class ModelDBUtils {
@@ -135,28 +139,37 @@ public class ModelDBUtils {
 		return null;
 	}
 	
-	public static String getParameterDisplayValue(AbstractNetworkElement element, String parameterID) {
-		return getParameterValue(element, parameterID, true, null, "label", false, false);
+	public static String getParameterDisplayValue(AbstractNetworkElement element, String parameterID, int displayFlags) {
+		return getParameterValue(element, parameterID, true, null, "label", false, false, displayFlags);
 	}
 	
 	public static String getParameterValue(AbstractNetworkElement element, String parameterID,
 			boolean roundedValues, String decimalSeparator, String exportListValues, 
-			boolean removePercentageSymbol, boolean convertBooleanValues) {
+			boolean removePercentageSymbol, boolean convertBooleanValues, int displayFlags) {
 		NetworkParameter param = element.getParameterDefinition(parameterID);
 		if(param != null) {
 			return getParameterValue(element, param, roundedValues, decimalSeparator, exportListValues, 
-					removePercentageSymbol, convertBooleanValues);
+					removePercentageSymbol, convertBooleanValues, displayFlags);
 		}
 		return element.getTextParameter(parameterID);
 	}
 	
-	public static String getParameterDisplayValue(ParameterSupport support, NetworkParameter paramDef) {
-		return getParameterValue(support, paramDef, true, null, "label", false, false);
+	public static String getParameterDisplayValue(ParameterSupport support, NetworkParameter paramDef, 
+			int displayFlags) {
+		return getParameterValue(support, paramDef, true, null, "label", false, false, displayFlags);
+	}
+	
+	public static String getParameterDisplayValue(final String value, final NetworkParameter paramDef, 
+			int displayFlags) {
+		if(paramDef == null)
+			return value;
+		ParameterSupport support = new SingleParameterSupport(value, paramDef);
+		return getParameterDisplayValue(support, paramDef, displayFlags);
 	}
 	
 	public static String getParameterValue(ParameterSupport support, NetworkParameter paramDef, 
 			boolean roundedValues, String decimalSeparator, String exportListValues, 
-			boolean removePercentageSymbol, boolean convertBooleanValues) {
+			boolean removePercentageSymbol, boolean convertBooleanValues, int displayFlags) {
 		if(support == null)
 			return "";
 		String parameterID = paramDef.getID();
@@ -180,15 +193,17 @@ public class ModelDBUtils {
 			}
 		}
 		if(type != null) {
+			boolean showUnit = (displayFlags & IDisplayConstants.PARAMETER_DISPLAY_UNIT) != 0;
+			String unit = getUnit(paramDef, showUnit);
 			if(type.equals(NetworkParameterType.INTEGER)) {
 				Integer result = support.getIntParameter(parameterID);
-				if(result != null)
-					return result.toString();
-				else
+				if(result != null) {
+					return result.toString() + unit;
+				} else
 					return "";
 			} else if(type.equals(NetworkParameterType.DOUBLE)) {
 				Double dvalue = support.getDoubleParameter(parameterID);
-				// round and replace decimal separator
+				// round value and replace decimal separator
 				if(dvalue != null && roundedValues && paramDef.getDisplay() != null) {
 					String pattern = paramDef.getDisplay().getDecimalFormatPattern();
 					if(removePercentageSymbol)
@@ -197,15 +212,16 @@ public class ModelDBUtils {
 					if(decimalSeparator != null)
 						symbols.setDecimalSeparator(decimalSeparator.trim().charAt(0));
 					DecimalFormat format = new DecimalFormat(pattern, symbols);
-					return format.format(dvalue);
+					return format.format(dvalue) + unit;
 				}
-				// replace decimal separator in exact values
+				// replace decimal separator in exact value
 				if(dvalue != null) {
 					String value = dvalue.toString();
 					if(decimalSeparator == null || decimalSeparator.length() == 0)
 						value = value.replace('.', SwingUtils.DEFAULT_DECIMAL_SEPARATOR_CHAR);
 					else if(decimalSeparator.trim().charAt(0) != '.')
 						value = value.replace('.', decimalSeparator.trim().charAt(0));
+					value += unit;
 					return value;
 				} else
 					return "";
@@ -220,6 +236,58 @@ public class ModelDBUtils {
 			}
 		}
 		return support.getTextParameter(parameterID);
+	}
+	
+	private static String getUnit(NetworkParameter paramDef, boolean showUnit) {
+		if(paramDef.getDisplay() == null)
+			return "";
+		if(showUnit && paramDef.getDisplay().getUnit() != null)
+			return " " + paramDef.getDisplay().getUnit();
+		else
+			return "";
+	}
+	
+	public static String getParameterDescription(AbstractNetworkElement element, String parameterID, String value, boolean showFullParameterInfo) {
+		NetworkParameter propertyDefinition = element.getParameterDefinition(parameterID);
+		if(propertyDefinition == null)
+			return "Undefined Parameter: " + parameterID;
+		else
+			return getParameterDescription(propertyDefinition, value, showFullParameterInfo);
+	}
+	
+	public static String getParameterDescription(NetworkParameter propertyDefinition, 
+			NetworkParameter parameterValue, boolean showFullParameterInfo) {
+		String value = null;
+		if(parameterValue == null)
+			value = "";
+		else if(parameterValue.getValue() != null)
+			value = parameterValue.getValue();
+		if(value != null)
+			value = ParameterUtils.getNormalizedParameterValue(propertyDefinition, value);
+		return getParameterDescription(propertyDefinition, value, showFullParameterInfo);
+	}
+	
+	public static String getParameterDescription(NetworkParameter propertyDefinition, String value, boolean showFullParameterInfo) {
+		String tooltipText = "<html>";
+		if(showFullParameterInfo && propertyDefinition.getLabel() != null 
+				&& propertyDefinition.getLabel().length() > 0)
+			tooltipText += "<b>" + propertyDefinition.getLabel() + "</b><br>";
+		if(propertyDefinition.getDescription() != null && propertyDefinition.getDescription().length() > 0)
+			tooltipText += HTMLUtil.removeHTMLTags(propertyDefinition.getDescription()) + "<br>";
+		if(showFullParameterInfo) {
+			if(tooltipText.length() > 6)
+				tooltipText += "<br>";
+			if(value != null)
+				tooltipText += "Value: " + value + "<br><br>";
+			tooltipText += "Parameter ID: " + propertyDefinition.getID();
+			if(propertyDefinition.getDisplay() != null)
+				tooltipText += "<br>Unit: " + (propertyDefinition.getDisplay().getUnit() == null ? 
+						"&lt;none&gt;" : propertyDefinition.getDisplay().getUnit());
+		}
+		if(tooltipText.length() > 6)
+			return tooltipText;
+		else
+			return null;
 	}
 	
 	public static String setParameterValue(AbstractNetworkElement element, String parameterID, String value, 
@@ -328,5 +396,22 @@ public class ModelDBUtils {
 				return p;
 		}
 		return null;
+	}
+	
+	static class SingleParameterSupport extends ParameterSupport {
+		
+		List<NetworkParameter> list;
+		
+		SingleParameterSupport(String value, NetworkParameter paramDef) {
+			list = new ArrayList<NetworkParameter>(1);
+			NetworkParameter paramValue = new NetworkParameter();
+			paramValue.setID(paramDef.getID());
+			paramValue.setValue(value);
+			list.add(paramValue);
+		}
+		@Override
+		public List<NetworkParameter> getParameterList() {
+			return list;
+		}
 	}
 }
