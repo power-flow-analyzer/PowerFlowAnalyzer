@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.ui.util;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
@@ -9,14 +10,19 @@ import javax.swing.JComponent;
 import net.ee.pfanalyzer.preferences.Preferences;
 
 public class ProgressBar extends JComponent {
-	final int BAR_HEIGHT = 20;
+	static final int BAR_HEIGHT = 16;
 	double value;
 	boolean isError, isWarning;
+	static Dimension DIMENSION = new Dimension(150, BAR_HEIGHT);
 	
 	public ProgressBar(double value, boolean isError, boolean isWarning) {
 		this.value = value;
 		this.isError = isError;
 		this.isWarning = isWarning;
+	}
+	
+	public Dimension getPreferredSize() {
+		return DIMENSION;
 	}
 	
 	protected void paintComponent(Graphics g) {
