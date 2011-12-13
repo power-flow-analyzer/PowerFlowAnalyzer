@@ -6,7 +6,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -18,6 +17,7 @@ import net.ee.pfanalyzer.model.data.AbstractModelElementData;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterModel;
+import net.ee.pfanalyzer.ui.util.Group;
 
 public class ParameterPanel extends ParameterContainer {
 	
@@ -36,15 +36,15 @@ public class ParameterPanel extends ParameterContainer {
 		if(master.getParent() == null)
 			setShowNetworkParameters(true);
 		referenceLabel = new JLabel(ModelDBUtils.getFullElementID(master));
-		JPanel commonPanel = addElementGroup("Common Parameters");
-		commonPanel.add(new JLabel("Label: "));
-		commonPanel.add(new ParameterLabelBox());
-		commonPanel.add(new JLabel("Description: "));
-		commonPanel.add(new JScrollPane(new ParameterDescriptionBox()));
-		commonPanel.add(new JLabel("Element ID: "));
-		commonPanel.add(new ParameterIDBox());
-		commonPanel.add(new JLabel("Reference: "));
-		commonPanel.add(referenceLabel);
+		Group commonPanel = addElementGroup("Common Parameters");
+		commonPanel.addLabel(new JLabel("Label: "));
+		commonPanel.addValue(new ParameterLabelBox());
+		commonPanel.addLabel(new JLabel("Description: "));
+		commonPanel.addValue(new JScrollPane(new ParameterDescriptionBox()));
+		commonPanel.addLabel(new JLabel("Element ID: "));
+		commonPanel.addValue(new ParameterIDBox());
+		commonPanel.addLabel(new JLabel("Reference: "));
+		commonPanel.addValue(referenceLabel);
 		addParameters(element, element, getElementContainer());
 	}
 	
