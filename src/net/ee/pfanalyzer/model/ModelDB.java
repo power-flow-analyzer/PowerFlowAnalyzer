@@ -23,13 +23,16 @@ public class ModelDB {
 	
 	public final static String ROOT_NETWORK_CLASS = "network";
 	public final static String ROOT_SCRIPT_CLASS = "script";
+	public final static String ROOT_FLAG_CLASS = "flag";
 	public final static String ROOT_CONFIGURATION_CLASS = "conf";
 	public final static String ROOT_OUTLINE_CLASS = "outline";
 	
 	private ModelDBData db;
 	
 	private Map<String, ModelData> models = new HashMap<String, ModelData>();
-	private ModelClassData networkClass, scriptClass, configurationClass, outlineClass;
+	private Map<String, ModelData> flags = new HashMap<String, ModelData>();
+	private Map<String, ModelData> configs = new HashMap<String, ModelData>();
+	private ModelClassData networkClass, scriptClass, flagClass, configurationClass, outlineClass;
 	
 	private List<IDatabaseChangeListener> listeners = new ArrayList<IDatabaseChangeListener>();
 	private boolean isDirty = false;
@@ -59,6 +62,8 @@ public class ModelDB {
 	public void refreshModels() {
 		// remove old items
 		models.clear();
+		flags.clear();
+		configs.clear();
 //		System.out.println("model db: refresh model index");
 		// add models recursively
 		for (ModelClassData clazz : getData().getModelClass()) {
@@ -66,15 +71,19 @@ public class ModelDB {
 				networkClass = clazz;
 			else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 				scriptClass = clazz;
+			else if(ROOT_FLAG_CLASS.equals(clazz.getID()))
+				flagClass = clazz;
 			else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
 				configurationClass = clazz;
 			else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
 				outlineClass = clazz;
 		}
 		if(networkClass != null)
-			addModelsRecursive(networkClass);
+			addModelsRecursive(networkClass, models);
 		if(configurationClass != null)
-			addModelsRecursive(configurationClass);
+			addModelsRecursive(configurationClass, configs);
+		if(flagClass != null)
+			addModelsRecursive(flagClass, flags);
 //		for (ModelClassData clazz : getData().getModelClass()) {
 //			addModelsRecursive(clazz);
 //		}
@@ -86,6 +95,8 @@ public class ModelDB {
 			replaceTopClass(networkClass, clazz);
 		else if(ROOT_SCRIPT_CLASS.equals(clazz.getID()))
 			replaceTopClass(scriptClass, clazz);
+		else if(ROOT_FLAG_CLASS.equals(clazz.getID()))
+			replaceTopClass(flagClass, clazz);
 		else if(ROOT_CONFIGURATION_CLASS.equals(clazz.getID()))
 			replaceTopClass(configurationClass, clazz);
 		else if(ROOT_OUTLINE_CLASS.equals(clazz.getID()))
@@ -106,16 +117,16 @@ public class ModelDB {
 		}
 	}
 	
-	private void addModelsRecursive(AbstractModelElementData element) {
+	private void addModelsRecursive(AbstractModelElementData element, Map<String, ModelData> map) {
 		if(element instanceof ModelData) {
 			ModelData model = (ModelData) element;
-			models.put(ModelDBUtils.getFullElementID(model), model);
+			map.put(ModelDBUtils.getFullElementID(model), model);
 //			System.out.println("   add " + ModelDBUtils.getParameterID(model));
 		} else if(element instanceof ModelClassData) {
 			for (ModelClassData clazz : ((ModelClassData) element).getModelClass())
-				addModelsRecursive(clazz);
+				addModelsRecursive(clazz, map);
 			for (ModelData childModel : ((ModelClassData) element).getModel())
-				addModelsRecursive(childModel);
+				addModelsRecursive(childModel, map);
 		}
 	}
 	
@@ -128,6 +139,23 @@ public class ModelDB {
 		for (String modelID : models.keySet()) {
 			if(modelID.startsWith(modelIDPrefix))
 				list.add(models.get(modelID));
+		}
+		return list;
+	}
+	
+	public ModelData getFlag(String modelID) {
+		return flags.get(modelID);
+	}
+	
+	public ModelData getConfiguration(String modelID) {
+		return configs.get(modelID);
+	}
+	
+	public List<ModelData> getConfigurations(String modelIDPrefix) {
+		List<ModelData> list = new ArrayList<ModelData>();
+		for (String modelID : configs.keySet()) {
+			if(modelID.startsWith(modelIDPrefix))
+				list.add(configs.get(modelID));
 		}
 		return list;
 	}
@@ -146,6 +174,10 @@ public class ModelDB {
 	
 	public ModelClassData getScriptClass() {
 		return scriptClass;
+	}
+	
+	public ModelClassData getFlagClass() {
+		return flagClass;
 	}
 	
 	public ModelClassData getOutlineClass() {
