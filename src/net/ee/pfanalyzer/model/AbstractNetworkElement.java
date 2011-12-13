@@ -33,15 +33,15 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 		
 		if(elementData.getModelID() == null)
 			setModelID(getDefaultModelID());
-		
-		updateElementData();
 	}
 
-	private void updateElementData() {
+	void updateFlags(ModelDB modelDB) {
+		hasFailures = null;
+		hasWarnings = null;
 		// update flags
 		getFlags().clear();
 		for (NetworkFlagData flagData : getElementData().getFlag()) {
-			NetworkFlag flag = new NetworkFlag(flagData);
+			NetworkFlag flag = new NetworkFlag(flagData, modelDB.getFlag(flagData.getID()));
 			getFlags().add(flag);
 		}
 	}
@@ -166,7 +166,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 		if(hasFailures == null) {
 			hasFailures = false;
 			for (NetworkFlag flag : getFlags()) {
-				if(flag.isFailure()) {
+				if(flag.isVisible() && flag.isFailure()) {
 					hasFailures = true;
 					break;
 				}
@@ -179,7 +179,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 		if(hasWarnings == null) {
 			hasWarnings = false;
 			for (NetworkFlag flag : getFlags()) {
-				if(flag.isWarning()) {
+				if(flag.isVisible() && flag.isWarning()) {
 					hasWarnings = true;
 					break;
 				}

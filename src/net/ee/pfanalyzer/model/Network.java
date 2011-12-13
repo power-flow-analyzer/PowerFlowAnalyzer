@@ -272,8 +272,16 @@ public class Network extends ParameterSupport {
 		setScriptParameterClass(getModelDB().getScriptClass());
 		// setting model references in network elements
 		for (AbstractNetworkElement element : getElements()) {
-			updateModel(element);
+			ModelData model = getModelDB().getModel(element.getModelID());
+			element.setModel(model);
+			element.updateFlags(getModelDB());
 		}
+		// clear cached flags
+		hasFailures = null;
+		for (CombinedBus cbus : combinedBusList)
+			cbus.updateFlags();
+		for (CombinedBranch cbranch : combinedBranchList)
+			cbranch.updateFlags();
 //		for (Network scenario : network.getScenarios()) {
 //			updateModels(scenario);
 //		}
