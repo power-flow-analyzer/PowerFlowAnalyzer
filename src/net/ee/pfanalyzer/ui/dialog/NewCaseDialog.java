@@ -1,7 +1,6 @@
 package net.ee.pfanalyzer.ui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,14 +10,13 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.SpringLayout;
 import javax.swing.filechooser.FileFilter;
 
-import layout.SpringUtilities;
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.util.FileSelectionPanel;
+import net.miginfocom.swing.MigLayout;
 
 public class NewCaseDialog extends BaseDialog implements IPreferenceConstants {
 	
@@ -52,15 +50,13 @@ public class NewCaseDialog extends BaseDialog implements IPreferenceConstants {
 		parameterFileInputPanel = new FileSelectionPanel(PROPERTY_PARAMETERS_FILES, PARAMETER_FILE_FILTER, false);
 		matpowerParametersButton = new JRadioButton("Matpower Compatible");
 		customParametersButton = new JRadioButton("Custom Parameters");
-		JPanel resizer = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		resizer.add(matpowerParametersButton);
-		resizer.add(customParametersButton);
-		JComponent openMatpowerCasePanel = new JPanel(new SpringLayout());
+		JComponent openMatpowerCasePanel = new JPanel(new MigLayout("insets 10", "[]10[]20[grow]"));
 		openMatpowerCasePanel.add(new JLabel("Parameters: "));
-		openMatpowerCasePanel.add(resizer);
+		openMatpowerCasePanel.add(matpowerParametersButton);
+		openMatpowerCasePanel.add(customParametersButton, "wrap");
 		final JLabel parameterFileLabel = new JLabel("Parameter File: ");
 		openMatpowerCasePanel.add(parameterFileLabel);
-		openMatpowerCasePanel.add(parameterFileInputPanel);
+		openMatpowerCasePanel.add(parameterFileInputPanel, "span 2, growx, width 300::");
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(matpowerParametersButton);
 		bg.add(customParametersButton);
@@ -78,11 +74,6 @@ public class NewCaseDialog extends BaseDialog implements IPreferenceConstants {
 			matpowerParametersButton.doClick();
 		else if("custom".equals(parameterSelection))
 			customParametersButton.doClick();
-		
-		SpringUtilities.makeCompactGrid(openMatpowerCasePanel,
-                2, 2, //rows, cols
-                5, 5, //initialX, initialY
-                5, 5);//xPad, yPad
 		
 		addOKButton();
 		addCancelButton();
