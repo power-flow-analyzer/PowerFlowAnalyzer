@@ -186,7 +186,7 @@ public class ParameterContainer extends JPanel {
 		String modelName = element.getModelID();
 		if(element.getModel() != null)
 			modelName = element.getModel().getLabel();
-		JPanel linkPanel = new JPanel(new BorderLayout());
+		JPanel linkPanel = new JPanel(new BorderLayout(10, 0));
 		JLabel label = new JLabel(modelName);
 		label.setToolTipText("Model ID: " + element.getModelID());
 		linkPanel.add(label, BorderLayout.CENTER);
