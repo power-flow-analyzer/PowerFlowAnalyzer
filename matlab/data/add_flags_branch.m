@@ -18,6 +18,8 @@ if branchData(RATE_A) > 0
     rate_A_percentage = S / branchData(RATE_A) * 100;
     rate_A_failure = S > branchData(RATE_A);
     jflag = net.ee.pfanalyzer.model.NetworkFlag('Long term rating');
+    jflag.setValue(S, 'RATE_A');
+    jflag.addParameter('RATE_A');
     jflag.addParameter('PF');
     jflag.addParameter('QF');
     jflag.addParameter('PT');
@@ -33,6 +35,8 @@ if branchData(RATE_A) ~= branchData(RATE_B) && ...
     rate_B_percentage = S / branchData(RATE_B) * 100;
     rate_B_failure = S > branchData(RATE_B);
     jflag = net.ee.pfanalyzer.model.NetworkFlag('Short term rating');
+    jflag.setValue(S, 'RATE_B');
+    jflag.addParameter('RATE_B');
     jflag.addParameter('PF');
     jflag.addParameter('QF');
     jflag.addParameter('PT');
@@ -49,6 +53,8 @@ if branchData(RATE_A) ~= branchData(RATE_B) && ...
     rate_C_percentage = S / branchData(RATE_C) * 100;
     rate_C_failure = S > branchData(RATE_C);
     jflag = net.ee.pfanalyzer.model.NetworkFlag('Emergency term rating');
+    jflag.setValue(S, 'RATE_C');
+    jflag.addParameter('RATE_C');
     jflag.addParameter('PF');
     jflag.addParameter('QF');
     jflag.addParameter('PT');
