@@ -416,6 +416,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			currentDB.replaceTopClass(database.getScriptClass());
 		if(modelDialog.isOutlineClassSelected())
 			currentDB.replaceTopClass(database.getOutlineClass());
+		if(modelDialog.isFlagClassSelected())
+			currentDB.replaceTopClass(database.getFlagClass());
 		currentDB.refreshModels();
 		currentDB.setDirty(true);
 		getCurrentCase().changeModelDB(currentDB);
@@ -439,6 +441,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			modelData.getModelClass().add(currentDB.getScriptClass());
 		if(modelDialog.isOutlineClassSelected())
 			modelData.getModelClass().add(currentDB.getOutlineClass());
+		if(modelDialog.isFlagClassSelected())
+			modelData.getModelClass().add(currentDB.getFlagClass());
 		// open file chooser dialog
 		JFileChooser fileChooser = new JFileChooser(getWorkingDirectory());
 		fileChooser.setAcceptAllFileFilterUsed(true);
