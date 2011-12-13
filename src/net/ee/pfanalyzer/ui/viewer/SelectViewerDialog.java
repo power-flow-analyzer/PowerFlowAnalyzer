@@ -26,7 +26,7 @@ public class SelectViewerDialog extends BaseDialog {
 		setText("<html><center><b>Select a viewer from the list below");
 		
 		Box contentPane = Box.createVerticalBox();
-		for (final ModelData viewer : PowerFlowAnalyzer.getConfiguration().getModels("viewer")) {
+		for (final ModelData viewer : PowerFlowAnalyzer.getConfiguration().getConfigurations("viewer")) {
 			String text = "<html>"  + "<b>" + viewer.getLabel() + "</b>";
 			if(viewer.getDescription() != null)
 				text += "<br>" + viewer.getDescription();

@@ -28,7 +28,7 @@ public class DataViewerConfiguration extends ParameterSupport {
 	
 	public DataViewerConfiguration(DataViewerData data) {
 		this.data = data;
-		this.dataDefinition = PowerFlowAnalyzer.getConfiguration().getModel(getModelID());
+		this.dataDefinition = PowerFlowAnalyzer.getConfiguration().getConfiguration(getModelID());
 	}
 
 	@Override

@@ -16,12 +16,12 @@ public class DataViewerDialog extends ParameterSupport {
 	public DataViewerDialog(String dialogID) {
 		data = new DataViewerDialogData();
 		data.setModelID(dialogID);
-		dialogModel = PowerFlowAnalyzer.getConfiguration().getModel(dialogID);
+		dialogModel = PowerFlowAnalyzer.getConfiguration().getConfiguration(dialogID);
 	}
 	
 	public DataViewerDialog(DataViewerDialogData data) {
 		this.data = data;
-		dialogModel = PowerFlowAnalyzer.getConfiguration().getModel(data.getModelID());
+		dialogModel = PowerFlowAnalyzer.getConfiguration().getConfiguration(data.getModelID());
 	}
 	
 	public String getDialogID() {
