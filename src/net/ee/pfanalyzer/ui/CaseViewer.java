@@ -109,7 +109,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 	
 	public void showModelDBDialog() {
 		if(modelDBDialog.isVisible() == false) {
-			modelDBDialog.showDialog(900, 500);
+			modelDBDialog.showDialog(900, 600);
 		} else {
 			modelDBDialog.setVisible(true);
 			modelDBDialog.toFront();
