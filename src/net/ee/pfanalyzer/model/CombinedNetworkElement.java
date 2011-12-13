@@ -10,12 +10,41 @@ public abstract class CombinedNetworkElement<TYPE extends AbstractNetworkElement
 	private String typeLabel;
 	private Boolean isActive = null;
 	private boolean isUngrouped = false;
+	protected Boolean hasFailures = null;
+	protected Boolean hasWarnings = null;
 	
 	public abstract String getLabel();
 	
-	public abstract boolean hasWarnings();
+	public boolean hasFailures() {
+		if(hasFailures == null) {
+			hasFailures = false;
+			for (AbstractNetworkElement element : getNetworkElements()) {
+				if(element.hasFailures()) {
+					hasFailures = true;
+					break;
+				}
+			}
+		}
+		return hasFailures;
+	}
+
+	public boolean hasWarnings() {
+		if(hasWarnings == null) {
+			hasWarnings = false;
+			for (AbstractNetworkElement element : getNetworkElements()) {
+				if(element.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+		}
+		return hasWarnings;
+	}
 	
-	public abstract boolean hasFailures();
+	public void updateFlags() {
+		hasWarnings = null;
+		hasFailures = null;
+	}
 	
 	public int getIndex() {
 		return index;

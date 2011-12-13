@@ -5,8 +5,6 @@ import java.util.List;
 public class CombinedBranch extends CombinedNetworkElement<Branch> {
 
 	private CombinedBus fromBus, toBus;
-	private Boolean hasErrors = null;
-	private Boolean hasWarnings = null;
 	
 	public CombinedBranch(CombinedBus fromBus, CombinedBus toBus, Branch branch) {
 		addBranch(branch);
@@ -88,33 +86,5 @@ public class CombinedBranch extends CombinedNetworkElement<Branch> {
 		else
 			text += "Combined bus " + (getIndex() + 1);
 		return text;
-	}
-	
-	@Override
-	public boolean hasFailures() {
-		if(hasErrors == null) {
-			hasErrors = false;
-			for (Branch branch : getBranches()) {
-				if(branch.hasFailures()) {
-					hasErrors = true;
-					break;
-				}
-			}
-		}
-		return hasErrors;
-	}
-	
-	@Override
-	public boolean hasWarnings() {
-		if(hasWarnings == null) {
-			hasWarnings = false;
-			for (Branch branch : getBranches()) {
-				if(branch.hasWarnings()) {
-					hasWarnings = true;
-					break;
-				}
-			}
-		}
-		return hasWarnings;
 	}
 }

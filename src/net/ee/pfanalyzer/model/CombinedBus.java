@@ -10,8 +10,6 @@ public class CombinedBus extends CombinedNetworkElement<Bus> {
 	private List<Generator> generators = new ArrayList<Generator>();
 //	private List<Transformer> transformers = new ArrayList<Transformer>();
 	private double longitude, latitude;
-	private Boolean hasFailures = null;
-	private Boolean hasWarnings = null;
 	
 	public CombinedBus(Bus bus) {
 		this.longitude = bus.getLongitude();
