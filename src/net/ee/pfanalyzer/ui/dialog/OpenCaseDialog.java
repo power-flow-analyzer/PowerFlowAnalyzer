@@ -7,13 +7,11 @@ import java.io.File;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
-import layout.SpringUtilities;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.ui.util.FileSelectionPanel;
+import net.miginfocom.swing.MigLayout;
 
 public class OpenCaseDialog extends BaseDialog implements IPreferenceConstants {
 	
@@ -37,22 +35,15 @@ public class OpenCaseDialog extends BaseDialog implements IPreferenceConstants {
 		setText("Select a case file and press OK.");
 
 		caseFileInputPanel = new FileSelectionPanel(PROPERTY_CASE_FILES, CASE_FILE_FILTER, false);
-		JComponent openCaseFilePanel = new JPanel(new SpringLayout());
-		openCaseFilePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		JComponent openCaseFilePanel = new JPanel(new MigLayout("insets 10", "[]10[grow]"));
 		openCaseFilePanel.add(new JLabel("Case File: "));
-		openCaseFilePanel.add(caseFileInputPanel);
-		SpringUtilities.makeCompactGrid(openCaseFilePanel,
-                1, 2, //rows, cols
-                5, 5, //initialX, initialY
-                5, 5);//xPad, yPad
-		JComponent resizer = new JPanel(new BorderLayout());
-		resizer.add(openCaseFilePanel, BorderLayout.NORTH);
+		openCaseFilePanel.add(caseFileInputPanel, "growx, width 300::");
 		
 		addOKButton();
 		addCancelButton();
 		
 		JPanel contentPane = new JPanel(new BorderLayout());
-		contentPane.add(resizer, BorderLayout.CENTER);
+		contentPane.add(openCaseFilePanel, BorderLayout.CENTER);
 		
 		setCenterComponent(contentPane);
 	}
