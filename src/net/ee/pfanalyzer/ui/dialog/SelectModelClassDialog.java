@@ -16,8 +16,8 @@ import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 
 public class SelectModelClassDialog extends BaseDialog implements IPreferenceConstants {
 	
-	private JCheckBox selectNetworkClass, selectScriptClass, selectOutlineClass;
-	private boolean isNetworkClassSelected, isScriptClassSelected, isOutlineClassSelected;
+	private JCheckBox selectNetworkClass, selectScriptClass, selectFlagClass, selectOutlineClass;
+	private boolean isNetworkClassSelected, isScriptClassSelected, isFlagClassSelected, isOutlineClassSelected;
 	
 	public SelectModelClassDialog(PowerFlowAnalyzer frame, ModelDB modelDB, String title) {
 		super(frame, title);
@@ -32,10 +32,14 @@ public class SelectModelClassDialog extends BaseDialog implements IPreferenceCon
 		selectOutlineClass = new JCheckBox("Outlines");
 		if(modelDB.getOutlineClass() == null || isEmpty(modelDB.getOutlineClass()))
 			selectOutlineClass.setEnabled(false);
+		selectFlagClass = new JCheckBox("Flags");
+		if(modelDB.getFlagClass() == null || isEmpty(modelDB.getFlagClass()))
+			selectFlagClass.setEnabled(false);
 		Box checkBoxPane = Box.createVerticalBox();
 		checkBoxPane.setBorder(new EmptyBorder(10, 40, 10, 10));
 		checkBoxPane.add(selectNetworkClass);
 		checkBoxPane.add(selectScriptClass);
+		checkBoxPane.add(selectFlagClass);
 		checkBoxPane.add(selectOutlineClass);
 		ActionListener boxListener = new ActionListener() {
 			@Override
@@ -46,6 +50,7 @@ public class SelectModelClassDialog extends BaseDialog implements IPreferenceCon
 		selectNetworkClass.addActionListener(boxListener);
 		selectScriptClass.addActionListener(boxListener);
 		selectOutlineClass.addActionListener(boxListener);
+		selectFlagClass.addActionListener(boxListener);
 		
 		addOKButton();
 		addCancelButton();
@@ -66,13 +71,14 @@ public class SelectModelClassDialog extends BaseDialog implements IPreferenceCon
 	
 	protected boolean checkInput() {
 		return ! (isNetworkClassSelected == false && isScriptClassSelected == false 
-				&& isOutlineClassSelected == false);
+				&& isOutlineClassSelected == false && isFlagClassSelected == false);
 	}
 	
 	private void updateSelections() {
 		isNetworkClassSelected = selectNetworkClass.isSelected();
 		isScriptClassSelected = selectScriptClass.isSelected();
 		isOutlineClassSelected = selectOutlineClass.isSelected();
+		isFlagClassSelected = selectFlagClass.isSelected();
 	}
 	
 	public boolean isNetworkParameterClassSelected() {
@@ -85,5 +91,9 @@ public class SelectModelClassDialog extends BaseDialog implements IPreferenceCon
 	
 	public boolean isOutlineClassSelected() {
 		return isOutlineClassSelected;
+	}
+	
+	public boolean isFlagClassSelected() {
+		return isFlagClassSelected;
 	}
 }
