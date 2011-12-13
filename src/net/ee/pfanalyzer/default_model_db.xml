@@ -320,6 +320,51 @@
                 <parameter ID="CHANGE_PATH" value="false"/>
             </model>
         </modelClass>
+        <modelClass ID="flag" label="Flags">
+            <parameter ID="UNIT" type="text" label="Unit" description="A scientific unit for the value" empty="true">
+                <display/>
+            </parameter>
+            <parameter ID="DISPLAY_PATTERN" type="text" label="Pattern" description="A number pattern for controlling the display of the value (e.g. precision)" value="#.##">
+                <display/>
+            </parameter>
+            <parameter ID="WARNING_LEVEL" type="double" label="Warning level" description="The level at which a percentage value will produce a warning (in %)" value="95">
+                <display decimalFormatPattern="#%" increment="5.0" min="0.0"/>
+            </parameter>
+            <parameter ID="ERROR_LEVEL" type="double" label="Error level" description="The level at which a percentage value will produce an error (in %)" value="101">
+                <display decimalFormatPattern="#%" increment="5.0" min="0.0"/>
+            </parameter>
+            <parameter ID="VISIBLE" type="boolean" label="Visible" description="Sets if this flag should be visible in the user interface." value="true">
+                <display/>
+            </parameter>
+            <parameter ID="ONLY_USE_MAXIMUM_VALUES" type="boolean" label="Only use maximum values" description="Only the warning and error levels will be taken into account,&lt;br&gt;regardless of any explicit setting on script side." value="false">
+                <display/>
+            </parameter>
+            <modelClass ID="branch" label="Branch">
+                <model ID="emergency_term_rating" label="Emergency term rating">
+                    <parameter ID="UNIT" value="MVA"/>
+                </model>
+                <model ID="long_term_rating" label="Long term rating">
+                    <parameter ID="UNIT" value="MVA"/>
+                </model>
+                <model ID="short_term_rating" label="Short term rating">
+                    <parameter ID="UNIT" value="MVA"/>
+                </model>
+            </modelClass>
+            <modelClass ID="bus" label="Bus">
+                <model ID="voltage_magnitude" label="Voltage magnitude">
+                    <parameter ID="UNIT" value="p.u."/>
+                    <parameter ID="DISPLAY_PATTERN" value="#.###"/>
+                </model>
+            </modelClass>
+            <modelClass ID="generator" label="Generator">
+                <model ID="reactive_power_output" label="Reactive power Output">
+                    <parameter ID="UNIT" value="MVAr"/>
+                </model>
+                <model ID="real_power_output" label="Real power Output">
+                    <parameter ID="UNIT" value="MW"/>
+                </model>
+            </modelClass>
+        </modelClass>
         <modelClass ID="outline" label="Outlines">
             <parameter ID="CSV_DATA_FILE" type="text" label="CSV Data file" empty="true">
                 <display/>
