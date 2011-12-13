@@ -36,12 +36,12 @@ public class ProgressBar extends JComponent {
 			g.setColor(Preferences.getFlagWarningColor());
 		else
 			g.setColor(Preferences.getFlagCorrectColor());
-		g.fillRect(0, y, barWidth - 1, BAR_HEIGHT);
+		g.fillRect(0, y, barWidth - 1, BAR_HEIGHT - 1);
 		g.setColor(Color.BLACK);
-		g.drawRect(0, y, getWidth() - 1, BAR_HEIGHT);
+		g.drawRect(0, y, getWidth() - 1, BAR_HEIGHT - 1);
 		String text = (int) value + "%";
 		Rectangle2D rect = g.getFontMetrics(g.getFont()).getStringBounds(text, g);
 		int x = (int) (getWidth() / 2 - rect.getWidth() / 2);
-		g.drawString(text, x, (int) (y + rect.getHeight() + 1));
+		g.drawString(text, x, (int) (y + rect.getHeight()));
 	}
 }
