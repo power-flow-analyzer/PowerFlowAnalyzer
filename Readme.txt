@@ -15,7 +15,7 @@ I. First-Time Installtion of Power Flow Analyzer
    The newly created folder will be designated as "<path-to-PowerFlowAnalyzer>" in
    the further reading.
    
-2. Start Matlab in Administrator mode
+2. Start Matlab in Administrator mode (only on Linux, Windows Vista, Windows 7)
    Note: Matlab must have been started before with your user account; otherwise it will create
          files with improper read permissions on the first start.
    Right-click on Matlab icon and select "Run as Administrator"
@@ -24,6 +24,7 @@ I. First-Time Installtion of Power Flow Analyzer
    a. Go to "File -> Set Path..."
    b. Click "Add with Subfolders..." and select the folder "<path-to-PowerFlowAnalyzer>/matlab"
    c. Click "Add Folder..." and select the folder "<path-to-matpower>"
+      (the location where Matpower is on your system)
    d. Click "Save"
    e. Close this window via "Close"
    
@@ -32,6 +33,7 @@ I. First-Time Installtion of Power Flow Analyzer
    b. Append the following lines (slashes may be mixed on Windows):
           <path-to-PowerFlowAnalyzer>/java/pfanalyzer.jar
           <path-to-PowerFlowAnalyzer>/java/fatcow-hosting-icons-2000.zip
+          <path-to-PowerFlowAnalyzer>/java/miglayout-3.7-swing.jar
 
 You will need to restart Matlab afterwards.
 
