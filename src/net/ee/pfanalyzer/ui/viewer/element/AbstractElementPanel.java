@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.Box;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
@@ -212,11 +211,11 @@ public abstract class AbstractElementPanel extends ModelElementPanel {
 
 	class ElementSumCalculator {
 		
-		private JComponent parent;
+		private Group parent;
 		private ElementAttributes attributes;
 		private double[] values;
 		
-		ElementSumCalculator(JComponent parent, ElementAttributes attributes) {
+		ElementSumCalculator(Group parent, ElementAttributes attributes) {
 			this.parent = parent;
 			this.attributes = attributes;
 			if(attributes != null)
