@@ -97,7 +97,6 @@ public class ParameterContainer extends JPanel {
 	protected void addParameter(NetworkParameter propertyDefinition, NetworkParameter propertyValue, Group panel) {
 		if(isParameterAdded(propertyDefinition))
 			return;
-		panel.add(createLabel(propertyDefinition, propertyValue));
 		boolean editParameter = NetworkParameterPurposeRestriction.PARAMETER.equals(
 						propertyDefinition.getPurpose())
 				|| NetworkParameterPurposeRestriction.SCENARIO.equals(propertyDefinition.getPurpose());
@@ -136,7 +135,8 @@ public class ParameterContainer extends JPanel {
 		}
 		if(showFullParameterInfo == false)
 			valuePanel.setShowFullParameterInfo(showFullParameterInfo);
-		panel.add(valuePanel);
+		panel.addLabel(createLabel(propertyDefinition, propertyValue));
+		panel.addValue(valuePanel);
 		parameterAdded(propertyDefinition);
 	}
 	
