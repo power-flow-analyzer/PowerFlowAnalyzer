@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer.ui.util;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 
@@ -11,6 +12,7 @@ import javax.swing.border.TitledBorder;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedNetworkElement;
 import net.ee.pfanalyzer.preferences.Preferences;
+import net.miginfocom.swing.MigLayout;
 
 public class Group extends JPanel {
 	
@@ -18,11 +20,21 @@ public class Group extends JPanel {
 	TitledBorder border;
 	
 	public Group(String title) {
-		super(new GridLayout(0, 2));
+		super(new MigLayout("wrap 2", "[]20[grow]"));
 		border = new TitledBorder(title);
 		border.setTitleColor(Color.BLACK);
 		border.setTitleFont(groupFont);
 		setBorder(border);
+	}
+	
+	public Component addLabel(Component c) {
+		add(c);
+		return c;
+	}
+	
+	public Component addValue(Component c) {
+		add(c, "width 300:300:, grow");
+		return c;
 	}
 	
 	public void addElementLink(CombinedNetworkElement<?> element, int displayFlags) {
