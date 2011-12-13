@@ -32,9 +32,8 @@
         <sequence>
             <element name="parameter" type="string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="label" type="string"/>
+        <attribute name="ID" type="string"/>
         <attribute name="value" type="double"/>
-        <attribute name="valueParameter" type="string"/>
         <attribute name="percentage" type="double" default="0"/>
         <attribute name="warning" type="boolean" default="false"/>
         <attribute name="failure" type="boolean" default="false"/>
