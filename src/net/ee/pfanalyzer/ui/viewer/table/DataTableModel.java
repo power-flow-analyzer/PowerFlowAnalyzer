@@ -116,7 +116,7 @@ public class DataTableModel extends AbstractTableModel {
 		List<NetworkFlag> flags = element.getFlags();
 		boolean correct = true;
 		for (NetworkFlag flag : flags) {
-			if(flag.isFailure()) {
+			if(flag.isVisible() && flag.isFailure()) {
 				String parameterID = parameters.get(column);
 				if(flag.containsParameter(parameterID)) {
 					correct = false;
