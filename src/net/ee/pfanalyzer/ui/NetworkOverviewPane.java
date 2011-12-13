@@ -562,6 +562,11 @@ public class NetworkOverviewPane extends JPanel {
 		protected void setText(String text) {
 			textfield.setText(text);
 		}
+		
+		@Override
+		public void setEnabled(boolean enabled) {
+			textfield.setEnabled(enabled);
+		}
 	}
 	
 	class NetworkDescription extends AbstractTextEditor {
@@ -600,6 +605,15 @@ public class NetworkOverviewPane extends JPanel {
 		@Override
 		protected void setText(String text) {
 			textarea.setText(text);
+		}
+		
+		@Override
+		public void setEnabled(boolean enabled) {
+			textarea.setEnabled(enabled);
+			if(enabled)
+				textarea.setBackground(Color.WHITE);
+			else
+				textarea.setBackground(NetworkOverviewPane.this.getBackground());
 		}
 	}
 }
