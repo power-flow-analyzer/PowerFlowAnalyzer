@@ -1,10 +1,10 @@
 package net.ee.pfanalyzer.ui.viewer.element;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -24,6 +24,7 @@ import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetworkElement;
 import net.ee.pfanalyzer.ui.util.Group;
 import net.ee.pfanalyzer.ui.util.ProgressBar;
+import net.miginfocom.swing.MigLayout;
 
 public class ModelElementPanel extends ParameterContainer {
 
@@ -85,21 +86,20 @@ public class ModelElementPanel extends ParameterContainer {
 		Group propGroup = new Group("Unknown Parameters");
 		for (NetworkParameter parameter : element.getParameterList()) {
 			NetworkParameter paramDef = element.getParameterDefinition(parameter.getID());
-			String value = element.getParameterDisplayValue(parameter.getID(), 
-					IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 			if(paramDef != null) {
 				addParameter(paramDef, parameter, propGroup);
 			} else {
-				String tooltipText = "<html>Parameter ID: " + getLabel(parameter);
-				tooltipText += "<br>Value: " + value;
-				tooltipText += "<br><br><i>This is an unknown parameter, i.e. " +
-						"it has no definition in the parameter database.</i>";
-				JLabel label = new JLabel(getLabel(parameter) + ": ");
-				label.setToolTipText(tooltipText);
-				propGroup.add(label);
-				label = new JLabel(value);
-				label.setToolTipText(tooltipText);
-				propGroup.add(label);
+				addParameter(parameter, parameter, propGroup);
+//				String tooltipText = "<html>Parameter ID: " + getLabel(parameter);
+//				tooltipText += "<br>Value: " + value;
+//				tooltipText += "<br><br><i>This is an unknown parameter, i.e. " +
+//						"it has no definition in the parameter database.</i>";
+//				JLabel label = new JLabel(getLabel(parameter) + ": ");
+//				label.setToolTipText(tooltipText);
+//				propGroup.add(label);
+//				label = new JLabel(value);
+//				label.setToolTipText(tooltipText);
+//				propGroup.add(label);
 			}
 		}
 		if(propGroup.getComponentCount() > 0)
@@ -138,19 +138,20 @@ public class ModelElementPanel extends ParameterContainer {
 		if(isEditable())
 			return; // do not show flags in editing mode
 		Group flagGroup = new Group("Flags");
+		flagGroup.setLayout(new MigLayout("", "[]20[]20[]"));
 		for (NetworkFlag flag : childData.getFlags()) {
 			JLabel label = new JLabel(flag.getLabel());
+			Color foreground;
 			if(flag.isFailure())
-				label.setForeground(Preferences.getFlagFailureColor());
+				foreground = Preferences.getFlagFailureColor();
 			else if(flag.isWarning())
-				label.setForeground(Preferences.getFlagWarningColor());
+				foreground = Preferences.getFlagWarningColor();
+			else
+				foreground = Color.BLACK;
+			label.setForeground(foreground);
 			flagGroup.add(label);
 			double percentage = flag.getPercentage();
 			if(percentage > -1) {
-				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
-						flag.isFailure(), flag.isWarning());
-				JPanel resizer = new JPanel(new BorderLayout());
-				resizer.add(progressBar, BorderLayout.EAST);
 				String value = null;
 				if(flag.getValueParameter() != null) {
 					if(flag.getValue() == null)
@@ -162,11 +163,16 @@ public class ModelElementPanel extends ParameterContainer {
 								IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
 				} else if(flag.getValue() != null)
 					value = flag.getValue().toString();
-				if(value != null)
-					resizer.add(new JLabel(value + " "), BorderLayout.WEST);
-				flagGroup.add(resizer);
+				if(value != null) {
+					JLabel valueLabel = new JLabel(value + " ");
+					valueLabel.setForeground(foreground);
+					flagGroup.add(valueLabel);
+				}
+				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
+						flag.isFailure(), flag.isWarning());
+				flagGroup.add(progressBar, "wrap");
 			} else
-				flagGroup.add(new JLabel("unknown (" + percentage + "%)"));
+				flagGroup.add(new JLabel("unknown (" + percentage + "%)"), "wrap");
 		}
 		if(flagGroup.getComponentCount() > 0)
 			addElementGroup(flagGroup);
