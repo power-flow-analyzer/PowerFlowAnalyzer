@@ -7,13 +7,11 @@ import java.io.File;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
-import layout.SpringUtilities;
 import net.ee.pfanalyzer.preferences.IPreferenceConstants;
 import net.ee.pfanalyzer.ui.util.FileSelectionPanel;
+import net.miginfocom.swing.MigLayout;
 
 public class ImportMatpowerDialog extends BaseDialog implements IPreferenceConstants {
 	
@@ -38,14 +36,9 @@ public class ImportMatpowerDialog extends BaseDialog implements IPreferenceConst
 		setText("Select a Matpower case and press OK.");
 
 		matpowerCaseInputPanel = new FileSelectionPanel(PROPERTY_MATPOWER_CASE_FILES, MATPOWER_CASE_FILTER, false);
-		JComponent openMatlabDataFilePanel = new JPanel(new SpringLayout());
-		openMatlabDataFilePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		JComponent openMatlabDataFilePanel = new JPanel(new MigLayout("insets 10", "[]10[grow]"));
 		openMatlabDataFilePanel.add(new JLabel("Matpower Case: "));
-		openMatlabDataFilePanel.add(matpowerCaseInputPanel);
-		SpringUtilities.makeCompactGrid(openMatlabDataFilePanel,
-                1, 2, //rows, cols
-                5, 5, //initialX, initialY
-                5, 5);//xPad, yPad
+		openMatlabDataFilePanel.add(matpowerCaseInputPanel, "growx, width 300::");
 		JPanel resizer = new JPanel(new BorderLayout());
 		resizer.add(openMatlabDataFilePanel, BorderLayout.NORTH);
 
