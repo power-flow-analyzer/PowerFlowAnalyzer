@@ -39,7 +39,6 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.preferences.Preferences;
-import net.ee.pfanalyzer.ui.dialog.ImportFromScriptDialog;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
 import net.ee.pfanalyzer.ui.util.HyperLinkAction;
@@ -56,7 +55,6 @@ public class NetworkOverviewPane extends JPanel {
 			duplicateNetworkAction, deleteNetworkAction;
 	private HyperLinkAction createScenarioAction;
 	private JPanel scriptActionPane;
-	private ImportFromScriptDialog importFromScriptDialg;
 	
 	NetworkOverviewPane(CaseViewer parentContainer) {
 		super(new BorderLayout());
@@ -295,8 +293,6 @@ public class NetworkOverviewPane extends JPanel {
 	}
 	
 	public void setWorkingDirectory(String workingDirectory) {
-		if(importFromScriptDialg != null)
-			importFromScriptDialg.setWorkingDirectory(workingDirectory);
 	}
 	
 	void updateScriptActions() {
