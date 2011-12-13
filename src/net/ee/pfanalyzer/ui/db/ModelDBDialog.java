@@ -202,7 +202,7 @@ public class ModelDBDialog extends BaseDialog implements PropertyChangeListener,
 		
 		splitter.setLeftComponent(treeParent);
 		splitter.setRightComponent(propPanelResizer);
-		splitter.setDividerLocation(200);
+		splitter.setDividerLocation(250);
 		setCenterComponent(splitter, false);
 		showElementProperties(null);
 		updateButtons(null);
