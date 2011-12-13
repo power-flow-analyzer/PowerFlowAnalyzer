@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.viewer.element;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -140,7 +141,9 @@ public class ModelElementPanel extends ParameterContainer {
 		Group flagGroup = new Group("Flags");
 		flagGroup.setLayout(new MigLayout("", "[]20[]20[]"));
 		for (NetworkFlag flag : childData.getFlags()) {
-			JLabel label = new JLabel(flag.getLabel());
+			if(flag.isVisible() == false)
+				continue;
+			JLabel label = new JLabel(flag.getLabel() + ": ");
 			Color foreground;
 			if(flag.isFailure())
 				foreground = Preferences.getFlagFailureColor();
@@ -150,29 +153,22 @@ public class ModelElementPanel extends ParameterContainer {
 				foreground = Color.BLACK;
 			label.setForeground(foreground);
 			flagGroup.add(label);
+			if(flag.getValue() != null) {
+				String pattern = flag.getPattern();
+				String unit = flag.getUnit();
+				DecimalFormat format = new DecimalFormat(pattern);
+				String value = format.format(flag.getValue()) + " " + unit;
+				JLabel valueLabel = new JLabel(value);
+				valueLabel.setForeground(foreground);
+				flagGroup.add(valueLabel);
+			}
 			double percentage = flag.getPercentage();
 			if(percentage > -1) {
-				String value = null;
-				if(flag.getValueParameter() != null) {
-					if(flag.getValue() == null)
-						value = ModelDBUtils.getParameterDisplayValue(childData, flag.getValueParameter(), 
-								IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
-					else
-						value = ModelDBUtils.getParameterDisplayValue(flag.getValue().toString(), 
-								childData.getParameterDefinition(flag.getValueParameter()), 
-								IDisplayConstants.PARAMETER_DISPLAY_DEFAULT);
-				} else if(flag.getValue() != null)
-					value = flag.getValue().toString();
-				if(value != null) {
-					JLabel valueLabel = new JLabel(value + " ");
-					valueLabel.setForeground(foreground);
-					flagGroup.add(valueLabel);
-				}
 				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
 						flag.isFailure(), flag.isWarning());
 				flagGroup.add(progressBar, "wrap");
 			} else
-				flagGroup.add(new JLabel("unknown (" + percentage + "%)"), "wrap");
+				flagGroup.add(new JLabel("unknown value (" + percentage + "%)"), "wrap");
 		}
 		if(flagGroup.getComponentCount() > 0)
 			addElementGroup(flagGroup);
