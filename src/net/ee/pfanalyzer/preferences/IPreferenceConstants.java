@@ -4,6 +4,8 @@ public interface IPreferenceConstants {
 
 	public final static String PROPERTY_VERSION = "version";
 	
+	public final static String PROPERTY_BRANDING_IMAGE = "branding.image";
+	
 	public final static String PROPERTY_MATPOWER_DIRECTORY = "property.matpower.directory";
 	
 	public final static String PROPERTY_CASE_FILES = "property.cases.files";
