@@ -484,6 +484,8 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 					AbstractNetworkElement targetObject = getObjectFromScreen(e.getX(), e.getY());
 					if(targetObject instanceof Branch)
 						targetObject = null;
+					if(targetObject == draggingObject.draggingElement)
+						targetObject = null;
 					if(targetObject != null) {
 						int action = JOptionPane.showConfirmDialog(PowerFlowAnalyzer.getInstance(), 
 								"Do you want to combine the elements?", "Combine?", JOptionPane.YES_NO_CANCEL_OPTION);
