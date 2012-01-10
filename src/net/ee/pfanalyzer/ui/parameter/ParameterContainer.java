@@ -49,9 +49,6 @@ public class ParameterContainer extends JPanel {
 			add(new JScrollPane(elementContainer), BorderLayout.CENTER);
 		else
 			add(elementContainer, BorderLayout.CENTER);
-		
-		setOpaque(false);
-		elementContainer.setOpaque(false);
 	}
 
 	public void setParameterMaster(IParameterMasterElement parameterMaster) {
