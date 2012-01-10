@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -212,6 +213,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 		}
 		doLayout();
 		revalidate();
+		scrollRectToVisible(new Rectangle(0, 0, 100, 10));// scroll to the top
 		repaint();
 		oldSelection = selection;
 	}
