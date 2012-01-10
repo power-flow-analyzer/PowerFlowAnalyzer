@@ -36,13 +36,15 @@ public class ModelElementPanel extends ParameterContainer {
 //	private Font groupFont = new Font(null, Font.BOLD, 12);
 	
 	public ModelElementPanel(ElementViewer viewer) {
-		super(null, true);
+		super(null, false);
 		this.viewer = viewer;
 		setEditable(false);// default setting
 		
 		titleLabel = new JLabel("", SwingConstants.CENTER);
 		titleLabel.setFont(titleFont);
 		titleLabel.setBorder(new EmptyBorder(5, 10, 5, 10));
+		titleLabel.setOpaque(true);
+		titleLabel.setBackground(Color.WHITE);
 		
 		add(titleLabel, BorderLayout.NORTH);
 	}
