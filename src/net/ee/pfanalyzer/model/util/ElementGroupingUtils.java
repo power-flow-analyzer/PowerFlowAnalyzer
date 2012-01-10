@@ -135,7 +135,7 @@ public class ElementGroupingUtils {
 						if(locationName != null)
 							return locationName;
 						else
-							return "Element list";
+							return super.getLabel();//"Element list";
 					}
 				};
 				list.addNetworkElement(element);
