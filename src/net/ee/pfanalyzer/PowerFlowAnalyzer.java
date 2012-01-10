@@ -1,6 +1,7 @@
 package net.ee.pfanalyzer;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -26,6 +27,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
@@ -130,9 +132,13 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		PowerFlowAnalyzer app = 
-			new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
-//		app.setWorkingDirectory(System.getProperty("user.home"));
+		SwingUtilities.invokeLater(new Runnable() {
+	        @Override
+	        public void run() {
+	        	new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
+	        }
+	    });
+
 	}
 	
 	public static PowerFlowAnalyzer getInstance() {
@@ -210,8 +216,9 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		toolbar.add(createToolbarButton(ACTION_SELECT_HOME, "Go to network overview", "direction.png", "Home"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_PREVIOUS, "Show previous selection", "resultset_previous.png", "Previous"));
 		toolbar.add(createToolbarButton(ACTION_SELECT_NEXT, "Show next selection", "resultset_next.png", "Next"));
-//		toolbar.addSeparator();
+//		toolbar.addSeparator();power-flow-analyzer_branding.png
 		toolbar.add(Box.createHorizontalGlue());
+		addBrandingButton(toolbar);
 //		toolbar.add(createToolbarButton(ACTION_DUMP_MEMORY_INFO, "Dump memory information", "system_monitor.png", "Memory"));
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -254,6 +261,25 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		if(hasUnsavedCases())
 			title += " *";
 		return title;
+	}
+	
+	private void addBrandingButton(Container c) {
+		try {
+			String brandingImage = Preferences.getProperty(PROPERTY_BRANDING_IMAGE);
+			// try as absolute path
+			File brandingImgFile = new File(brandingImage);
+			if(brandingImgFile.exists() == false)
+				// try in user's home director
+				brandingImgFile = new File(System.getProperty("user.home"), brandingImage);
+			URL iconURL = brandingImgFile.toURI().toURL();
+			JButton brandingButton = new JButton();
+			brandingButton.setFocusable(false);
+			brandingButton.setToolTipText("");
+			brandingButton.setIcon(new ImageIcon(iconURL, ""));
+			c.add(brandingButton);
+		} catch(Exception e) {
+			// do nothing
+		}
 	}
 	
 	private boolean hasUnsavedCases() {
