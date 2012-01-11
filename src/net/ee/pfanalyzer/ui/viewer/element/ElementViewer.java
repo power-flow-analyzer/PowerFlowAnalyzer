@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.viewer.element;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.Scrollable;
 
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CombinedBranch;
@@ -25,7 +27,8 @@ import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
-public class ElementViewer extends JPanel implements INetworkDataViewer, IDatabaseChangeListener {
+public class ElementViewer extends JPanel implements INetworkDataViewer, 
+		IDatabaseChangeListener, Scrollable {
 
 	public final static String VIEWER_ID = "viewer.element.viewer";
 	
@@ -282,5 +285,30 @@ public class ElementViewer extends JPanel implements INetworkDataViewer, IDataba
 		} else if(property.equals(PROPERTY_SHOW_SUMS_OF_VALUES)) {
 			showSumsOfElements = Boolean.valueOf(value);
 		}
+	}
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return getPreferredSize();
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 40;
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		return 40;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		return false;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		return true;
 	}
 }
