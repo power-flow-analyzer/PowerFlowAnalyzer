@@ -28,7 +28,7 @@ import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 
 public class ElementViewer extends JPanel implements INetworkDataViewer, 
-		IDatabaseChangeListener, Scrollable {
+		IDatabaseChangeListener {//, Scrollable {
 
 	public final static String VIEWER_ID = "viewer.element.viewer";
 	
@@ -144,8 +144,8 @@ public class ElementViewer extends JPanel implements INetworkDataViewer,
 	}
 
 	@Override
-	public void setData(Network network) {
-		this.network = network;
+	public void setData(Network data) {
+		this.network = data;
 //		filterElements();
 		refresh();
 	}
@@ -157,7 +157,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer,
 
 	@Override
 	public void refresh() {
-		
+		selectionChanged(null);
 	}
 	
 	public void reloadCard() {
@@ -170,7 +170,7 @@ public class ElementViewer extends JPanel implements INetworkDataViewer,
 			networkPanel.setShowNetworkParameters(showNetworkParameters);
 			networkPanel.setShowSumsOfValues(showSumsOfElements);
 			networkPanel.setEditable(isEditable);
-			networkPanel.updateNetwork();
+			networkPanel.updateNetwork(getNetwork());
 			setPreferredSize(networkPanel.getPreferredSize());
 			cardLayout.show(this, NETWORK_CARD);
 		} else if(selection instanceof CombinedBus) {
@@ -286,29 +286,29 @@ public class ElementViewer extends JPanel implements INetworkDataViewer,
 			showSumsOfElements = Boolean.valueOf(value);
 		}
 	}
-
-	@Override
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
-
-	@Override
-	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 40;
-	}
-
-	@Override
-	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 40;
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportHeight() {
-		return false;
-	}
-
-	@Override
-	public boolean getScrollableTracksViewportWidth() {
-		return true;
-	}
+//	
+//	@Override
+//	public Dimension getPreferredScrollableViewportSize() {
+//		return getPreferredSize();
+//	}
+//
+//	@Override
+//	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+//		return 40;
+//	}
+//
+//	@Override
+//	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+//		return 40;
+//	}
+//
+//	@Override
+//	public boolean getScrollableTracksViewportHeight() {
+//		return false;
+//	}
+//
+//	@Override
+//	public boolean getScrollableTracksViewportWidth() {
+//		return false;
+//	}
 }
