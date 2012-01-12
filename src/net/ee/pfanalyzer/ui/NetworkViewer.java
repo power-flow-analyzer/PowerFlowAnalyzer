@@ -210,6 +210,18 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 	public Network getNetwork() {
 		return network;
 	}
+	
+	public void setNetwork(Network newNetwork) {
+		Network oldNetwork = getNetwork();
+		this.network = newNetwork;
+		leftViewers.changeNetwork(oldNetwork, newNetwork);
+		rightViewers.changeNetwork(oldNetwork, newNetwork);
+		bottomViewers.changeNetwork(oldNetwork, newNetwork);
+		for (ViewerFrame frame : viewerFrames) {
+			frame.changeNetwork(oldNetwork, newNetwork);
+		}
+		updateNetworkDescription();
+	}
 
 	public void updateNetworkDescription() {
 		networkDescriptionLabel.setText(network.getDescription());
@@ -354,6 +366,14 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			if(updateAgain)
 				updateTabs(tabPosition);
 		}
+		
+		private void changeNetwork(Network oldNetwork, Network newNetwork) {
+			for (INetworkDataViewer viewer : viewers) {
+				oldNetwork.removeNetworkChangeListener(viewer);
+				viewer.setData(newNetwork);
+				newNetwork.addNetworkChangeListener(viewer);
+			}
+		}
 	}
 	
 	public static String getFrameTitle(DataViewerConfiguration viewerConfiguration, Network network) {
@@ -397,6 +417,13 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 			int height = viewer.getViewerConfiguration().getIntParameter(ModelDBUtils.HEIGHT_PARAMETER, 300);
 			setSize(width, height);
 			setVisible(true);
+		}
+		
+		private void changeNetwork(Network oldNetwork, Network newNetwork) {
+			oldNetwork.removeNetworkChangeListener(viewer);
+			viewer.setData(newNetwork);
+			newNetwork.addNetworkChangeListener(viewer);
+			updateFrame();
 		}
 		
 		private void closeFrame(boolean removeFromCase) {
