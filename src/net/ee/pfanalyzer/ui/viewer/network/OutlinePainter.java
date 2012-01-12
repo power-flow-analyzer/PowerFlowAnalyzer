@@ -29,6 +29,9 @@ public class OutlinePainter implements IPaintListener {
 	
 	@Override
 	public void paint(Graphics2D g2d) {
+		List<Outline> outlines = getOutlines();
+		if(outlines == null)
+			return;
 		for (Outline outline : getOutlines()) {
 			Color outlineColor = outline.getBorderColor();
 			Color backgroundColor = outline.getBackgroundColor();
@@ -101,9 +104,9 @@ public class OutlinePainter implements IPaintListener {
 	}
 	
 	private List<Outline> getOutlines() {
-		if(outlines == null)
-			update();
 		CaseViewer container = viewer.getNetworkContainer();
+		if(outlines == null && container != null)
+			update();
 		if(container != null && container.getOutlines() != lastOutlineList)
 			update();
 		return outlines;
