@@ -22,7 +22,11 @@ public class ClosableTabbedPane {
 	private JTabbedPane tabbedPane;
 	
 	public ClosableTabbedPane() {
-		tabbedPane = new JTabbedPane() {
+		this(JTabbedPane.TOP);
+	}
+	
+	public ClosableTabbedPane(int tabPlacement) {
+		tabbedPane = new JTabbedPane(tabPlacement) {
 			public void setSelectedIndex(int index) {
 				super.setSelectedIndex(index);
 				if(getTabListener() != null)
