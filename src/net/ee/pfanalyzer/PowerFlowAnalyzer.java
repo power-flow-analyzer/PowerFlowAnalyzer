@@ -27,6 +27,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
@@ -165,7 +166,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		
 		getContentPane().setLayout(new BorderLayout());
 		
-		casesParent = new ClosableTabbedPane();
+		casesParent = new ClosableTabbedPane(SwingConstants.BOTTOM);
 		casesParent.setTabListener(new TabListener() {
 			@Override
 			public boolean tabClosing(int tabIndex) {
