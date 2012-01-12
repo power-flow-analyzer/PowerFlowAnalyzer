@@ -417,17 +417,22 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				double y2 = coords2[1];//getBusYDouble(toBus, verticalScale);
 				if(drawPowerDirection) {
 					boolean highlighted = isSelected || isHovered;
+					boolean fadeOut = fadeOutUnselected && selection != null && highlighted == false;
 					// draw first branch
 					Branch branch = cbranch.getFirstBranch();
 					if(drawFlags == false || branch.isCorrect()) {
-						if(fadeOutUnselected && selection != null && highlighted == false)
+						if(fadeOut)
 							g2d.setColor(Color.LIGHT_GRAY);
 						else if(branch.isActive())
 							g2d.setColor(Color.BLUE);
 						else
 							g2d.setColor(Color.GRAY);
-					} else
-						g2d.setColor(Color.RED);
+					} else {
+						if(fadeOut)
+							g2d.setColor(Preferences.getFlagFailureColorBright());
+						else
+							g2d.setColor(Preferences.getFlagFailureColor());
+					}
 					IElementShape branchShape = drawShape(branch, g2d, x1, y1, x2, y2, highlighted, null, 
 							getBranchStroke(branch, highlighted));
 					double realInjectionSumFrom = cbranch.getFromBusRealInjectionSum();
@@ -496,6 +501,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 						isHovered = true;
 				}
 				boolean highlighted = isSelected || isHovered;
+				boolean fadeOut = fadeOutUnselected && selection != null && highlighted == false;
 				if(drawFlags && hasFailures)
 					g2d.setColor(Preferences.getFlagFailureColor());
 				else if(drawFlags && hasWarnings)
@@ -503,7 +509,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				else {
 					if(isSlack)
 						g2d.setColor(Color.BLUE);
-					else if(fadeOutUnselected && selection != null && highlighted == false)
+					else if(fadeOut)
 						g2d.setColor(Color.GRAY);
 					else
 						g2d.setColor(Color.BLACK);
@@ -758,12 +764,17 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 	public void refresh() {
 	}
 
-	@Override
-	public void setData(Network network) {
-	}
-
 	public NetworkViewerController getViewerController() {
 		return controller;
+	}
+
+	@Override
+	public void setData(Network network) {
+//		System.out.println("viewer: setData");
+		super.setData(network);
+		initializeInternalCoordinates();
+		updateVoltageLevels();
+		repaint();
 	}
 
 	@Override
