@@ -102,6 +102,12 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	}
 
 	@Override
+	public void setData(Network network) {
+		data = network;
+		selection = null;
+	}
+
+	@Override
 	public DataViewerConfiguration getViewerConfiguration() {
 		return viewerConfiguration;
 	}
