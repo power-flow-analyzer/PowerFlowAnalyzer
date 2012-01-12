@@ -123,7 +123,7 @@ public class NetworkOverviewPane extends JPanel {
 				Network network = getSelectedNetwork();
 				if(network != null) {
 					try {
-						String newName = "Copy of " + network.getName();
+						String newName = "Copy of " + network.getDisplayName();
 						network = getPowerFlowCase().createNetworkCopy(network);
 						network.setName(newName);
 						getPowerFlowCase().addNetwork(network);
@@ -400,6 +400,10 @@ public class NetworkOverviewPane extends JPanel {
 	
 	void repaintTree() {
 		networkTree.repaint();
+	}
+	
+	List<Network> getNetworkList() {
+		return treeModel.sortedNetworks;
 	}
 	
 	class NetworkTreeModel implements TreeModel {
