@@ -8,20 +8,18 @@ import net.ee.pfanalyzer.ui.util.Group;
 
 public class NetworkPanel extends AbstractElementPanel {
 
-	private Network data;
 	private boolean showNetworkParameters;
 	
 	public NetworkPanel(ElementViewer viewer, Network data) {
 		super(viewer);
-		this.data = data;
-		setParameterMaster(new ParameterMasterNetwork(data, false));
 		setShowNetworkParameters(true);
 		setTitle("Network Overview");
-		updateNetwork();
+		updateNetwork(data);
 	}
 	
-	public void updateNetwork() {
+	public void updateNetwork(Network data) {
 		removeAllElements();
+		setParameterMaster(new ParameterMasterNetwork(data, false));
 		// add network parameters
 		if(isShowNetworkParameters()) {
 			Group globalParameters = new Group("Global Network Parameters");
