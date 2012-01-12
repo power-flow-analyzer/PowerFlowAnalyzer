@@ -2,16 +2,27 @@ package net.ee.pfanalyzer.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.math.coordinate.ICoordinateConverter;
 import net.ee.pfanalyzer.math.coordinate.Mercator;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
@@ -38,6 +49,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 	
 	private ModelDBDialog modelDBDialog;
 	private NetworkOverviewPane overviewPane;
+	private NetworkSwitcher networkSwitcher;
 	
 	private Map<String, Outline> outlinesMap = new HashMap<String, Outline>();
 	private Collection<Outline> cachedOutlines;
@@ -71,10 +83,13 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 				fireActionUpdate();
 			}
 		});
+		networkSwitcher = new NetworkSwitcher();
+		add(networkSwitcher, BorderLayout.NORTH);
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
 		getPowerFlowCase().addPowerFlowCaseListener(this);
+		addActionUpdateListener(networkSwitcher);
 		updateOutlines(null, false);
 	}
 	
@@ -92,6 +107,16 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 	
 	void closeTab(int tabIndex) {
 		networkTabs.closeTab(tabIndex);
+	}
+	
+	private void setNetwork(Network network) {
+		NetworkViewer viewer = getCurrentViewer();
+		if(viewer == null) {
+			openNetwork(network);
+		} else {
+			viewer.setNetwork(network);
+			updateTabTitles();
+		}
 	}
 	
 	public void openNetwork(Network network) {
@@ -313,6 +338,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 		modelDBDialog.setVisible(false);
 		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
 		getPowerFlowCase().removePowerFlowCaseListener(this);
+		removeActionUpdateListener(networkSwitcher);
 		for (int i = 0; i < getViewerCount(); i++) {
 			getViewer(i + 1).removeActionUpdateListener(CaseViewer.this);
 			getViewer(i + 1).removeNetworkElementSelectionListener(modelDBDialog);
@@ -379,5 +405,108 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 //				addNetwork();
 //			}
 //		}
+	}
+	
+	class NetworkSwitcher extends JPanel implements IActionUpdater {
+		
+		private JComboBox switcherBox;
+		private boolean selfSelection = false;
+		private JButton previousButton, nextButton;
+		
+		NetworkSwitcher() {
+			super(new FlowLayout(FlowLayout.LEFT));
+			switcherBox = new JComboBox();
+			switcherBox.setRenderer(new NetworkCellRenderer());
+			switcherBox.addActionListener(new SwitcherListener());
+			previousButton = PowerFlowAnalyzer.createButton("Show previous network", 
+					"arrow_left.png", "Previous", false);
+			previousButton.setMargin(new Insets(2, 2, 2, 2));
+			previousButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showPreviousNetwork();
+				}
+			});
+			nextButton = PowerFlowAnalyzer.createButton("Show next network", 
+					"arrow_right.png", "Next", false);
+			nextButton.setMargin(new Insets(2, 2, 2, 2));
+			nextButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showNextNetwork();
+				}
+			});
+			add(switcherBox);
+			add(previousButton);
+			add(nextButton);
+			updateSwitcherBox();
+		}
+		
+		private void updateListItems() {
+			List<Network> networks = overviewPane.getNetworkList();
+			Vector<Network> items = new Vector<Network>(networks.size() + 1);
+			items.add(null);
+			for (int i = 0; i < networks.size(); i++) {
+				items.add(networks.get(i));
+			}
+			switcherBox.setModel(new DefaultComboBoxModel(items));
+		}
+		
+		public Network getSelectedNetwork() {
+			return (Network) switcherBox.getSelectedItem();
+		}
+		
+		class NetworkCellRenderer extends DefaultListCellRenderer {
+			public Component getListCellRendererComponent(JList list,
+					Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				Network network = (Network) value;
+				String text = network != null ? network.getDisplayName() : "Select a network";
+				return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+			}
+		}
+		
+		private void showPreviousNetwork() {
+			int index = switcherBox.getSelectedIndex();
+			if(index > 1)
+				switcherBox.setSelectedIndex(index - 1);
+		}
+		
+		private void showNextNetwork() {
+			int index = switcherBox.getSelectedIndex();
+			if(index < switcherBox.getItemCount() - 1)
+				switcherBox.setSelectedIndex(index + 1);
+		}
+
+		@Override
+		public void updateActions() {
+			updateSwitcherBox();
+		}
+		
+		private void updateSwitcherBox() {
+			selfSelection = true;
+			updateListItems();
+			NetworkViewer viewer = getCurrentViewer();
+			if(viewer != null)
+				switcherBox.setSelectedItem(viewer.getNetwork());
+			else
+				switcherBox.setSelectedIndex(0);
+			previousButton.setEnabled(viewer != null && switcherBox.getSelectedIndex() > 1);
+			nextButton.setEnabled(viewer != null && switcherBox.getSelectedIndex() < switcherBox.getItemCount() - 1);
+			selfSelection = false;
+		}
+		
+		class SwitcherListener implements ActionListener {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(selfSelection)
+					return;
+				Network network = getSelectedNetwork();
+				if(network == null)
+					networkTabs.setSelectedIndex(0);
+				else
+					setNetwork(network);
+				fireActionUpdate();
+			}
+		}
 	}
 }
