@@ -43,7 +43,7 @@
                     <display min="10.0"/>
                 </parameter>
                 <modelClass ID="element" label="Element">
-                    <model ID="viewer" label="Element Viewer" description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. ">
+                    <model ID="viewer" label="Network Browser" description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. ">
                         <parameter ID="POSITION" value="right"/>
                         <parameter ID="ICON" value="application_form.png"/>
                         <parameter ID="VIEWER_AREA_NAME" type="text" label="Label" value="Area">
