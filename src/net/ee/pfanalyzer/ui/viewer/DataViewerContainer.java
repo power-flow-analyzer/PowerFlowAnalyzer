@@ -43,7 +43,9 @@ public class DataViewerContainer extends JPanel {
 		viewer.addViewerActions(this);
 
 		add(buttonPane, BorderLayout.EAST);
-		add(new JScrollPane(viewer.getComponent()), BorderLayout.CENTER);
+		JScrollPane scroller = new JScrollPane(viewer.getComponent());
+		scroller.getVerticalScrollBar().setUnitIncrement(40);
+		add(scroller, BorderLayout.CENTER);
 	}
 	
 	public AbstractButton addAction(String tooltipText, String iconName, 
