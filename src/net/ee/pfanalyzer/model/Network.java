@@ -1,7 +1,9 @@
 package net.ee.pfanalyzer.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.ee.pfanalyzer.io.IllegalDataException;
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
@@ -32,7 +34,8 @@ public class Network extends ParameterSupport {
 	private List<Network> scenarios = new ArrayList<Network>();
 	private List<AbstractNetworkElement> elements = new ArrayList<AbstractNetworkElement>();
 	private List<INetworkChangeListener> listeners = new ArrayList<INetworkChangeListener>();
-	private Boolean hasFailures = null;
+	private Boolean hasFailures, hasWarnings = null;
+	private List<NetworkFlag> worstFlags;
 	private Boolean wasCalculated = null;
 	private boolean isDirty = false;
 	
@@ -260,6 +263,7 @@ public class Network extends ParameterSupport {
 //			getScenarios().add(scenario);
 //		}
 		hasFailures = null;
+		worstFlags = null;
 		wasCalculated = null;
 	}
 	
@@ -278,6 +282,7 @@ public class Network extends ParameterSupport {
 		}
 		// clear cached flags
 		hasFailures = null;
+		worstFlags = null;
 		for (CombinedBus cbus : combinedBusList)
 			cbus.updateFlags();
 		for (CombinedBranch cbranch : combinedBranchList)
@@ -466,6 +471,49 @@ public class Network extends ParameterSupport {
 			}
 		}
 		return hasFailures;
+	}
+	
+	public boolean hasWarnings() {
+		if(hasWarnings == null) {
+			if(wasCalculated() == false) {
+				hasWarnings = false;
+				return false;// no need to check flags of elements
+			}
+			for (AbstractNetworkElement element : getElements()) {
+				if(element.hasWarnings()) {
+					hasWarnings = true;
+					break;
+				}
+			}
+		}
+		return hasWarnings;
+	}
+	
+	public List<NetworkFlag> getWorstFlags() {
+		if(worstFlags == null) {
+			Map<String, NetworkFlag> flags = new HashMap<String, NetworkFlag>();
+			for (AbstractNetworkElement element : getElements()) {
+				for (NetworkFlag flag : element.getFlags()) {
+					if(flag.isVisible() == false)
+						continue;
+					NetworkFlag oldFlag = flags.get(flag.getID());
+					if(oldFlag == null || flag.getPercentage() > oldFlag.getPercentage()) {
+						flags.put(flag.getID(), flag);
+					}
+				}
+			}
+			worstFlags = new ArrayList<NetworkFlag>();
+			worstFlags.addAll(flags.values());
+		}
+		return worstFlags;
+	}
+	
+	public double getOperatingGrade() {
+		double maxGrade = 0;
+		for (NetworkFlag flag : getWorstFlags()) {
+			maxGrade = Math.max(maxGrade, flag.getPercentage());
+		}
+		return maxGrade;
 	}
 	
 	public boolean wasCalculated() {
