@@ -136,6 +136,12 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 				updateBackground();
 			}
 		});
+		container.addAction("Best fit", "canvas_size.png", "Best fit", false, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setPerfectFit();
+			}
+		});
 		container.addAction("Toggle editing mode - allows to move elements", 
 				"pencil.png", "Toggle editing mode", true, new ActionListener() {
 			@Override
@@ -212,7 +218,7 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 		viewer.updateArrowSize((int) (this.arrowSize * factor * weightFactor));
 		viewer.networkMarkerSize = (int) (this.networkMarkerSize * factor);
 	}
-
+	
 	public void dispose() {
 		getViewerController().dispose();
 		getViewerConfiguration().removeDatabaseChangeListener(this);
