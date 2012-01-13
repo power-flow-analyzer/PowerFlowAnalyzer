@@ -140,7 +140,7 @@ public class ModelElementPanel extends ParameterContainer {
 	protected void addFlags(AbstractNetworkElement childData) {
 		if(isEditable())
 			return; // do not show flags in editing mode
-		Group flagGroup = new Group("Flags");
+		Group flagGroup = new Group("Operating Grade (Flags)");
 		flagGroup.setLayout(new MigLayout("", "[]20[]20[]"));
 		for (NetworkFlag flag : childData.getFlags()) {
 			if(flag.isVisible() == false)
