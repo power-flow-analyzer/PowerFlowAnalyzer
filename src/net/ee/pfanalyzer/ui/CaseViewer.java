@@ -18,6 +18,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -37,6 +38,7 @@ import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
+import net.ee.pfanalyzer.ui.util.NetworkCellRenderer;
 import net.ee.pfanalyzer.ui.util.TabListener;
 import net.ee.pfanalyzer.ui.viewer.network.Outline;
 
@@ -416,9 +418,9 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 		NetworkSwitcher() {
 			super(new FlowLayout(FlowLayout.LEFT));
 			switcherBox = new JComboBox();
-			switcherBox.setRenderer(new NetworkCellRenderer());
+			switcherBox.setRenderer(new NetworkListCellRenderer());
 			switcherBox.addActionListener(new SwitcherListener());
-			previousButton = PowerFlowAnalyzer.createButton("Show previous network", 
+			previousButton = PowerFlowAnalyzer.createButton("Show previous network in list", 
 					"arrow_left.png", "Previous", false);
 			previousButton.setMargin(new Insets(2, 2, 2, 2));
 			previousButton.addActionListener(new ActionListener() {
@@ -427,7 +429,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 					showPreviousNetwork();
 				}
 			});
-			nextButton = PowerFlowAnalyzer.createButton("Show next network", 
+			nextButton = PowerFlowAnalyzer.createButton("Show next network in list", 
 					"arrow_right.png", "Next", false);
 			nextButton.setMargin(new Insets(2, 2, 2, 2));
 			nextButton.addActionListener(new ActionListener() {
@@ -436,6 +438,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 					showNextNetwork();
 				}
 			});
+			add(new JLabel("Network: "));
 			add(switcherBox);
 			add(previousButton);
 			add(nextButton);
@@ -456,12 +459,15 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 			return (Network) switcherBox.getSelectedItem();
 		}
 		
-		class NetworkCellRenderer extends DefaultListCellRenderer {
+		class NetworkListCellRenderer extends DefaultListCellRenderer {
 			public Component getListCellRendererComponent(JList list,
 					Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				Network network = (Network) value;
 				String text = network != null ? network.getDisplayName() : "Select a network";
-				return super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+				super.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+				if(network != null)
+					return NetworkCellRenderer.setupRenderer(this, network);
+				return this;
 			}
 		}
 		
@@ -490,8 +496,10 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 				switcherBox.setSelectedItem(viewer.getNetwork());
 			else
 				switcherBox.setSelectedIndex(0);
-			previousButton.setEnabled(viewer != null && switcherBox.getSelectedIndex() > 1);
-			nextButton.setEnabled(viewer != null && switcherBox.getSelectedIndex() < switcherBox.getItemCount() - 1);
+			previousButton.setEnabled(viewer != null 
+					&& switcherBox.getSelectedIndex() > 1);
+			nextButton.setEnabled(viewer != null 
+					&& switcherBox.getSelectedIndex() < switcherBox.getItemCount() - 1);
 			selfSelection = false;
 		}
 		
