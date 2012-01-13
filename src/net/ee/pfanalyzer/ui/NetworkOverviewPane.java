@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -12,9 +14,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -38,10 +43,11 @@ import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.util.ListUtils;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
-import net.ee.pfanalyzer.preferences.Preferences;
 import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
 import net.ee.pfanalyzer.ui.util.HyperLinkAction;
+import net.ee.pfanalyzer.ui.util.NetworkCellRenderer;
+import net.miginfocom.swing.MigLayout;
 
 public class NetworkOverviewPane extends JPanel {
 	
@@ -55,6 +61,8 @@ public class NetworkOverviewPane extends JPanel {
 			duplicateNetworkAction, deleteNetworkAction;
 	private HyperLinkAction createScenarioAction;
 	private JPanel scriptActionPane;
+	private JRadioButton sortPerName, sortPerFlags;
+	private JCheckBox ascendingOrderBox, showNetworksOK, showNetworksWarning, showNetworksError;
 	
 	NetworkOverviewPane(CaseViewer parentContainer) {
 		super(new BorderLayout());
@@ -62,7 +70,7 @@ public class NetworkOverviewPane extends JPanel {
 		
 		treeModel = new NetworkTreeModel();
 		networkTree = new JTree(treeModel);
-		networkTree.setCellRenderer(new NetworkCellRenderer());
+		networkTree.setCellRenderer(new NetworkTreeCellRenderer());
 		networkTree.setExpandsSelectedPaths(true);
 		networkTree.setRootVisible(false);
 		networkTree.setShowsRootHandles(true);
@@ -163,7 +171,7 @@ public class NetworkOverviewPane extends JPanel {
 			}
 		};
 		JPanel networkActionPane = new JPanel(new GridLayout(0, 1));
-		networkActionPane.setBorder(new TitledBorder("Add / Remove Network"));
+		networkActionPane.setBorder(new TitledBorder("Add / Remove network"));
 		networkActionPane.add(createEmptyNetworkAction);
 		networkActionPane.add(importMatpowerNetworkAction);
 //		networkActionPane.add(importFromScriptAction);
@@ -192,26 +200,63 @@ public class NetworkOverviewPane extends JPanel {
 		scenarioActionPane.setBorder(new TitledBorder("Manage Scenarios"));
 		scenarioActionPane.add(createScenarioAction);
 		
-		scriptActionPane = new JPanel(new GridLayout(0, 1));
-		scriptActionPane.setBorder(new TitledBorder("Execute Script"));
+		JPanel sortNetworkPane = new JPanel(new GridLayout(0, 1));
+		sortNetworkPane.setBorder(new TitledBorder("Sort networks"));
+		sortPerName = new JRadioButton("by name", true);
+		sortPerFlags = new JRadioButton("by operating grade");
+		ButtonGroup sortBG = new ButtonGroup();
+		sortBG.add(sortPerName);
+		sortBG.add(sortPerFlags);
+		ascendingOrderBox = new JCheckBox("in ascending order", true);
+		ActionListener treeRefreshListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshTree();
+				parent.updateActions();
+			}
+		};
+		sortPerName.addActionListener(treeRefreshListener);
+		sortPerFlags.addActionListener(treeRefreshListener);
+		ascendingOrderBox.addActionListener(treeRefreshListener);
+		sortNetworkPane.add(sortPerName);
+		sortNetworkPane.add(sortPerFlags);
+		sortNetworkPane.add(ascendingOrderBox);
 		
-		JPanel actionGroupPanel = new JPanel();
+		JPanel showHideNetworksPane = new JPanel(new GridLayout(0, 1));
+		showHideNetworksPane.setBorder(new TitledBorder("Show networks"));
+		showNetworksOK = new JCheckBox("without warnings/errors", true);
+		showNetworksWarning = new JCheckBox("with warnings", true);
+		showNetworksError = new JCheckBox("with errors", true);
+		showNetworksOK.addActionListener(treeRefreshListener);
+		showNetworksWarning.addActionListener(treeRefreshListener);
+		showNetworksError.addActionListener(treeRefreshListener);
+		showHideNetworksPane.add(showNetworksOK);
+		showHideNetworksPane.add(showNetworksWarning);
+		showHideNetworksPane.add(showNetworksError);
+		
+		scriptActionPane = new JPanel(new GridLayout(0, 1));
+		scriptActionPane.setBorder(new TitledBorder("Execute script"));
+		
+		JPanel networkDataPane = new JPanel(new MigLayout("", "[]10[grow]"));
+		networkDataPane.setBorder(new CompoundBorder(
+				new EmptyBorder(5, 5, 5, 5),
+				new TitledBorder("Network Information")));
+		networkDataPane.add(new JLabel("Name: "));
+		networkDataPane.add(networkLabel, "wrap, growx");
+		networkDataPane.add(new JLabel("Description: "));
+		networkDataPane.add(networkDescription, "wrap, growx");
+
+		JPanel actionGroupPanel = new JPanel(new MigLayout());
 		actionGroupPanel.setBorder(new CompoundBorder(
 				new EmptyBorder(5, 5, 5, 5),
 				new TitledBorder("Actions")));
 		actionGroupPanel.add(networkActionPane);
 //		actionGroupPanel.add(scenarioActionPane);
-		actionGroupPanel.add(scriptActionPane);
+		actionGroupPanel.add(scriptActionPane, "wrap");
+		actionGroupPanel.add(sortNetworkPane);
+		actionGroupPanel.add(showHideNetworksPane);
 		
 		JPanel actionContainer = new JPanel(new BorderLayout());
-		JPanel networkDataPane = new JPanel(new GridLayout(0, 2));
-		networkDataPane.setBorder(new CompoundBorder(
-				new EmptyBorder(5, 5, 5, 5),
-				new TitledBorder("Network Information")));
-		networkDataPane.add(new JLabel("Name: "));
-		networkDataPane.add(networkLabel);
-		networkDataPane.add(new JLabel("Description: "));
-		networkDataPane.add(networkDescription);
 		
 		actionContainer.add(networkDataPane, BorderLayout.NORTH);
 		actionContainer.add(actionGroupPanel, BorderLayout.CENTER);
@@ -417,16 +462,20 @@ public class NetworkOverviewPane extends JPanel {
 		
 		private void sortNetworks() {
 			sortedNetworks.clear();
-			for(Network network: getPowerFlowCase().getNetworks(false))
+			boolean showOK = showNetworksOK == null || showNetworksOK.isSelected();
+			boolean showWarnings = showNetworksWarning == null || showNetworksWarning.isSelected();
+			boolean showErrors = showNetworksError == null || showNetworksError.isSelected();
+			for(Network network: getPowerFlowCase().getNetworks(false)) {
+				if(showOK == false && network.hasWarnings() == false && network.hasFailures() == false)
+					continue;
+				if(showWarnings == false && network.hasWarnings() && (showErrors == false || network.hasFailures() == false))
+//				if(showWarnings == false && network.hasWarnings() && showErrors == false && network.hasFailures())
+					continue;
+				if(showErrors == false && network.hasFailures())
+					continue;
 				sortedNetworks.add(network);
-			Collections.sort(sortedNetworks, new Comparator<Network>() {
-				@Override
-				public int compare(Network n1, Network n2) {
-					if(n1.getName() == null)
-						return 0;
-					return n1.getName().compareTo(n2.getName());
-				}
-			});
+			}
+			Collections.sort(sortedNetworks, new NetworkSorter());
 		}
 		
 		@Override
@@ -499,24 +548,36 @@ public class NetworkOverviewPane extends JPanel {
 		public void removeTreeModelListener(TreeModelListener l) {
 	        treeModelListeners.removeElement(l);
 	    }
+		
+		class NetworkSorter implements Comparator<Network> {
+			@Override
+			public int compare(Network n1, Network n2) {
+				int order = ascendingOrderBox == null || ascendingOrderBox.isSelected() ? 1 : -1;
+				if(sortPerName == null || sortPerName.isSelected()) {
+					if(n1.getName() == null)
+						return 0;
+					return order * n1.getName().compareTo(n2.getName());
+				} else if(sortPerFlags.isSelected()) {
+					double grade1 = n1.getOperatingGrade();
+					double grade2 = n2.getOperatingGrade();
+					if(grade1 < grade2)
+						return order * -1;
+					if(grade1 > grade2)
+						return order * 1;
+					return 0;
+				}
+				return 0;
+			}
+		}
 	}
 	
-	class NetworkCellRenderer extends DefaultTreeCellRenderer {
+	class NetworkTreeCellRenderer extends DefaultTreeCellRenderer {
 		public Component getTreeCellRendererComponent(JTree tree, Object value,
 				boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 			try {
 				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 				if(value instanceof Network) {
-					Network network = (Network) value;
-					String dirtySuffix = network.isDirty() ? " *" : "";
-					setText(network.getDisplayName() + dirtySuffix);
-					if(network.hasFailures())
-						setForeground(Preferences.getFlagFailureColor());
-					else 
-						if(network.wasCalculated())
-						setForeground(Preferences.getHyperlinkForeground());
-					else
-						setForeground(Color.BLACK);
+					NetworkCellRenderer.setupRenderer(this, (Network) value);
 				} else
 					setText("");
 			} catch(Exception e) {
