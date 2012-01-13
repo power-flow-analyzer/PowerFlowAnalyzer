@@ -280,6 +280,13 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		getViewerConfiguration().setParameter("ZOOM", 1);
 	}
 	
+	protected void setPerfectFit() {
+		perfectFit = true;
+		getViewerConfiguration().setParameter("ZOOM", 0);
+		initializeInternalCoordinates();
+		repaint();
+	}
+	
 	public void setPerfectFit(boolean flag) {
 		perfectFit = flag;
 		initializeInternalCoordinates();
