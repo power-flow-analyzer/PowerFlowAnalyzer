@@ -101,7 +101,6 @@ public class NetworkMapViewer extends CoordinateMap implements INetworkDataViewe
 	
 	protected List<CombinedBus> visibleBusses;
 	protected List<CombinedBranch> visibleBranches;
-	protected PaintManager paintManager;
 	
 	private NetworkViewerController controller;
 	private Component parentContainer;
