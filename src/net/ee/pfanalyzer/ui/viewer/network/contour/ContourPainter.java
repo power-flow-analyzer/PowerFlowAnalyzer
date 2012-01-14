@@ -8,6 +8,7 @@ import net.ee.pfanalyzer.model.Bus;
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.Generator;
 import net.ee.pfanalyzer.model.NetworkElement;
+import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.IPaintListener;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
@@ -95,5 +96,10 @@ public class ContourPainter implements IPaintListener {
 	@Override
 	public int getLayer() {
 		return LAYER_CONTOUR;
+	}
+
+	@Override
+	public MapBoundingBox getBoundingBox() {
+		return null;// no bounding box
 	}
 }
