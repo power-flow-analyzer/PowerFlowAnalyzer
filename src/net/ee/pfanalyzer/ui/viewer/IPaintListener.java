@@ -3,6 +3,7 @@ package net.ee.pfanalyzer.ui.viewer;
 import java.awt.Graphics2D;
 
 import net.ee.pfanalyzer.model.DatabaseChangeEvent;
+import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 
 public interface IPaintListener {
 	
@@ -24,4 +25,6 @@ public interface IPaintListener {
 	String getPaintID();
 	
 	int getLayer();
+	
+	MapBoundingBox getBoundingBox();
 }
