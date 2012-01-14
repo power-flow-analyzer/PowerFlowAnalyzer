@@ -28,8 +28,10 @@ import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
 import net.ee.pfanalyzer.ui.dialog.ElementSelectionDialog;
+import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
+import net.ee.pfanalyzer.ui.viewer.IPaintListener;
 
 public abstract class CoordinateMap extends JComponent implements INetworkDataViewer, INetworkMapParameters {
 
@@ -79,6 +81,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	protected Object selection, hover;
 	protected boolean editingMode = false;
 	protected DraggingObject draggingObject;
+	protected PaintManager paintManager;
 	
 	protected abstract AbstractNetworkElement getObjectFromScreen(int x, int y);
 	
@@ -142,14 +145,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 					minLongitude = longitude;
 					maxLongitude = longitude;
 				} else {
-					internalMinX = Math.min(internalMinX, x);
-					internalMaxX = Math.max(internalMaxX, x);
-					internalMinY = Math.min(internalMinY, y);
-					internalMaxY = Math.max(internalMaxY, y);
-					minLatitude = Math.min(minLatitude, latitude);
-					maxLatitude = Math.max(maxLatitude, latitude);
-					minLongitude = Math.min(minLongitude, longitude);
-					maxLongitude = Math.max(maxLongitude, longitude);
+					updateInternalCoordinates(latitude, longitude, x, y);
 				}
 			}
 		}
@@ -164,7 +160,48 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 			int x = converter.getX(longitude);
 			int y = converter.getY(latitude);
 			internalMarkerCoords.put(marker.getIndex(), new int[]{x, y});
+			if(perfectFit)
+				updateInternalCoordinates(latitude, longitude, x, y);
 		}
+		// update min/max coords of background painters
+		if(perfectFit && paintManager != null) {
+			for (IPaintListener painter : paintManager.getActivePaintListeners()) {
+				if(painter.getBoundingBox() == null || painter.getBoundingBox().isIncomplete())
+					continue;
+				MapBoundingBox box = painter.getBoundingBox();
+				// determine minimum coords
+				double longitudeMin = box.getLongitudeMin();
+				double latitudeMin = box.getLatitudeMin();
+				if(Double.isNaN(longitudeMin)// no coords set
+						|| Double.isNaN(latitudeMin))
+					continue;
+				// determine maximum coords
+				double longitudeMax = box.getLongitudeMax();
+				double latitudeMax = box.getLatitudeMax();
+				if(Double.isNaN(longitudeMax)// no coords set
+						|| Double.isNaN(latitudeMax))
+					continue;
+				// calculate min/max screen coords
+				int xmin = converter.getX(longitudeMin);
+				int ymin = converter.getY(latitudeMin);
+				int xmax = converter.getX(longitudeMax);
+				int ymax = converter.getY(latitudeMax);
+				// update min/max coords
+				updateInternalCoordinates(latitudeMin, longitudeMin, xmin, ymin);
+				updateInternalCoordinates(latitudeMax, longitudeMax, xmax, ymax);
+			}
+		}
+	}
+	
+	private void updateInternalCoordinates(double latitude, double longitude, int x, int y) {
+		internalMinX = Math.min(internalMinX, x);
+		internalMaxX = Math.max(internalMaxX, x);
+		internalMinY = Math.min(internalMinY, y);
+		internalMaxY = Math.max(internalMaxY, y);
+		minLatitude = Math.min(minLatitude, latitude);
+		maxLatitude = Math.max(maxLatitude, latitude);
+		minLongitude = Math.min(minLongitude, longitude);
+		maxLongitude = Math.max(maxLongitude, longitude);
 	}
 
 	public void paintViewer(Graphics g) {
