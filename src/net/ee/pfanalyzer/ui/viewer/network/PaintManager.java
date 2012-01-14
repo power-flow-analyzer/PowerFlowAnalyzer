@@ -60,6 +60,15 @@ public class PaintManager {
 		}
 	}
 	
+	public List<IPaintListener> getActivePaintListeners() {
+		List<IPaintListener> activeListeners = new ArrayList<IPaintListener>();
+		for (IPaintListener listener : paintListeners) {
+			if(listener.isActive())
+				activeListeners.add(listener);
+		}
+		return activeListeners;
+	}
+	
 	public void drawBackground(Graphics2D g2d) {
 		if(isOffscreenPainting()) {
 			// draw image directly in offscreen mode
