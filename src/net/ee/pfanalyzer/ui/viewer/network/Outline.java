@@ -14,6 +14,7 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.model.util.ParameterUtils;
+import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 
 public class Outline {
 
@@ -21,8 +22,10 @@ public class Outline {
 	private File dataFile;
 //	private double[][] points;
 	private int[][] screenPoints;
+	private MapBoundingBox boundingBox;
 	private ICoordinateConverter converter;
 	private Color borderColor, backgroundColor;
+	private boolean isLoaded = false;
 	
 	public Outline(ICoordinateConverter converter, ModelData outlineData, File dataFile) {
 		this.converter = converter;
@@ -58,13 +61,25 @@ public class Outline {
 		return backgroundColor;
 	}
 	
+	Object lock = new Object();
+	
 	public int[][] getScreenPoints() {
-		if(screenPoints == null)
-			screenPoints = loadFromCSV(dataFile);
+		synchronized(lock) {
+			if(isLoaded == false)
+				loadFromCSV(dataFile);
+		}
 		return screenPoints;
 	}
+
+	public MapBoundingBox getBoundingBox() {
+		synchronized(lock) {
+			if(isLoaded == false)
+				loadFromCSV(dataFile);
+		}
+		return boundingBox;
+	}
 	
-	private int[][] loadFromCSV(File csvFile) {
+	private void loadFromCSV(File csvFile) {
 		try {
 			List<double[]> allCoords = new ArrayList<double[]>();
 			FileReader reader = new FileReader(csvFile);
@@ -78,17 +93,25 @@ public class Outline {
 					allCoords.add(coords);
 			}
 			reader.close();
+			// determine min/max coordinates of outline
+			boundingBox = new MapBoundingBox();
+			for (double[] coords : allCoords) {
+				boundingBox.add(coords[1], coords[0]);
+			}
 			int[][] points = new int[allCoords.size()][2];
 			for (int i = 0; i < points.length; i++) {
 				points[i] = transformValues(allCoords.get(i));
 			}
-			return points;
+			screenPoints =  points;
 		} catch (FileNotFoundException e) {
 			System.err.println("Cannot find outline file " + csvFile);
+			screenPoints =  new int[0][2];
 		} catch (IOException e) {
 			System.err.println("Cannot read outline file " + csvFile + ": " + e);
+			screenPoints =  new int[0][2];
+		} finally {
+			isLoaded = true;
 		}
-		return new int[0][2];
 	}
 	
 	private double[] parseValues(String text, int lineIndex) {
@@ -106,7 +129,7 @@ public class Outline {
 	}
 	
 	private int[] transformValues(double[] coords) {
-		if(Double.isNaN(coords[0]) && Double.isNaN(coords[0]))
+		if(Double.isNaN(coords[0]) || Double.isNaN(coords[1]))
 			return new int[] { -1, -1 };
 		int x = converter.getX(coords[0]);
 		int y = converter.getY(coords[1]);
