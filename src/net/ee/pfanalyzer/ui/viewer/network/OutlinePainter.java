@@ -11,6 +11,7 @@ import net.ee.pfanalyzer.model.DatabaseChangeEvent;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.CaseViewer;
+import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.IPaintListener;
 
@@ -22,6 +23,7 @@ public class OutlinePainter implements IPaintListener {
 	private boolean isActive = true;
 	private List<Outline> outlines;
 	private Collection<Outline> lastOutlineList;
+	private MapBoundingBox boundingBox = new MapBoundingBox();
 
 	public OutlinePainter(NetworkMapViewer viewer) {
 		this.viewer = viewer;
@@ -98,9 +100,15 @@ public class OutlinePainter implements IPaintListener {
 				param = ModelDBUtils.getParameterValue(outline.getOutlineData(), "ENABLED");
 			boolean defaultEnabled = param == null ? false : Boolean.parseBoolean(param.getValue());
 			if(getViewer().getViewerConfiguration().getBooleanParameter(paramID, defaultEnabled))
-				outlines.add(outline);
+				addOutlineInternal(outline);
 		}
 //		repaint();
+	}
+	
+	private void addOutlineInternal(Outline outline) {
+		outlines.add(outline);
+		if(outline.getBoundingBox() != null)
+			boundingBox.add(outline.getBoundingBox());
 	}
 	
 	private List<Outline> getOutlines() {
@@ -140,5 +148,10 @@ public class OutlinePainter implements IPaintListener {
 	@Override
 	public int getLayer() {
 		return LAYER_OUTLINES;
+	}
+
+	@Override
+	public MapBoundingBox getBoundingBox() {
+		return boundingBox;
 	}
 }
