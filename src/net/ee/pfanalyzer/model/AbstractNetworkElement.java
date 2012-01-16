@@ -43,6 +43,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 		for (NetworkFlagData flagData : getElementData().getFlag()) {
 			NetworkFlag flag = new NetworkFlag(flagData, modelDB.getFlag(flagData.getID()));
 			getFlags().add(flag);
+			flag.setNetworkElement(this);
 		}
 	}
 	
@@ -156,6 +157,7 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 	public void addFlag(NetworkFlag flag) {
 		flags.add(flag);
 		elementData.getFlag().add(flag.getData());
+		flag.setNetworkElement(this);
 	}
 	
 	public boolean isCorrect() {
