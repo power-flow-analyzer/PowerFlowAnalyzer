@@ -2,6 +2,9 @@ package net.ee.pfanalyzer.ui.util;
 
 import java.text.DecimalFormatSymbols;
 
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+
 
 public class SwingUtils {
 
@@ -11,4 +14,11 @@ public class SwingUtils {
 //	public static Window getTopLevelFrame(Component c) {
 //		return SwingUtilities.getWindowAncestor(c);
 //	}
+	
+	public static JScrollPane createScrollpane(JComponent comp) {
+		JScrollPane scroller = new JScrollPane(comp);
+		scroller.getHorizontalScrollBar().setUnitIncrement(40);
+		scroller.getVerticalScrollBar().setUnitIncrement(40);
+		return scroller;
+	}
 }
