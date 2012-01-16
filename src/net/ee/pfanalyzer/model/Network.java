@@ -1,6 +1,8 @@
 package net.ee.pfanalyzer.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -504,6 +506,7 @@ public class Network extends ParameterSupport {
 			}
 			worstFlags = new ArrayList<NetworkFlag>();
 			worstFlags.addAll(flags.values());
+			Collections.sort(worstFlags, new WorstNetworkFlagSorter());
 		}
 		return worstFlags;
 	}
@@ -761,6 +764,19 @@ public class Network extends ParameterSupport {
 			return CaseSerializer.writeNetwork(getData());
 		} catch (Exception e) {
 			throw new IllegalDataException("Cannot write network data", e);
+		}
+	}
+	
+	class WorstNetworkFlagSorter implements Comparator<NetworkFlag> {
+		@Override
+		public int compare(NetworkFlag flag1, NetworkFlag flag2) {
+			double grade1 = flag1.getPercentage();
+			double grade2 = flag2.getPercentage();
+			if(grade1 < grade2)
+				return 1;
+			if(grade1 > grade2)
+				return -1;
+			return 0;
 		}
 	}
 }
