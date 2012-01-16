@@ -8,13 +8,13 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.ui.NetworkViewer;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
 
 public class DataViewerContainer extends JPanel {
 	
@@ -43,9 +43,7 @@ public class DataViewerContainer extends JPanel {
 		viewer.addViewerActions(this);
 
 		add(buttonPane, BorderLayout.EAST);
-		JScrollPane scroller = new JScrollPane(viewer.getComponent());
-		scroller.getVerticalScrollBar().setUnitIncrement(40);
-		add(scroller, BorderLayout.CENTER);
+		add(SwingUtils.createScrollpane(viewer.getComponent()), BorderLayout.CENTER);
 	}
 	
 	public AbstractButton addAction(String tooltipText, String iconName, 
