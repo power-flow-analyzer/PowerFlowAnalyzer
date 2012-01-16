@@ -11,6 +11,7 @@ public class NetworkFlag {
 
 	private NetworkFlagData data;
 	private ModelData model;
+	private AbstractNetworkElement networkElement;
 	
 	public NetworkFlag(NetworkFlagData data, ModelData flagModel) {
 		this.data = data;
@@ -176,5 +177,13 @@ public class NetworkFlag {
 
 	public void setPercentage(double percentage) {
 		getData().setPercentage(percentage);
+	}
+
+	public AbstractNetworkElement getNetworkElement() {
+		return networkElement;
+	}
+
+	public void setNetworkElement(AbstractNetworkElement networkElement) {
+		this.networkElement = networkElement;
 	}
 }
