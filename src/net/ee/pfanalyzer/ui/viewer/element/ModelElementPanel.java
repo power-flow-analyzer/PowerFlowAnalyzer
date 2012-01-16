@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.text.DecimalFormat;
+import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -24,6 +26,7 @@ import net.ee.pfanalyzer.ui.parameter.IParameterMasterElement;
 import net.ee.pfanalyzer.ui.parameter.ParameterContainer;
 import net.ee.pfanalyzer.ui.parameter.ParameterMasterNetworkElement;
 import net.ee.pfanalyzer.ui.util.Group;
+import net.ee.pfanalyzer.ui.util.IObjectAction;
 import net.ee.pfanalyzer.ui.util.ProgressBar;
 import net.miginfocom.swing.MigLayout;
 
@@ -142,7 +145,13 @@ public class ModelElementPanel extends ParameterContainer {
 			return; // do not show flags in editing mode
 		Group flagGroup = new Group("Operating Grade (Flags)");
 		flagGroup.setLayout(new MigLayout("", "[]20[]20[]"));
-		for (NetworkFlag flag : childData.getFlags()) {
+		addFlags(childData.getFlags(), flagGroup, null);
+		if(flagGroup.getComponentCount() > 0)
+			addElementGroup(flagGroup);
+	}
+	
+	public static void addFlags(List<NetworkFlag> flags, JComponent flagGroup, IObjectAction elementLinkAction) {
+		for (NetworkFlag flag : flags) {
 			if(flag.isVisible() == false)
 				continue;
 			JLabel label = new JLabel(flag.getLabel() + ": ");
@@ -168,12 +177,16 @@ public class ModelElementPanel extends ParameterContainer {
 			if(percentage > -1) {
 				ProgressBar progressBar = new ProgressBar((int) Math.floor(percentage), 
 						flag.isFailure(), flag.isWarning());
-				flagGroup.add(progressBar, "wrap");
+				if(elementLinkAction != null) {
+					flagGroup.add(progressBar);
+					flagGroup.add(Group.createElementLink(flag.getNetworkElement(), 
+							AbstractNetworkElement.DISPLAY_DEFAULT, elementLinkAction), "wrap");
+				} else {
+					flagGroup.add(progressBar, "wrap");
+				}
 			} else
 				flagGroup.add(new JLabel("unknown value (" + percentage + "%)"), "wrap");
 		}
-		if(flagGroup.getComponentCount() > 0)
-			addElementGroup(flagGroup);
 	}
 	
 	protected void addConnectedElements(AbstractNetworkElement element) {
