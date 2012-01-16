@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -47,6 +48,8 @@ import net.ee.pfanalyzer.ui.dialog.ImportMatpowerDialog;
 import net.ee.pfanalyzer.ui.util.AbstractTextEditor;
 import net.ee.pfanalyzer.ui.util.HyperLinkAction;
 import net.ee.pfanalyzer.ui.util.NetworkCellRenderer;
+import net.ee.pfanalyzer.ui.util.SwingUtils;
+import net.ee.pfanalyzer.ui.viewer.NetworkSummary;
 import net.miginfocom.swing.MigLayout;
 
 public class NetworkOverviewPane extends JPanel {
@@ -63,6 +66,7 @@ public class NetworkOverviewPane extends JPanel {
 	private JPanel scriptActionPane;
 	private JRadioButton sortPerName, sortPerFlags;
 	private JCheckBox ascendingOrderBox, showNetworksOK, showNetworksWarning, showNetworksError;
+	private NetworkSummary networkSummary;
 	
 	NetworkOverviewPane(CaseViewer parentContainer) {
 		super(new BorderLayout());
@@ -256,12 +260,18 @@ public class NetworkOverviewPane extends JPanel {
 		actionGroupPanel.add(sortNetworkPane);
 		actionGroupPanel.add(showHideNetworksPane);
 		
+		networkSummary = new NetworkSummary(parent);
+		
 		JPanel actionContainer = new JPanel(new BorderLayout());
 		
-		actionContainer.add(networkDataPane, BorderLayout.NORTH);
+		JTabbedPane tabPane = new JTabbedPane();
+		tabPane.addTab("Network summary", networkSummary);
+		tabPane.addTab("Network information", networkDataPane);
+		
+		actionContainer.add(tabPane, BorderLayout.NORTH);
 		actionContainer.add(actionGroupPanel, BorderLayout.CENTER);
 		JSplitPane centerSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, 
-				new JScrollPane(networkTree), actionContainer);
+				new JScrollPane(networkTree), SwingUtils.createScrollpane(actionContainer));
 		centerSplitter.setDividerLocation(300);
 		
 		add(centerSplitter, BorderLayout.CENTER);
@@ -334,6 +344,8 @@ public class NetworkOverviewPane extends JPanel {
 		duplicateNetworkAction.setEnabled(singleSelection);
 		deleteNetworkAction.setEnabled( ! emptySelection);
 		createScenarioAction.setEnabled(singleSelection);
+		if(singleSelection)
+			networkSummary.updateNetwork(selectedNetworks.get(0));
 		updateScriptActions();
 	}
 	
