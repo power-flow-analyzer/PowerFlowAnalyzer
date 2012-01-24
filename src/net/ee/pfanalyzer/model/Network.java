@@ -477,10 +477,9 @@ public class Network extends ParameterSupport {
 	
 	public boolean hasWarnings() {
 		if(hasWarnings == null) {
-			if(wasCalculated() == false) {
-				hasWarnings = false;
+			hasWarnings = false;
+			if(wasCalculated() == false)
 				return false;// no need to check flags of elements
-			}
 			for (AbstractNetworkElement element : getElements()) {
 				if(element.hasWarnings()) {
 					hasWarnings = true;
