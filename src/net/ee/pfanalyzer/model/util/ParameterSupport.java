@@ -84,7 +84,7 @@ public abstract class ParameterSupport {
 	
 	public double getDoubleParameter(String name, double defaultValue) {
 		Double value = getDoubleParameter(name);
-		if(value == null)
+		if(value == null || value.isNaN())
 			return defaultValue;
 		return value;
 	}
