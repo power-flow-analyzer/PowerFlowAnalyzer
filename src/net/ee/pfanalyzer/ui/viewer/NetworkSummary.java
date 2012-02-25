@@ -20,7 +20,7 @@ public class NetworkSummary extends JPanel implements IGeneratorDataConstants {
 
 	private final static DecimalFormat FORMAT = new DecimalFormat("#,###.#");
 	
-	private JLabel numberBus, numberGenerators, numberActiveGenerators;
+	private JLabel numberBus, numberGenerators, numberActiveGenerators, numberBranches;
 	private JLabel totalGenCapacityP, totalGenCapacityQ, onLineCapacityP, onLineCapacityQ, actualGenerationP, actualGenerationQ;
 	private JPanel flagPanel;
 	private CaseViewer parent;
@@ -32,6 +32,7 @@ public class NetworkSummary extends JPanel implements IGeneratorDataConstants {
 		numberBus = new JLabel();
 		numberGenerators = new JLabel();
 		numberActiveGenerators = new JLabel();
+		numberBranches = new JLabel();
 		
 		totalGenCapacityP = new JLabel();
 		totalGenCapacityQ = new JLabel();
@@ -67,6 +68,9 @@ public class NetworkSummary extends JPanel implements IGeneratorDataConstants {
 		summaryPanel.add(actualGenerationP);  
 		summaryPanel.add(actualGenerationQ, "wrap");
 		
+		summaryPanel.add(new JLabel("Branches")); 
+		summaryPanel.add(numberBranches, "wrap");
+		
 		add(summaryPanel);
 		
 		add(new JLabel("<html><u>Highest operating grades"), "wrap, span");
@@ -79,6 +83,7 @@ public class NetworkSummary extends JPanel implements IGeneratorDataConstants {
 			numberBus.setText(network.getBusses().size() + "");
 			numberGenerators.setText(network.getGeneratorsCount() + "");
 			numberActiveGenerators.setText(getCommittedGeneratorsCount(network) + "");
+			numberBranches.setText(network.getBranchesCount() + "");
 			totalGenCapacityP.setText(FORMAT.format(getTotalGenCapacityP(network, false)));
 			totalGenCapacityQ.setText(FORMAT.format(getTotalGenCapacityQMin(network, false)) + " to "
 					+ FORMAT.format(getTotalGenCapacityQMax(network, false)));
