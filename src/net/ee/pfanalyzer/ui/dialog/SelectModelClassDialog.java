@@ -23,16 +23,16 @@ public class SelectModelClassDialog extends BaseDialog implements IPreferenceCon
 		super(frame, title);
 		setText("Select the desired database sections and press OK to continue.");
 		
-		selectNetworkClass = new JCheckBox("Network parameters");
+		selectNetworkClass = new JCheckBox("Models and network parameters");
 		if(modelDB.getNetworkClass() == null || isEmpty(modelDB.getNetworkClass()))
 			selectNetworkClass.setEnabled(false);
-		selectScriptClass = new JCheckBox("Scripts");
+		selectScriptClass = new JCheckBox("Script definitions");
 		if(modelDB.getScriptClass() == null || isEmpty(modelDB.getScriptClass()))
 			selectScriptClass.setEnabled(false);
-		selectOutlineClass = new JCheckBox("Outlines");
+		selectOutlineClass = new JCheckBox("Borders (outlines)");
 		if(modelDB.getOutlineClass() == null || isEmpty(modelDB.getOutlineClass()))
 			selectOutlineClass.setEnabled(false);
-		selectFlagClass = new JCheckBox("Flags");
+		selectFlagClass = new JCheckBox("Operating grades (flags)");
 		if(modelDB.getFlagClass() == null || isEmpty(modelDB.getFlagClass()))
 			selectFlagClass.setEnabled(false);
 		Box checkBoxPane = Box.createVerticalBox();
