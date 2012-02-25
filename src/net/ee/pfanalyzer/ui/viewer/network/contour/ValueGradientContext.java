@@ -42,7 +42,7 @@ public class ValueGradientContext implements PaintContext {
 				for (int p = 0; p < points.length; p++) {
 					if(points[p] == null)
 						continue;
-					double distance = points[p].distance(x + i, y + j);
+					// limit value if necessary or omit this point
 					double value = points[p].getValue();
 					if(outOfBoundsAction == ACTION_CUT_VALUES) {
 						if(value > maxValue)
@@ -54,16 +54,22 @@ public class ValueGradientContext implements PaintContext {
 							continue;
 					}
 					
+					// calculate relative value
 					double relValue;
 					if(value >= middleValue)
 						relValue = Math.abs((value - middleValue) / (maxValue - middleValue));
 					else
 						relValue = -Math.abs((middleValue - value) / (middleValue - minValue));
 					
+					// limit distance if necessary
+					double distance = points[p].distance(x + i, y + j);
 					if(distance > maxDistance)
 						distance = maxDistance;
 					
+					// calculate relative value
 					double relDistance = ((maxDistance - distance) / maxDistance);
+					
+					// calculate ratio for this point
 					double newRatio = relDistance * relValue;
 					
 					// draw small values at least in direct sourroundings of point
@@ -72,12 +78,16 @@ public class ValueGradientContext implements PaintContext {
 						break;
 					}
 					
+					// check if ratio for this point is the highest until now
 					if(Math.abs(newRatio) > Math.abs(ratio)) {
 						ratio = newRatio;
 					}
 				}
 
+				// create a color based on the ratio
 				int[] argb = getColorProvider().getARGB(0, 1, ratio);
+				
+				// change this pixel to the new color
 				int pixelIndex = (j * width + i) * 4;
 				pixels[pixelIndex + 0] = argb[0];// red
 				pixels[pixelIndex + 1] = argb[1];// green
