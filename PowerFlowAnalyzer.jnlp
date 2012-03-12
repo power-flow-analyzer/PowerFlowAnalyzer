@@ -9,9 +9,9 @@
     <resources>
         <j2se version="1.6+"
               href="http://java.sun.com/products/autodl/j2se"/>
-        <jar href="java/pfanalyzer.jar" main="true" />
-        <jar href="java/miglayout-3.7-swing.jar" />
-        <jar href="java/fatcow-hosting-icons-2000.zip" />
+        <jar href="PowerFlowAnalyzer_webstart-2.1.9/pfanalyzer.jar" main="true" />
+        <jar href="PowerFlowAnalyzer_webstart-2.1.9/miglayout-3.7-swing.jar" />
+        <jar href="PowerFlowAnalyzer_webstart-2.1.9/fatcow-hosting-icons-2000.zip" />
     </resources>
     <security>
       <all-permissions/>
