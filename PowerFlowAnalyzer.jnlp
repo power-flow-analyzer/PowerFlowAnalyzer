@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" 
+    codebase="." 
+    href="PowerFlowAnalyzer.jnlp">
+    <information>
+        <title>PowerFlowAnalyzer</title>
+        <vendor>Markus Gronau</vendor>
+    </information>
+    <resources>
+        <j2se version="1.6+"
+              href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="java/pfanalyzer.jar" main="true" />
+        <jar href="java/miglayout-3.7-swing.jar" />
+        <jar href="java/fatcow-hosting-icons-2000.zip" />
+    </resources>
+    <security>
+      <all-permissions/>
+    </security> 
+    <application-desc
+         name="PowerFlowAnalyzer"
+         main-class="net.ee.pfanalyzer.PowerFlowAnalyzer"
+         width="800"
+         height="700">
+     </application-desc>
+</jnlp>				
