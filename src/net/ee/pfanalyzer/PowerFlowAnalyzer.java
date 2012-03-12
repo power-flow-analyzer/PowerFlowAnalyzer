@@ -126,7 +126,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private ModelDB configuration;
 	private final int environment;
 	
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		// setting look and feel of current platform
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -136,7 +136,21 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		SwingUtilities.invokeLater(new Runnable() {
 	        @Override
 	        public void run() {
-	        	new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT);
+	        	String filePath = args.length > 0 ? args[0] : null;
+	        	if(filePath != null) {
+		        	File caseFile = new File(filePath);
+		        	if(caseFile.exists() == false) {
+			        	File[] rootDirs = File.listRoots();
+			        	for (File rootDir : rootDirs) {
+			        		File testDir = new File(rootDir, filePath);
+			        		if(testDir.exists()) {
+			        			filePath = testDir.getAbsolutePath();
+			        			break;
+			        		}
+						}
+		        	}
+	        	}
+	        	new PowerFlowAnalyzer(APPLICATION_ENVIRONMENT, filePath);
 	        }
 	    });
 
@@ -151,6 +165,10 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	}
 	
 	public PowerFlowAnalyzer(int environment) {
+		this(environment, null);
+	}
+	
+	public PowerFlowAnalyzer(int environment, String caseFile) {
 		super();
 		this.environment = environment;
 		INSTANCE = this;
@@ -244,7 +262,18 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 		setVisible(true);
 		PreferencesInitializer.checkForEmptyPreferences();
 		
-		server = new MatpowerGUIServer(this);
+		// only start server in MATLAB environment
+		if(getEnvironment() == MATLAB_ENVIRONMENT)
+			server = new MatpowerGUIServer(this);
+		
+		if(caseFile != null) {
+			File file = new File(caseFile);
+			if(file.exists() && file.canRead())
+				openCase(new PowerFlowCase(file));
+			else
+				JOptionPane.showMessageDialog(null, "Case file cannot be found: " + caseFile, 
+						"Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public int getEnvironment() {
