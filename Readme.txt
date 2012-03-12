@@ -57,11 +57,16 @@ II. Update an existing Power Flow Analyzer installation
    The update is complete.
 
 
-FIN
-
-
 III. Set Memory of MATLAB
 ------------------------------------------------
 
-copy file: java.opts
-past in: C:\Program Files (x86)\MATLAB\R2009b\bin\win64
+Larger networks may require increasing the memory for MATLAB. Copy the file
+   java.opts
+into an operating system dependant folder of MATLAB:
+- Windows XP  (32 bit): C:\Programme\MATLAB\R2011a\bin\win32
+- Win Vista/7 (32 bit): C:\Program Files (x86)\MATLAB\R2009b\bin\win32
+- Win Vista/7 (64 bit): C:\Program Files\MATLAB\R2009b\bin\win64
+
+These folders may be different on some systems.
+
+FIN
