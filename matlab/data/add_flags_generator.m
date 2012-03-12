@@ -12,8 +12,13 @@ if abs(genData(PG)) < 1E-8 && abs(genData(QG)) < 1E-8
 end
 
 %% real power output
-real_power_percentage = genData(PG) / genData(PMAX) * 100;
-real_power_failure = genData(PG) > genData(PMAX) || genData(PG) < genData(PMIN);
+if(genData(PG) >= 0) % positive real power
+    real_power_percentage = genData(PG) / genData(PMAX) * 100;
+    real_power_failure = genData(PG) > genData(PMAX) || genData(PG) < genData(PMIN);
+else % negative real power
+    real_power_percentage = 101;
+    real_power_failure = true;
+end
 
 jflag = net.ee.pfanalyzer.model.NetworkFlag('generator.real_power_output');
 jflag.setValue(genData(PG), 'PG');
