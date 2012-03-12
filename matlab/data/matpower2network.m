@@ -40,7 +40,7 @@ for i=1:length(mpc.branch(:,1))
 end
 % create generators
 for i=1:length(mpc.gen(:,1))
-    if exist('mpc.success', 'var')
+    if exist('mpc.gencost', 'var')
         jgenerator = create_generator(jnetwork, mpc.gen(i,:), mpc.gencost(i,:));
     else
         jgenerator = create_generator(jnetwork, mpc.gen(i,:));
