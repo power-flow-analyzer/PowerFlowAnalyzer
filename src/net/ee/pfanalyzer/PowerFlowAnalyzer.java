@@ -72,6 +72,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 
 	public final static int APPLICATION_ENVIRONMENT = 0;
 	public final static int MATLAB_ENVIRONMENT = 1;
+	public final static int MATLAB_MULTIPLE_INSTANCES_ENVIRONMENT = 2;
 	
 	private final static String ACTION_CASE_NEW = "action.case.new";
 	private final static String ACTION_CASE_OPEN = "action.case.open";
@@ -820,7 +821,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private void destroyViewer() {
 		if(environment == APPLICATION_ENVIRONMENT)
 			System.exit(0);
-		if(environment == MATLAB_ENVIRONMENT)
+		if(environment == MATLAB_ENVIRONMENT || environment == MATLAB_MULTIPLE_INSTANCES_ENVIRONMENT)
 			callMatlabCommand("stoppfviewer", new Object[0], -1, 0, false);
 	}
 	
@@ -1066,7 +1067,7 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 	private void updateToolbarButtons() {
 		boolean hasViewer = getCurrentViewer() != null;
 		boolean hasCase = getCurrentCase() != null;
-		boolean isMatlabEnv = environment == MATLAB_ENVIRONMENT;
+		boolean isMatlabEnv = environment == MATLAB_ENVIRONMENT || environment == MATLAB_MULTIPLE_INSTANCES_ENVIRONMENT;
 //		toolbarButtons.get(ACTION_DIAGRAM_ADD).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_TABLE_ADD).setEnabled(hasViewer);
 		toolbarButtons.get(ACTION_CASE_SAVE).setEnabled(hasCase);
@@ -1130,5 +1131,11 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			count++;
 		}
 		return result;
+	}
+	
+	public void updateModelDBDialog() {
+		CaseViewer container = getCurrentContainer();
+		if(container != null)
+			container.reloadModelDBDialog();
 	}
 }
