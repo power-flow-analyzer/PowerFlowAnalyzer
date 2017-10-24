@@ -1,12 +1,7 @@
 
 % check if viewer's main class can be found on the classpath
 if exist('net.ee.pfanalyzer.PowerFlowAnalyzer', 'class') ~= 8
-    disp('Power Flow Analyzer cannot be found, probably it is not installed.')
-    disp('If this is not the case it needs to be in Matlab`s classpath:')
-    disp('    Type "edit classpath.txt" in Matlab`s console and append the following lines:')
-    disp('        <path-to-PowerFlowAnalyzer>/java/pfanalyzer.jar')
-    disp('        <path-to-PowerFlowAnalyzer>/java/fatcow-hosting-icons-2000.zip')
-    disp('    You will need to restart Matlab afterwards.')
+    error('PowerFlowAnalyzer is not configured in Matlab, you need to run "pfa_start_application.m" first!')
 else
     % perform internal checks of Java runtime
     javachk('jvm');
