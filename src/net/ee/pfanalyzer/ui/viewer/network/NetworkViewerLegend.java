@@ -50,11 +50,11 @@ public class NetworkViewerLegend extends JComponent {
 		int textHeight = g2d.getFontMetrics().getHeight();
 		int linePosY = g2d.getFontMetrics().getAscent() / 2;
 		int x = X_OFFSET;
-		for (Integer voltageLevel : viewer.getVoltageLevels()) {
+		for (Integer voltageLevel : viewer.getPaintManager().getBranchPainter().getVisibleVoltageLevels()) {
 			String text = voltageLevel + " kV";
 			g2d.drawString(text, x, textHeight);
 			x += g2d.getFontMetrics().getStringBounds(text, g2d).getWidth() + X_PADDING;
-			g2d.setStroke(viewer.getBranchStroke(voltageLevel, false));
+			g2d.setStroke(viewer.getPaintManager().getBranchPainter().getBranchStroke(voltageLevel, false));
 			g2d.drawLine(x, textHeight - linePosY, 
 					x + branchLength, textHeight - linePosY);
 			x += branchLength + X_MARGIN;
