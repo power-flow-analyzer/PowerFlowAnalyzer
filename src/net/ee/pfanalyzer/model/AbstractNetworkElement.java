@@ -1,7 +1,9 @@
 package net.ee.pfanalyzer.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.ee.pfanalyzer.model.data.AbstractNetworkElementData;
 import net.ee.pfanalyzer.model.data.ModelData;
@@ -19,7 +21,8 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 	private AbstractNetworkElementData elementData;
 	private ModelData model;
 	private List<NetworkFlag> flags = new ArrayList<NetworkFlag>();
-	
+	private Map<String, double[] > doubleTimeSeries = new HashMap<String, double[]>();
+
 	public abstract String getDisplayName(int displayFlags);
 	
 	AbstractNetworkElement(Network data, int index) {
@@ -128,6 +131,21 @@ public abstract class AbstractNetworkElement extends ParameterSupport implements
 	@Override
 	public List<NetworkParameter> getParameterList() {
 		return elementData.getParameter();
+	}
+
+	public double[] getDoubleTimeSeries(String parameterName) {
+		return doubleTimeSeries.get(parameterName);
+	}
+
+	public void setDoubleTimeSeries(String parameterName, double[] doubleTimeSeries) {
+		this.doubleTimeSeries.put(parameterName, doubleTimeSeries);
+	}
+	
+	public double getDoubleValue(String parameterName, int timeStep) {
+		double[] timeSeries = doubleTimeSeries.get(parameterName);
+		if(timeSeries == null || timeStep < 0 || timeSeries.length < timeStep)
+			return Double.NaN;
+		return timeSeries[timeStep];
 	}
 	
 	public int getIndex() {
