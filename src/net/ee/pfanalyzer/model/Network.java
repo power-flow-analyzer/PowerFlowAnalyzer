@@ -279,6 +279,7 @@ public class Network extends ParameterSupport {
 		// setting model references in network elements
 		for (AbstractNetworkElement element : getElements()) {
 			ModelData model = getModelDB().getModel(element.getModelID());
+			// TODO warning if model is null? -> will not be found when searching for model IDs
 			element.setModel(model);
 			element.updateFlags(getModelDB());
 		}
@@ -308,8 +309,8 @@ public class Network extends ParameterSupport {
 	private void updateElement(AbstractNetworkElement element) {
 		if(element instanceof Branch) {
 			Branch branch = (Branch) element;
-			branch.setFromBus(getBus(branch.getFromBusNumber()));
-			branch.setToBus(getBus(branch.getToBusNumber()));
+			branch.setFromBus(getBusSafe(branch.getFromBusNumber(), "Branch: from bus"));
+			branch.setToBus(getBusSafe(branch.getToBusNumber(), "Branch: to bus"));
 		} else if(element instanceof Generator) {
 			Generator generator = (Generator) element;
 			generator.setBus(getBus(generator.getBusNumber()));
@@ -317,6 +318,13 @@ public class Network extends ParameterSupport {
 			NetworkElement ne = (NetworkElement) element;
 			ne.setParentBus(getBus(ne.getParentBusNumber()));
 		}
+	}
+	
+	private Bus getBusSafe(int busNumber, String elementRef) {
+		Bus bus = getBus(busNumber);
+		if(bus == null)
+			System.err.println(elementRef + ": bus not found with number " + Integer.toString(busNumber));
+		return bus;
 	}
 	
 	public void addNetworkChangeListener(INetworkChangeListener listener) {
