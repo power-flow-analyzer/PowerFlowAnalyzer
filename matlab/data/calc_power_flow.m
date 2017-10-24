@@ -3,13 +3,15 @@ function [  ] = calc_power_flow( jnetwork )
 %   Detailed explanation goes here
 
 % options for Matpower
+%mpopt = mpoption('VERBOSE', 3,'OUT_SYS_SUM',1,'OUT_BUS',0,'OUT_BRANCH',0,'OUT_GEN',0,'OUT_ALL_LIM',0);
 mpopt = mpoption('VERBOSE', 0, 'OUT_ALL', 0);
 
 % create structure containing case data for Matpower
 mpc = network2matpower(jnetwork);
+%save('matpower_case.mat', 'mpc');
 
 % calculate power flow
-algo = jnetwork.getTextParameter('POWER_FLOW_ALGO');
+algo = pfa_param_text(jnetwork, 'POWER_FLOW_ALGO');
 if strcmp(algo, 'PF')
     mpc2 = runpf(mpc, mpopt);
 elseif strcmp(algo, 'OPF')
@@ -32,7 +34,7 @@ end
 update_network(mpc2, jnetwork);
 
 % transfer data to visualisation
-transfer_update_network(jnetwork);
+pfa_update_network(jnetwork);
 
 end
 
