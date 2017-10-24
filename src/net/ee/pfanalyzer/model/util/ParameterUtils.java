@@ -21,6 +21,6 @@ public class ParameterUtils {
 		for (int i = 0; i < Math.min(rgb.length, rgbText.length); i++) {
 			rgb[i] = Integer.parseInt(rgbText[i]);
 		}
-		return new Color(rgb[0], rgb[1], rgb[2]);
+		return new Color(rgb[0], rgb[1], rgb[2]);// FIXME alpha channel is not used
 	}
 }
