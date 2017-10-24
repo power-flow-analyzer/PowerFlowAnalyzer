@@ -1,217 +1,242 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
 <power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
     <model-db>
-        <modelClass ID="conf" label="Configuration">
-            <modelClass ID="dialog" label="Dialog">
-                <modelClass ID="viewer" label="Viewer Dialog">
-                    <modelClass ID="network" label="Network" description="">
-                        <model ID="export_image" label="Export Image">
-                            <parameter ID="IMAGE_WIDTH" type="integer" label="Image width" description="The width of the output file in pixels" value="600.0">
-                                <display increment="100.0" min="0.0"/>
+        <modelClass label="Configuration" ID="conf">
+            <modelClass label="Dialog" ID="dialog">
+                <modelClass label="Viewer Dialog" ID="viewer">
+                    <modelClass description="" label="Network" ID="network">
+                        <model label="Export Image" ID="export_image">
+                            <parameter value="600.0" description="The width of the output file in pixels" label="Image width" type="integer" ID="IMAGE_WIDTH">
+                                <display min="0.0" increment="100.0"/>
                             </parameter>
-                            <parameter ID="IMAGE_HEIGHT" type="integer" label="Image height" description="The height of the output file in pixels" value="800.0">
-                                <display increment="100.0" min="0.0"/>
+                            <parameter value="800.0" description="The height of the output file in pixels" label="Image height" type="integer" ID="IMAGE_HEIGHT">
+                                <display min="0.0" increment="100.0"/>
                             </parameter>
-                            <parameter ID="IMAGE_COMPRESSION_QUALITY" type="double" label="Compression quality" description="Sets the quality of the JPEG image. &lt;br&gt;Must be between 0 and 1 (both inclusive). &lt;br&gt;A higher value means a higher quality, i.e. a lesser compression." value="1">
-                                <display decimalFormatPattern="#.##" increment="0.1" max="1.0" min="0.0"/>
+                            <parameter value="1" description="Sets the quality of the JPEG image. &lt;br&gt;Must be between 0 and 1 (both inclusive). &lt;br&gt;A higher value means a higher quality, i.e. a lesser compression." label="Compression quality" type="double" ID="IMAGE_COMPRESSION_QUALITY">
+                                <display min="0.0" max="1.0" increment="0.1" decimalFormatPattern="#.##"/>
                             </parameter>
-                            <parameter ID="IMAGE_FILE" type="text" label="Output file (JPEG)" description="The path of the output file. &lt;br&gt;May be relative to the current power flow case." restriction="file" empty="true">
+                            <parameter empty="true" restriction="file" description="The path of the output file. &lt;br&gt;May be relative to the current power flow case." label="Output file (JPEG)" type="text" ID="IMAGE_FILE">
                                 <display/>
                             </parameter>
                         </model>
                     </modelClass>
                 </modelClass>
             </modelClass>
-            <modelClass ID="viewer" label="Viewer">
-                <parameter ID="TITLE" type="text" label="Title" description="The title of this viewer" empty="true">
+            <modelClass label="Viewer" ID="viewer">
+                <parameter empty="true" description="The title of this viewer" label="Title" type="text" ID="TITLE">
                     <display/>
                 </parameter>
-                <parameter ID="POSITION" type="text" label="Position" description="&lt;html&gt;The position of this viewer.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Left: positioned at the left&lt;/li&gt;&lt;li&gt;Bottom: positioned at the bottom&lt;/li&gt;&lt;li&gt;Free: displayed in an external window&lt;/li&gt;&lt;/ul&gt;The default position is &quot;bottom&quot;." restriction="list" empty="true">
-                    <option value="left" label="Left" ID="LEFT"/>
-                    <option value="right" label="Right" ID="RIGHT"/>
-                    <option value="bottom" label="Bottom" ID="BOTTOM"/>
-                    <option value="free" label="Free" ID="FREE"/>
+                <parameter empty="true" restriction="list" description="&lt;html&gt;The position of this viewer.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Left: positioned at the left&lt;/li&gt;&lt;li&gt;Bottom: positioned at the bottom&lt;/li&gt;&lt;li&gt;Free: displayed in an external window&lt;/li&gt;&lt;/ul&gt;The default position is &quot;bottom&quot;." label="Position" type="text" ID="POSITION">
+                    <option ID="LEFT" label="Left" value="left"/>
+                    <option ID="RIGHT" label="Right" value="right"/>
+                    <option ID="BOTTOM" label="Bottom" value="bottom"/>
+                    <option ID="FREE" label="Free" value="free"/>
                     <display/>
                 </parameter>
-                <parameter ID="ICON" type="text" label="Icon" empty="true">
+                <parameter empty="true" label="Icon" type="text" ID="ICON">
                     <display/>
                 </parameter>
-                <parameter ID="WIDTH" type="integer" label="Width" value="300.0">
+                <parameter value="300.0" label="Width" type="integer" ID="WIDTH">
                     <display min="10.0"/>
                 </parameter>
-                <parameter ID="HEIGHT" type="integer" label="Height" value="300.0">
+                <parameter value="300.0" label="Height" type="integer" ID="HEIGHT">
                     <display min="10.0"/>
                 </parameter>
-                <modelClass ID="element" label="Element">
-                    <model ID="viewer" label="Network Browser" description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. ">
-                        <parameter ID="POSITION" value="right"/>
-                        <parameter ID="ICON" value="application_form.png"/>
-                        <parameter ID="VIEWER_AREA_NAME" type="text" label="Label" value="Area">
-                            <display section="Grouping Attributes" group="Area"/>
+                <modelClass label="Element" ID="element">
+                    <model description="A viewer allowing to navigate through the network and &lt;br&gt;to view and edit network elements. " label="Network Browser" ID="viewer">
+                        <parameter value="right" ID="POSITION"/>
+                        <parameter value="application_form.png" ID="ICON"/>
+                        <parameter value="Area" label="Label" type="text" ID="VIEWER_AREA_NAME">
+                            <display group="Area" section="Grouping Attributes"/>
                         </parameter>
-                        <parameter ID="VIEWER_AREA_PARAMETER" type="text" label="Parameter" value="BUS_AREA">
-                            <display section="Grouping Attributes" group="Area"/>
+                        <parameter value="BUS_AREA" label="Parameter" type="text" ID="VIEWER_AREA_PARAMETER">
+                            <display group="Area" section="Grouping Attributes"/>
                         </parameter>
-                        <parameter ID="GROUP_BUS_BY_AREA" type="boolean" label="Group by area" value="true">
+                        <parameter value="true" label="Group by area" type="boolean" ID="GROUP_BUS_BY_AREA">
                             <display group="Group Busses"/>
                         </parameter>
-                        <parameter ID="GROUP_BUS_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                        <parameter value="true" label="Group by coordinates" type="boolean" ID="GROUP_BUS_BY_LOCATION">
                             <display group="Group Busses"/>
                         </parameter>
-                        <parameter ID="GROUP_BRANCH_BY_AREA" type="boolean" label="Group by area and tie lines" value="true">
+                        <parameter value="true" label="Group by area and tie lines" type="boolean" ID="GROUP_BRANCH_BY_AREA">
                             <display group="Group Branches"/>
                         </parameter>
-                        <parameter ID="GROUP_BRANCH_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                        <parameter value="true" label="Group by coordinates" type="boolean" ID="GROUP_BRANCH_BY_LOCATION">
                             <display group="Group Branches"/>
                         </parameter>
-                        <parameter ID="GROUP_BRANCH_BY_VOLTAGE" type="boolean" label="Group by voltage level" value="true">
+                        <parameter value="true" label="Group by voltage level" type="boolean" ID="GROUP_BRANCH_BY_VOLTAGE">
                             <display group="Group Branches"/>
                         </parameter>
-                        <parameter ID="GROUP_ELEMENTS_BY_AREA" type="boolean" label="Group by area" value="true">
+                        <parameter value="true" label="Group by area" type="boolean" ID="GROUP_ELEMENTS_BY_AREA">
                             <display group="Group other elements"/>
                         </parameter>
-                        <parameter ID="GROUP_ELEMENTS_BY_LOCATION" type="boolean" label="Group by coordinates" value="true">
+                        <parameter value="true" label="Group by coordinates" type="boolean" ID="GROUP_ELEMENTS_BY_LOCATION">
                             <display group="Group other elements"/>
                         </parameter>
-                        <parameter ID="SHOW_NETWORK_PARAMETERS" type="boolean" label="Show global network parameters" value="true">
+                        <parameter value="true" label="Show global network parameters" type="boolean" ID="SHOW_NETWORK_PARAMETERS">
                             <display/>
                         </parameter>
-                        <parameter ID="SHOW_SUMS_OF_VALUES" type="boolean" label="Show sums of elements" value="true">
+                        <parameter value="true" label="Show sums of elements" type="boolean" ID="SHOW_SUMS_OF_VALUES">
                             <display/>
                         </parameter>
                     </model>
                 </modelClass>
-                <modelClass ID="network" label="Network">
-                    <parameter ID="POSITION" value="left"/>
-                    <parameter ID="ZOOM" type="integer" label="Zoom" restriction="list" value="0" empty="false">
-                        <option value="0" label="Best fit" ID="BEST_FIT"/>
-                        <option value="1" label="Custom" ID="CUSTOM"/>
-                        <option value="2" label="Germany" ID="GERMANY"/>
+                <modelClass label="Network" ID="network">
+                    <parameter value="left" ID="POSITION"/>
+                    <parameter empty="false" value="0" restriction="list" label="Zoom" type="integer" ID="ZOOM">
+                        <option ID="BEST_FIT" label="Best fit" value="0"/>
+                        <option ID="CUSTOM" label="Custom" value="1"/>
+                        <option ID="GERMANY" label="Germany" value="2"/>
                         <display group="View"/>
                     </parameter>
-                    <parameter ID="SHOW_LEGEND" type="boolean" label="Show Legend" value="true">
+                    <parameter value="true" label="Show Legend" type="boolean" ID="SHOW_LEGEND">
                         <display group="View"/>
                     </parameter>
-                    <parameter ID="KEEP_ASPECT_RATIO" type="boolean" label="Keep Aspect Ratio" value="true">
+                    <parameter value="true" label="Keep Aspect Ratio" type="boolean" ID="KEEP_ASPECT_RATIO">
                         <display group="View"/>
                     </parameter>
-                    <parameter ID="DRAW_BUSSES" type="boolean" label="Draw Bus Nodes" value="true">
+                    <parameter value="true" label="Draw Bus Nodes" type="boolean" ID="DRAW_BUSSES">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="DRAW_BRANCHES" type="boolean" label="Draw Branches" value="true">
+                    <parameter value="true" label="Draw Branches" type="boolean" ID="DRAW_BRANCHES">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="DRAW_POWER_FLOW_DIRECTION" type="boolean" label="Draw Power Flow Direction" value="true">
+                    <parameter value="true" label="Draw Power Flow Direction" type="boolean" ID="DRAW_POWER_FLOW_DIRECTION">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="DRAW_GENERATORS" type="boolean" label="Draw Generators" value="true">
+                    <parameter value="true" label="Draw Generators" type="boolean" ID="DRAW_GENERATORS">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="DRAW_OUTLINE" type="boolean" label="Draw Outline" value="true">
+                    <parameter value="true" label="Draw Outline" type="boolean" ID="DRAW_OUTLINE">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="ALLOW_ZOOMING" type="boolean" label="Allow zooming" value="true">
+                    <parameter value="true" label="Allow zooming" type="boolean" ID="ALLOW_ZOOMING">
                         <display group="Interaction"/>
                     </parameter>
-                    <parameter ID="ALLOW_DRAGGING" type="boolean" label="Allow dragging" value="true">
+                    <parameter value="true" label="Allow dragging" type="boolean" ID="ALLOW_DRAGGING">
                         <display group="Interaction"/>
                     </parameter>
-                    <parameter ID="SHOW_TOOLTIPS" type="boolean" label="Show Tooltips" value="true">
+                    <parameter value="true" label="Show Tooltips" type="boolean" ID="SHOW_TOOLTIPS">
                         <display group="Interaction"/>
                     </parameter>
-                    <parameter ID="DRAW_BUS_NAMES" type="boolean" label="Draw bus names" value="true">
+                    <parameter value="true" label="Draw bus names" type="boolean" ID="DRAW_BUS_NAMES">
                         <display group="Draw"/>
                     </parameter>
-                    <parameter ID="ICON" value="map.png"/>
-                    <parameter ID="FADE_OUT_UNSELECTED" type="boolean" label="Fade out unselected elements" value="false">
+                    <parameter value="map.png" ID="ICON"/>
+                    <parameter value="false" label="Fade out unselected elements" type="boolean" ID="FADE_OUT_UNSELECTED">
                         <display group="Draw"/>
                     </parameter>
-                    <model ID="busbar" label="Busbar View" description="Experimental!">
-                        <parameter ID="ICON" value="hlocchart.png"/>
+                    <parameter value="true" label="Draw areas" type="boolean" ID="DRAW_AREAS">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter value="FIXED_VALUE" restriction="list" label="Background color" type="text" ID="AREA_DISPLAY_VALUE">
+                        <option ID="FIXED_VALUE" label="Fixed value" value="FIXED_VALUE"/>
+                        <option ID="TIME_SERIES" label="Time series" value="TIME_SERIES"/>
+                        <option ID="FLAG" label="Flag" value="FLAG"/>
+                        <option ID="OUTLINE_BACKGROUND" label="Outline's background color" value="OUTLINE_BACKGROUND"/>
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter empty="true" restriction="model or class ID" label="Element Filter" type="text" ID="AREA_ELEMENT_FILTER">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter empty="true" label="Parameter" type="text" ID="AREA_PARAMETER_NAME">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter empty="true" label="Minimum value" type="double" ID="AREA_MIN_VALUE">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter empty="true" label="Maximum value" type="double" ID="AREA_MAX_VALUE">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter empty="false" value="255,255,255" restriction="color (RGB)" label="Minimum color" type="text" ID="AREA_MIN_COLOR">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <parameter value="255,0,0" restriction="color (RGB)" label="Maximum color" type="text" ID="AREA_MAX_COLOR">
+                        <display group="Areas" section="Network Elements"/>
+                    </parameter>
+                    <model description="A geographic map displaying network parameters &lt;br&gt;as colored contours." label="Contour Diagram" ID="contour">
+                        <parameter empty="true" restriction="model or class ID" description="Only includes those elements whose model ID starts with this pattern." label="Element Filter" type="text" ID="CONTOUR_ELEMENT_ID_PREFIX">
+                            <display group="Values" section="Contours"/>
+                        </parameter>
+                        <parameter empty="true" description="The ID of a parameter whose values should be drawn." label="Parameter" type="text" ID="CONTOUR_PARAMETER_NAME">
+                            <display group="Values" section="Contours"/>
+                        </parameter>
+                        <parameter empty="true" description="The maximum value to be displayed" label="Maximum value" type="double" ID="CONTOUR_MAX_VALUE">
+                            <display group="Values" section="Contours"/>
+                        </parameter>
+                        <parameter empty="true" description="The middle value to be displayed." label="Middle value" type="double" ID="CONTOUR_MIDDLE_VALUE">
+                            <display group="Values" section="Contours" decimalFormatPattern="#.##"/>
+                        </parameter>
+                        <parameter empty="true" description="The minimum value to be displayed" label="Minimum value" type="double" ID="CONTOUR_MIN_VALUE">
+                            <display group="Values" section="Contours" decimalFormatPattern="#.##"/>
+                        </parameter>
+                        <parameter value="70.0" description="Maximum distance for drawing values." label="Highlight distance" type="integer" ID="CONTOUR_MAX_DISTANCE">
+                            <display group="Display" section="Contours" min="0.0"/>
+                        </parameter>
+                        <parameter value="0.93" description="Controls the visibility of small values when they are in proximity of big values." label="Factor for small values" type="double" ID="CONTOUR_MAX_REL_DISTANCE">
+                            <display group="Display" section="Contours" min="0.0" max="1.0" increment="0.01" decimalFormatPattern="#.##"/>
+                        </parameter>
+                        <parameter value="0.0" description="The number of steps in the color legend. &lt;br&gt;Zero means an infinite number of steps." label="Color steps" type="integer" ID="CONTOUR_COLOR_STEPS">
+                            <display group="Display" section="Contours"/>
+                        </parameter>
+                        <parameter value="5" restriction="list" description="The color scheme to be used." label="Color scheme" type="integer" ID="COLOR_PROVIDER">
+                            <option ID="3" label="3 Colors" value="3"/>
+                            <option ID="5" label="5 Colors" value="5"/>
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="255,0,0" restriction="color (RGB)" description="The color for maximum values." label="Maximum color" type="text" ID="CONTOUR_MAX_COLOR">
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="255,255,0" restriction="color (RGB)" description="The color for values in the middle of the upper half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." label="Upper half color" type="text" ID="CONTOUR_UPPER_HALF_COLOR">
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="255,255,255" restriction="color (RGB)" description="The color for middle values. &lt;br&gt;Note that this color will also be used for drawing the background." label="Middle color" type="text" ID="CONTOUR_MIDDLE_COLOR">
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="0,255,255" restriction="color (RGB)" description="The color for values in the middle of the lower half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." label="Lower half color" type="text" ID="CONTOUR_LOWER_HALF_COLOR">
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="0,0,255" restriction="color (RGB)" description="The color for minimum values." label="Minimum color" type="text" ID="CONTOUR_MIN_COLOR">
+                            <display group="Colors" section="Contours"/>
+                        </parameter>
+                        <parameter value="0" restriction="list" description="Controls how values should be handled when they exceed the maximum/minimum value.&lt;br&gt;They can either be cut to the maximum/minimum value &lt;br&gt;or they can be omitted." label="Action for values out of bounds" type="integer" ID="ACTION_OUT_OF_BOUNDS">
+                            <option ID="CUT" label="Cut values" value="0"/>
+                            <option ID="OMIT" label="Omit values" value="1"/>
+                            <display group="Values" section="Contours"/>
+                        </parameter>
+                        <parameter value="185.0" description="Sets the contrast of all colors. A higher value means a higher contrast." label="Contrast" type="integer" ID="TRANSPARENCY">
+                            <display group="Display" section="Contours" min="0.0" max="255.0" increment="10.0"/>
+                        </parameter>
+                        <parameter value="color_management.png" ID="ICON"/>
                     </model>
-                    <model ID="contour" label="Contour Diagram" description="A geographic map displaying network parameters &lt;br&gt;as colored contours.">
-                        <parameter ID="CONTOUR_ELEMENT_ID_PREFIX" type="text" label="Element Filter" description="Only includes those elements whose model ID starts with this pattern." restriction="model or class ID" empty="true">
-                            <display section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_PARAMETER_NAME" type="text" label="Parameter" description="The ID of a parameter whose values should be drawn." empty="true">
-                            <display section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MAX_VALUE" type="double" label="Maximum value" description="The maximum value to be displayed" empty="true">
-                            <display section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MIDDLE_VALUE" type="double" label="Middle value" description="The middle value to be displayed." empty="true">
-                            <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MIN_VALUE" type="double" label="Minimum value" description="The minimum value to be displayed" empty="true">
-                            <display decimalFormatPattern="#.##" section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MAX_DISTANCE" type="integer" label="Highlight distance" description="Maximum distance for drawing values." value="70.0">
-                            <display min="0.0" section="Contours" group="Display"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MAX_REL_DISTANCE" type="double" label="Factor for small values" description="Controls the visibility of small values when they are in proximity of big values." value="0.93">
-                            <display decimalFormatPattern="#.##" increment="0.01" max="1.0" min="0.0" section="Contours" group="Display"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_COLOR_STEPS" type="integer" label="Color steps" description="The number of steps in the color legend. &lt;br&gt;Zero means an infinite number of steps." value="0.0">
-                            <display section="Contours" group="Display"/>
-                        </parameter>
-                        <parameter ID="COLOR_PROVIDER" type="integer" label="Color scheme" description="The color scheme to be used." restriction="list" value="5">
-                            <option value="3" label="3 Colors" ID="3"/>
-                            <option value="5" label="5 Colors" ID="5"/>
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MAX_COLOR" type="text" label="Maximum color" description="The color for maximum values." restriction="color (RGB)" value="255,0,0">
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_UPPER_HALF_COLOR" type="text" label="Upper half color" description="The color for values in the middle of the upper half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." restriction="color (RGB)" value="255,255,0">
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MIDDLE_COLOR" type="text" label="Middle color" description="The color for middle values. &lt;br&gt;Note that this color will also be used for drawing the background." restriction="color (RGB)" value="255,255,255">
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_LOWER_HALF_COLOR" type="text" label="Lower half color" description="The color for values in the middle of the lower half. &lt;br&gt;Note that this setting will only have an effect in the 5 colors scheme." restriction="color (RGB)" value="0,255,255">
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="CONTOUR_MIN_COLOR" type="text" label="Minimum color" description="The color for minimum values." restriction="color (RGB)" value="0,0,255">
-                            <display section="Contours" group="Colors"/>
-                        </parameter>
-                        <parameter ID="ACTION_OUT_OF_BOUNDS" type="integer" label="Action for values out of bounds" description="Controls how values should be handled when they exceed the maximum/minimum value.&lt;br&gt;They can either be cut to the maximum/minimum value &lt;br&gt;or they can be omitted." restriction="list" value="0">
-                            <option value="0" label="Cut values" ID="CUT"/>
-                            <option value="1" label="Omit values" ID="OMIT"/>
-                            <display section="Contours" group="Values"/>
-                        </parameter>
-                        <parameter ID="TRANSPARENCY" type="integer" label="Contrast" description="Sets the contrast of all colors. A higher value means a higher contrast." value="185.0">
-                            <display increment="10.0" max="255.0" min="0.0" section="Contours" group="Display"/>
-                        </parameter>
-                        <parameter ID="ICON" value="color_management.png"/>
-                    </model>
-                    <model ID="map" label="Network Map" description="A geographic map displaying the network."/>
+                    <model description="A geographic map displaying the network." label="Network Map" ID="map"/>
                 </modelClass>
-                <modelClass ID="table" label="Table">
-                    <parameter ID="POSITION" value="bottom"/>
-                    <model ID="type_filter" label="Data Table" description="A table containing the parameters of all elements &lt;br&gt;whose model ID matches a given pattern.">
-                        <parameter ID="ELEMENT_FILTER" type="text" label="Element filter" description="&lt;html&gt;Only those elements will be displayed&lt;br&gt;whose model ID starts with this pattern." restriction="model or class ID" empty="true">
+                <modelClass label="Table" ID="table">
+                    <parameter value="bottom" ID="POSITION"/>
+                    <model description="A table containing the parameters of all elements &lt;br&gt;whose model ID matches a given pattern." label="Data Table" ID="type_filter">
+                        <parameter empty="true" restriction="model or class ID" description="&lt;html&gt;Only those elements will be displayed&lt;br&gt;whose model ID starts with this pattern." label="Element filter" type="text" ID="ELEMENT_FILTER">
                             <display/>
                         </parameter>
-                        <parameter ID="ICON" value="table.png"/>
-                        <parameter ID="EXPORT_ROUND_VALUES" type="boolean" label="Round values" description="&lt;html&gt;Select this option if floating point numbers should be exported&lt;br&gt;with the precision defined in the parameter database.&lt;br&gt;Disable this option if values should not be rounded at all." value="false">
+                        <parameter value="table.png" ID="ICON"/>
+                        <parameter value="false" description="&lt;html&gt;Select this option if floating point numbers should be exported&lt;br&gt;with the precision defined in the parameter database.&lt;br&gt;Disable this option if values should not be rounded at all." label="Round values" type="boolean" ID="EXPORT_ROUND_VALUES">
                             <display group="Export values"/>
                         </parameter>
-                        <parameter ID="EXPORT_REMOVE_PERCENTAGE_SYMBOL" type="boolean" label="Convert percentage values" description="&lt;html&gt;If enabled percentage values will not be exported as such, i.e. their value&lt;br&gt;will not be multiplied by 100 and it will not contain a percentage symbol (%).&lt;br&gt;This option only has an effect if rounding of values is enabled." value="true">
+                        <parameter value="true" description="&lt;html&gt;If enabled percentage values will not be exported as such, i.e. their value&lt;br&gt;will not be multiplied by 100 and it will not contain a percentage symbol (%).&lt;br&gt;This option only has an effect if rounding of values is enabled." label="Convert percentage values" type="boolean" ID="EXPORT_REMOVE_PERCENTAGE_SYMBOL">
                             <display group="Export values"/>
                         </parameter>
-                        <parameter ID="EXPORT_CONVERT_BOOLEAN_VALUES" type="boolean" label="Convert boolean values" description="&lt;html&gt;If enabled boolean values will be exported as integers, &lt;br&gt;i.e. the values &quot;true&quot;/&quot;false&quot; will be exported as &quot;1&quot;/&quot;0&quot;." value="true">
+                        <parameter value="true" description="&lt;html&gt;If enabled boolean values will be exported as integers, &lt;br&gt;i.e. the values &quot;true&quot;/&quot;false&quot; will be exported as &quot;1&quot;/&quot;0&quot;." label="Convert boolean values" type="boolean" ID="EXPORT_CONVERT_BOOLEAN_VALUES">
                             <display group="Export values"/>
                         </parameter>
-                        <parameter ID="EXPORT_DECIMAL_SEPARATOR" type="text" label="Decimal separator" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." empty="true">
+                        <parameter empty="true" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." label="Decimal separator" type="text" ID="EXPORT_DECIMAL_SEPARATOR">
                             <display group="Export values"/>
                         </parameter>
-                        <parameter ID="EXPORT_LIST_VALUES" type="text" label="Values of list parameters" description="&lt;html&gt;Sets how the value of list parameters will be exported.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Value: exports the value of the selected option&lt;/li&gt;&lt;li&gt;Label: exports the label of the selected option.&lt;/li&gt;&lt;li&gt;ID: exports the ID of the selected option.&lt;/li&gt;&lt;/ul&gt;" restriction="list" value="value">
-                            <option value="value" label="Value" ID="VALUE"/>
-                            <option value="label" label="Label" ID="LABEL"/>
-                            <option value="id" label="ID" ID="ID"/>
+                        <parameter value="value" restriction="list" description="&lt;html&gt;Sets how the value of list parameters will be exported.&lt;br&gt;Possible values are:&lt;ul&gt;&lt;li&gt;Value: exports the value of the selected option&lt;/li&gt;&lt;li&gt;Label: exports the label of the selected option.&lt;/li&gt;&lt;li&gt;ID: exports the ID of the selected option.&lt;/li&gt;&lt;/ul&gt;" label="Values of list parameters" type="text" ID="EXPORT_LIST_VALUES">
+                            <option ID="VALUE" label="Value" value="value"/>
+                            <option ID="LABEL" label="Label" value="label"/>
+                            <option ID="ID" label="ID" value="id"/>
                             <display group="Export values"/>
                         </parameter>
-                        <parameter ID="IMPORT_DECIMAL_SEPARATOR" type="text" label="Decimal separator" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." empty="true">
+                        <parameter empty="true" description="&lt;html&gt;Use this character for representing decimal separators in floating point numbers.&lt;br&gt;Leave this option empty to use the system default of your operating system." label="Decimal separator" type="text" ID="IMPORT_DECIMAL_SEPARATOR">
                             <display group="Import values"/>
                         </parameter>
                     </model>

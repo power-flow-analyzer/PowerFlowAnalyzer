@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Programme/MATLAB/R2011a/java/jar/jmi.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="C:/Program Files (x86)/MATLAB/R2014a/java/jar/jmi.jar"/>
 	<classpathentry kind="lib" path="java/fatcow-hosting-icons-2000.zip"/>
 	<classpathentry kind="lib" path="java/miglayout-3.7-swing.jar" sourcepath="old/miglayout-3.7-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
