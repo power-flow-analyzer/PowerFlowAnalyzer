@@ -7,8 +7,12 @@ import net.ee.pfanalyzer.ui.util.MapBoundingBox;
 
 public interface IPaintListener {
 	
-	public final static int LAYER_CONTOUR = 0;
-	public final static int LAYER_OUTLINES = 10;
+	public final static int LAYER_BUS_NODES = 10;
+	public final static int LAYER_MARKERS = 9;
+	public final static int LAYER_BRANCHES = 8;
+	public final static int LAYER_AREAS = 7;
+	public final static int LAYER_OUTLINES = 6;
+	public final static int LAYER_CONTOUR = 5;
 
 	void paint(Graphics2D g2d);
 	
@@ -17,6 +21,8 @@ public interface IPaintListener {
 	boolean needsUpdate(DatabaseChangeEvent event);
 	
 	void update();
+	
+//	void updateDisplayTime(DisplayTimer timer);
 	
 	void setActive(boolean flag);
 	

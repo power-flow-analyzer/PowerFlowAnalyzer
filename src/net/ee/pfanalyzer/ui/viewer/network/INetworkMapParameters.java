@@ -9,6 +9,7 @@ public interface INetworkMapParameters {
 	
 	final static String PROPERTY_ZOOM_CHOICE = "ZOOM";
 	final static String PROPERTY_RESPECT_ASPECT_RATIO = "KEEP_ASPECT_RATIO";
+	final static String PROPERTY_DRAW_AREAS = "DRAW_AREAS";
 	final static String PROPERTY_DRAW_BUSSES = "DRAW_BUSSES";
 	final static String PROPERTY_DRAW_BUS_NAMES = "DRAW_BUS_NAMES";
 	final static String PROPERTY_DRAW_BRANCHES = "DRAW_BRANCHES";

@@ -62,6 +62,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 	
 	protected boolean respectAspectRatio = true;
 	protected boolean perfectFit = true;
+	protected boolean drawAreas = true;
 	protected boolean drawBusNodes = true;
 	protected boolean drawBusNames = true;
 	protected boolean drawBranches = true;
@@ -270,7 +271,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		return converter.getLongitude((int) coord);
 	}
 	
-	protected int[] getBusXY(int i) {
+	public int[] getBusXY(int i) {
 		double[] coords = getBusXYDouble(i);
 		return new int[] { (int) coords[0], (int) coords[1] };
 	}
@@ -286,7 +287,7 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		return new double[] { x, y };
 	}
 	
-	protected double[] getMarkerXYDouble(int i) {
+	public double[] getMarkerXYDouble(int i) {
 		int[] coords = internalMarkerCoords.get(i);
 		if(coords == null)
 			return new double[] { -1, -1 };
@@ -336,11 +337,11 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		repaint();
 	}
 	
-	protected boolean isHovered(Object object) {
+	public boolean isHovered(Object object) {
 		return hover != null && hover == object;
 	}
 	
-	protected boolean isSelection(Object object) {
+	public boolean isSelection(Object object) {
 		if(object == null || selection == null)
 			return false;
 		if(selection == object)
@@ -352,10 +353,51 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		if(selection instanceof CombinedNetworkElement<?> 
 				&& object instanceof AbstractNetworkElement) {
 			return ((CombinedNetworkElement<?>) selection).contains((AbstractNetworkElement) object);
-}
-		return selection != null && selection == object;
+		}
+		return false; // TODO is this really equivalent?
+//		return selection != null && selection == object;
 	}
 	
+	public boolean hasSelection() {
+		return selection != null;
+	}
+	
+	public boolean isDrawElementNames() {
+		return drawBusNames;
+	}
+	
+	public boolean isDrawBranches() {
+		return drawBranches;
+	}
+	
+	public boolean isDrawAreas() {
+		return drawAreas;
+	}
+	
+	public boolean isDrawBusNodes() {
+		return drawBusNodes;
+	}
+
+	public boolean isDrawGenerators() {
+		return drawGenerators;
+	}
+
+	public boolean isDrawMarkers() {
+		return drawMarkers;
+	}
+
+	public boolean isDrawFlags() {
+		return drawFlags;
+	}
+
+	public boolean isDrawPowerDirection() {
+		return drawPowerDirection;
+	}
+	
+	public boolean isFadeOutUnselected() {
+		return fadeOutUnselected;
+	}
+
 	protected void setViewerProperty(String property, String value) {
 		if(property.equals(PROPERTY_ZOOM_CHOICE)) {
 			if(value == null)
@@ -367,6 +409,9 @@ public abstract class CoordinateMap extends JComponent implements INetworkDataVi
 		} else if(property.equals(PROPERTY_RESPECT_ASPECT_RATIO)) {
 			respectAspectRatio = Boolean.valueOf(value);
 			initializeInternalCoordinates();
+			repaint();
+		} else if(property.equals(PROPERTY_DRAW_AREAS)) {
+			drawAreas = Boolean.valueOf(value);
 			repaint();
 		} else if(property.equals(PROPERTY_DRAW_BUSSES)) {
 			drawBusNodes = Boolean.valueOf(value);

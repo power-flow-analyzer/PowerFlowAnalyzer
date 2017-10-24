@@ -50,7 +50,7 @@ public class ContourDiagramViewer extends NetworkMapViewer {
 		colorLegend = new ColorLegend(settings);
 		getViewerController().add(colorLegend, BorderLayout.WEST);
 		getViewerController().add(contourLegend, BorderLayout.NORTH);
-		paintManager.addPaintListener(new ContourPainter(this, settings));
+		paintManager.addAsyncPaintListener(new ContourPainter(this, settings));
 	}
 	
 	@Override
