@@ -9,7 +9,7 @@ define_constants;
 mpc.version = '2';
 
 % collect data from network
-mpc.baseMVA = parameter_int(jnetwork, 'BASE_MVA');
+mpc.baseMVA = pfa_param_int(jnetwork, 'BASE_MVA');
 
 mpc.bus    = create_matpower_bus_matrix(jnetwork.getBusses());
 mpc.branch = create_matpower_branch_matrix(jnetwork.getBranches());

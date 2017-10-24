@@ -33,43 +33,43 @@ for i=1:bus_list.size()
 
 %% add parameters to current matrix row
     if length(busData) >= BUS_I 
-        busData(i, BUS_I) = parameter_int(jbus, 'BUS_I');
+        busData(i, BUS_I) = pfa_param_int(jbus, 'BUS_I');
     end
     if length(busData) >= BUS_TYPE 
-        busData(i, BUS_TYPE) = parameter_int(jbus, 'BUS_TYPE');
+        busData(i, BUS_TYPE) = pfa_param_int(jbus, 'BUS_TYPE');
     end
     if length(busData) >= PD 
-        busData(i, PD) = parameter_double(jbus, 'PD');
+        busData(i, PD) = pfa_param(jbus, 'PD');
     end
     if length(busData) >= QD 
-    	busData(i, QD) = parameter_double(jbus, 'QD');
+    	busData(i, QD) = pfa_param(jbus, 'QD');
     end
     if length(busData) >= GS 
-        busData(i, GS) = parameter_double(jbus, 'GS');
+        busData(i, GS) = pfa_param(jbus, 'GS');
     end
     if length(busData) >= BS 
-        busData(i, BS) = parameter_double(jbus, 'BS');
+        busData(i, BS) = pfa_param(jbus, 'BS');
     end
     if length(busData) >= BUS_AREA 
-        busData(i, BUS_AREA) = parameter_int(jbus, 'BUS_AREA');
+        busData(i, BUS_AREA) = pfa_param_int(jbus, 'BUS_AREA');
     end
     if length(busData) >= VM 
-        busData(i, VM) = parameter_double(jbus, 'VM');
+        busData(i, VM) = pfa_param(jbus, 'VM');
     end
     if length(busData) >= VA 
-        busData(i, VA) = parameter_double(jbus, 'VA');
+        busData(i, VA) = pfa_param(jbus, 'VA');
     end
     if length(busData) >= BASE_KV 
-        busData(i, BASE_KV) = parameter_double(jbus, 'BASE_KV');
+        busData(i, BASE_KV) = pfa_param(jbus, 'BASE_KV');
     end
     if length(busData) >= ZONE 
-        busData(i, ZONE) = parameter_int(jbus, 'ZONE');
+        busData(i, ZONE) = pfa_param_int(jbus, 'ZONE');
     end
     if length(busData) >= VMAX 
-        busData(i, VMAX) = parameter_double(jbus, 'VMAX');
+        busData(i, VMAX) = pfa_param(jbus, 'VMAX');
     end
     if length(busData) >= VMIN 
-        busData(i, VMIN) = parameter_double(jbus, 'VMIN');
+        busData(i, VMIN) = pfa_param(jbus, 'VMIN');
     end
 end
 
