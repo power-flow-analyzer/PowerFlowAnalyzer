@@ -208,7 +208,7 @@ public class FileSelectionPanel extends JPanel {
 		browseButton.setEnabled(enabled);
 	}
 	
-	class PathRenderer extends DefaultListCellRenderer implements ListCellRenderer {
+	class PathRenderer extends DefaultListCellRenderer {
 		@Override
 		public Component getListCellRendererComponent(JList list,
 				Object value, int index, boolean isSelected,
