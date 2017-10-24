@@ -2,10 +2,21 @@ package net.ee.pfanalyzer.ui.util;
 
 public class MapBoundingBox {
 
-	private double latitudeMin = Double.NaN;
-	private double latitudeMax = Double.NaN;
-	private double longitudeMin = Double.NaN;
-	private double longitudeMax = Double.NaN;
+	private double latitudeMin;
+	private double latitudeMax;
+	private double longitudeMin;
+	private double longitudeMax;
+	
+	public MapBoundingBox() {
+		reset();
+	}
+	
+	public void reset() {
+		latitudeMin = Double.NaN;
+		latitudeMax = Double.NaN;
+		longitudeMin = Double.NaN;
+		longitudeMax = Double.NaN;
+	}
 	
 	public void add(double latitude, double longitude) {
 		if(Double.isNaN(latitude) || Double.isNaN(longitude))
