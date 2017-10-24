@@ -7,10 +7,13 @@ import javax.swing.JComponent;
 import net.ee.pfanalyzer.model.INetworkChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.ui.INetworkElementSelectionListener;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 
 public interface INetworkDataViewer extends INetworkElementSelectionListener, INetworkChangeListener {
 
 	void refresh();
+	
+	void fireDisplayTimeChanged(DisplayTimer timer);
 	
 	void dispose();
 	

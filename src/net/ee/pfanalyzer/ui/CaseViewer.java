@@ -7,8 +7,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.ee.pfanalyzer.PowerFlowAnalyzer;
 import net.ee.pfanalyzer.math.coordinate.ICoordinateConverter;
@@ -36,6 +42,7 @@ import net.ee.pfanalyzer.model.data.ModelData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.db.ModelDBDialog;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.NetworkCellRenderer;
@@ -52,6 +59,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 	private ModelDBDialog modelDBDialog;
 	private NetworkOverviewPane overviewPane;
 	private NetworkSwitcher networkSwitcher;
+	private DisplayTimerControls timerControls;
 	
 	private Map<String, Outline> outlinesMap = new HashMap<String, Outline>();
 	private Collection<Outline> cachedOutlines;
@@ -86,7 +94,11 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 			}
 		});
 		networkSwitcher = new NetworkSwitcher();
-		add(networkSwitcher, BorderLayout.NORTH);
+		timerControls = new DisplayTimerControls();
+		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		topPanel.add(networkSwitcher);
+		topPanel.add(timerControls);
+		add(topPanel, BorderLayout.NORTH);
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
@@ -515,6 +527,110 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 					setNetwork(network);
 				fireActionUpdate();
 			}
+		}
+	}
+	
+	class DisplayTimerControls extends JPanel implements IActionUpdater, ActionListener, ChangeListener {
+		
+		Timer animation;
+		boolean isRunning = false;
+		JSlider timeSlider;
+		DisplayTimer timer;
+		boolean isTimerAction = false;
+		JButton startStopButton;
+		JLabel timeLabel;
+		
+		public DisplayTimerControls() {
+			super(new FlowLayout(FlowLayout.LEFT));
+			timer = powerFlowCase.getTimer();
+			JButton nextButton = PowerFlowAnalyzer.createButton("Set display time to next time step", 
+					"control_fastforward_blue.png", "Next", false);
+			nextButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					timer.nextStep();
+					updateViewer();
+				}
+			});
+			JButton previousButton = PowerFlowAnalyzer.createButton("Set display time to previous time step", 
+					"control_rewind_blue.png", "Previous", false);
+			previousButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					timer.previousStep();
+					updateViewer();
+				}
+			});
+			startStopButton = PowerFlowAnalyzer.createButton("Start animation", 
+					"control_play_blue.png", "Play", false);
+//			JButton playButton = PowerFlowAnalyzer.createButton("Start animation", 
+//					"control_play_blue.png", "Play", false);
+			startStopButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if(animation.isRunning()) {
+						animation.stop();
+						PowerFlowAnalyzer.decorateButton(startStopButton, "Start animation", 
+								"control_play_blue.png", "Play", false);
+					} else {
+						animation.start();
+						PowerFlowAnalyzer.decorateButton(startStopButton, "Stop animation", 
+								"control_stop_blue.png", "Stop", false);
+					}
+				}
+			});
+//			JButton pauseButton = PowerFlowAnalyzer.createButton("Stop animation", 
+//					"control_pause_blue.png", "Pause", false);
+//			pauseButton.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					animation.stop();
+//				}
+//			});
+			add(previousButton);
+			add(startStopButton);
+//			add(pauseButton);
+			add(nextButton);
+			timeSlider = new JSlider(JSlider.HORIZONTAL, 0, 8736, timer.getTimeStep());
+			timeSlider.addChangeListener(this);
+			timeSlider.setMajorTickSpacing(24 * 30);
+//			timeSlider.setSnapToTicks(true);
+			timeSlider.setPaintTicks(true);
+			add(timeSlider);
+			
+			timeLabel = new JLabel();
+			add(timeLabel);
+			
+			animation = new Timer(300, this);
+			animation.setInitialDelay(500);
+		}
+
+		@Override
+		public void updateActions() {
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if(isTimerAction == false) {
+				timer.setTimeStep(timeSlider.getValue());
+				updateViewer();
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			timer.nextStep();
+			isTimerAction = true;
+			timeSlider.setValue(timer.getTimeStep());
+			isTimerAction = false;
+			updateViewer();
+		}
+		
+		private void updateViewer() {
+			String text = SimpleDateFormat.getDateTimeInstance().format(new Date(timer.getTime()));
+			timeLabel.setText(text + " (time step " + timer.getTimeStep() + ")");
+			if(getCurrentViewer() != null)
+				getCurrentViewer().fireDisplayTimeChanged(timer);
 		}
 	}
 }

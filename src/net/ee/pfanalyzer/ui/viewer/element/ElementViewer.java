@@ -21,6 +21,7 @@ import net.ee.pfanalyzer.model.IDatabaseChangeListener;
 import net.ee.pfanalyzer.model.Network;
 import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
@@ -156,6 +157,11 @@ public class ElementViewer extends JPanel implements INetworkDataViewer,
 	@Override
 	public void refresh() {
 		selectionChanged(null);
+	}
+	
+	@Override
+	public void fireDisplayTimeChanged(DisplayTimer timer) {
+		// do nothing
 	}
 	
 	public void reloadCard() {

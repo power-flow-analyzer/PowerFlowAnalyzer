@@ -20,6 +20,7 @@ import net.ee.pfanalyzer.model.NetworkChangeEvent;
 import net.ee.pfanalyzer.model.NetworkFlag;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
 import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
@@ -125,6 +126,11 @@ public class PowerFlowDiagram extends JComponent implements INetworkDataViewer {
 	@Override
 	public void refresh() {
 		revalidate();
+	}
+	
+	@Override
+	public void fireDisplayTimeChanged(DisplayTimer timer) {
+		// do nothing
 	}
 
 	@Override

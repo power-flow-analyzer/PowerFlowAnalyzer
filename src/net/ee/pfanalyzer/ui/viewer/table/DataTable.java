@@ -29,6 +29,7 @@ import net.ee.pfanalyzer.model.ParameterException;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
 import net.ee.pfanalyzer.ui.NetworkElementSelectionManager;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 import net.ee.pfanalyzer.ui.util.SwingUtils;
 import net.ee.pfanalyzer.ui.viewer.DataViewerConfiguration;
 import net.ee.pfanalyzer.ui.viewer.DataViewerContainer;
@@ -184,6 +185,11 @@ public class DataTable extends JTable implements INetworkDataViewer {
 //		model.reloadTableData();
 		resizeAndRepaint();
 		selfSelection = false;
+	}
+	
+	@Override
+	public void fireDisplayTimeChanged(DisplayTimer timer) {
+		// do nothing
 	}
 
 	@Override

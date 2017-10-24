@@ -9,6 +9,7 @@ import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.data.NetworkData;
 import net.ee.pfanalyzer.model.data.NetworkParameter;
 import net.ee.pfanalyzer.ui.CaseViewer;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 
 public class PowerFlowCase implements IDatabaseChangeListener {
 
@@ -18,6 +19,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 	private List<Network> networksAndScenarios = new ArrayList<Network>();
 	private ModelDB modelDB;
 	private CaseViewer viewer;
+	private DisplayTimer timer;
 	private long maxNetworkID = 0;
 	private long caseID = -1;
 	private List<IPowerFlowCaseListener> listeners = new ArrayList<IPowerFlowCaseListener>();
@@ -27,6 +29,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		pfCase = new CaseData();
 		this.modelDB = modelDB;
 		pfCase.setModelDb(modelDB.getData());
+		timer = new DisplayTimer();
 		addDefaultTableViewers();
 		updateAllNetworkData();
 		modelDB.addDatabaseChangeListener(this);
@@ -41,6 +44,7 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 			for (NetworkData netData : pfCase.getNetwork()) {
 				addNetworkInternal(netData);
 			}
+			timer = new DisplayTimer();
 			addDefaultTableViewers();
 			modelDB.addDatabaseChangeListener(this);
 		} catch (Exception e) {
@@ -107,6 +111,10 @@ public class PowerFlowCase implements IDatabaseChangeListener {
 		for (IPowerFlowCaseListener listener : listeners) {
 			listener.caseChanged(this);
 		}
+	}
+	
+	public DisplayTimer getTimer() {
+		return timer;
 	}
 	
 	public CaseViewer getViewer() {

@@ -23,6 +23,7 @@ import net.ee.pfanalyzer.model.PowerFlowCase;
 import net.ee.pfanalyzer.model.data.DataViewerData;
 import net.ee.pfanalyzer.model.diagram.DiagramSheetProperties;
 import net.ee.pfanalyzer.model.util.ModelDBUtils;
+import net.ee.pfanalyzer.ui.timer.DisplayTimer;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
@@ -33,7 +34,6 @@ import net.ee.pfanalyzer.ui.viewer.INetworkDataViewer;
 import net.ee.pfanalyzer.ui.viewer.SelectViewerDialog;
 import net.ee.pfanalyzer.ui.viewer.diagram.PowerFlowDiagram;
 import net.ee.pfanalyzer.ui.viewer.element.ElementViewer;
-import net.ee.pfanalyzer.ui.viewer.network.BusBarViewer;
 import net.ee.pfanalyzer.ui.viewer.network.ContourDiagramViewer;
 import net.ee.pfanalyzer.ui.viewer.network.NetworkMapViewer;
 import net.ee.pfanalyzer.ui.viewer.table.DataTable;
@@ -120,8 +120,8 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 //			viewer = new PowerFlowDiagram(viewerData);
 		else if(NetworkMapViewer.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new NetworkMapViewer(getNetwork(), viewerData, this);
-		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
-			viewer = new BusBarViewer(getNetwork(), viewerData, this);
+//		else if(BusBarViewer.VIEWER_ID.equals(viewerData.getModelID()))
+//			viewer = new BusBarViewer(getNetwork(), viewerData, this);
 		else if(ContourDiagramViewer.VIEWER_ID.equals(viewerData.getModelID()))
 			viewer = new ContourDiagramViewer(getNetwork(), viewerData, this);
 		if(viewer == null)
@@ -161,6 +161,18 @@ public class NetworkViewer extends JPanel implements INetworkElementSelectionLis
 		else
 			tabPane = bottomViewers;
 		return tabPane;
+	}
+	
+	public void fireDisplayTimeChanged(DisplayTimer timer) {
+		DataViewerContainer c = (DataViewerContainer) bottomViewers.getVisibleTabComponent();
+		if(c != null)
+			c.getViewer().fireDisplayTimeChanged(timer);
+		c = (DataViewerContainer) leftViewers.getVisibleTabComponent();
+		if(c != null)
+			c.getViewer().fireDisplayTimeChanged(timer);
+		c = (DataViewerContainer) rightViewers.getVisibleTabComponent();
+		if(c != null)
+			c.getViewer().fireDisplayTimeChanged(timer);
 	}
 	
 //	private void addDiagram(String label, String elementID, String parameterID) {
