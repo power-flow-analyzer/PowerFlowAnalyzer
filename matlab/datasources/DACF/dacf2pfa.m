@@ -2,6 +2,7 @@ function [ network_data ] = dacf2pfa( dacf_data )
 %DACF2MATPOWER Summary of this function goes here
 %   Detailed explanation goes here
 
+aggregate_fixed_generation = false;
 
 network_data = struct();
 network_data.bus = struct();
@@ -32,7 +33,7 @@ if isfield(dacf_data, 'nodes')
     network_data.bus.VMAX = zeros(node_count, 1);
     network_data.bus.VMIN = zeros(node_count, 1);
     % initialize generator data
-    gen_count = length(find(~isnan(dacf_data.nodes.P_MIN)>0));
+    gen_count = length(find(dacf_data.nodes.P_GEN ~= 0));
     network_data.gen.GEN_BUS = zeros(gen_count, 1);
     network_data.gen.GEN_BUS_NAME = cell(gen_count, 1);
     network_data.gen.PG = zeros(gen_count, 1);
@@ -56,13 +57,44 @@ if isfield(dacf_data, 'nodes')
         network_data.bus.VMAX(node_i) = 1.1;
         network_data.bus.VMIN(node_i) = 0.9;
 
-        if ~isnan(dacf_data.nodes.P_MIN(node_i))
+        if dacf_data.nodes.P_GEN(node_i) ~= 0
+%             % set type of all PQ buses with a generator to PV type
+%             if network_data.bus.BUS_TYPE(node_i) == 1
+%                network_data.bus.BUS_TYPE(node_i) = 2; 
+%             end
+            PG = -dacf_data.nodes.P_GEN(node_i);
+            QG = -dacf_data.nodes.Q_GEN(node_i);
+            P_MAX = -dacf_data.nodes.P_MAX(node_i);
+            P_MIN = -dacf_data.nodes.P_MIN(node_i);
+            Q_MAX = -dacf_data.nodes.Q_MAX(node_i);
+            Q_MIN = -dacf_data.nodes.Q_MIN(node_i);
+            if isnan(P_MAX)
+                P_MAX = PG;
+            end
+            if isnan(P_MIN)
+                P_MIN = PG;
+            end
+            if isnan(Q_MAX)
+                Q_MAX = QG;
+            end
+            if isnan(Q_MIN)
+                Q_MIN = QG;
+            end
+            if aggregate_fixed_generation && ...
+                    PG == P_MAX && PG == P_MIN && QG == Q_MAX && QG == Q_MIN
+                network_data.bus.PD(node_i) = network_data.bus.PD(node_i) - PG;
+                network_data.bus.QD(node_i) = network_data.bus.QD(node_i) - QG;
+               continue; 
+            end
             network_data.gen.GEN_BUS(gen_i) = node_i;
             network_data.gen.GEN_BUS_NAME{gen_i} = dacf_data.nodes.NODE{node_i};
-            network_data.gen.PG(gen_i) = dacf_data.nodes.P_GEN(node_i);
-            network_data.gen.QG(gen_i) = dacf_data.nodes.Q_GEN(node_i);
-            network_data.gen.QMAX(gen_i) = dacf_data.nodes.Q_MAX(node_i);
-            network_data.gen.QMIN(gen_i) = dacf_data.nodes.Q_MIN(node_i);
+            network_data.gen.PG(gen_i) = PG;
+            network_data.gen.PMAX(gen_i) = P_MAX;
+            network_data.gen.PMIN(gen_i) = P_MIN;
+            network_data.gen.QG(gen_i) = QG;
+            network_data.gen.QMAX(gen_i) = Q_MAX;
+            network_data.gen.QMIN(gen_i) = Q_MIN;
+            % set voltage set point: only used in OPF if option opf.use_vg = 1
             if isnan(dacf_data.nodes.VOLTAGE_SET_POINT(node_i))
                 network_data.gen.VG(gen_i) = 1;
             else
@@ -70,19 +102,25 @@ if isfield(dacf_data, 'nodes')
                     dacf_data.nodes.VOLTAGE_SET_POINT(node_i) / network_data.bus.BASE_KV(node_i);
             end
             % set voltage set point for bus
-            network_data.bus.VM(node_i) = network_data.gen.VG(gen_i);
-            network_data.gen.MBASE(gen_i) = dacf_data.nodes.P_NOM(node_i);
-            network_data.gen.GEN_STATUS(gen_i) = ...
-                abs(dacf_data.nodes.P_GEN(node_i)) > 0 || abs(dacf_data.nodes.Q_GEN(node_i)) > 0;
-            network_data.gen.PMAX(gen_i) = dacf_data.nodes.P_MAX(node_i);
-            network_data.gen.PMIN(gen_i) = dacf_data.nodes.P_MIN(node_i);
+%             network_data.bus.VM(node_i) = network_data.gen.VG(gen_i);
+            network_data.gen.MBASE(gen_i) = 100;%dacf_data.nodes.P_NOM(node_i);
+            network_data.gen.GEN_STATUS(gen_i) = abs(PG) > 0 || abs(QG) > 0;
             gen_i = gen_i + 1;
         end
     end
-    % Some values might not be given for all voltage levels
-    network_data.gen.MBASE(find(isnan(network_data.gen.MBASE) == 1)) = 0;
-    network_data.gen.QMAX(find(isnan(network_data.gen.QMAX) == 1)) = 100;
-    network_data.gen.QMIN(find(isnan(network_data.gen.QMIN) == 1)) = -100;
+    if aggregate_fixed_generation
+        network_data.gen.GEN_BUS = network_data.gen.GEN_BUS(1:gen_i - 1); %#ok<UNRCH>
+        network_data.gen.GEN_BUS_NAME = network_data.gen.GEN_BUS_NAME(1:gen_i - 1);
+        network_data.gen.PG = network_data.gen.PG(1:gen_i - 1);
+        network_data.gen.QG = network_data.gen.QG(1:gen_i - 1);
+        network_data.gen.QMAX = network_data.gen.QMAX(1:gen_i - 1);
+        network_data.gen.QMIN = network_data.gen.QMIN(1:gen_i - 1);
+        network_data.gen.VG = network_data.gen.VG(1:gen_i - 1);
+        network_data.gen.MBASE = network_data.gen.MBASE(1:gen_i - 1);
+        network_data.gen.GEN_STATUS = network_data.gen.GEN_STATUS(1:gen_i - 1);
+        network_data.gen.PMAX = network_data.gen.PMAX(1:gen_i - 1);
+        network_data.gen.PMIN = network_data.gen.PMIN(1:gen_i - 1);
+    end
 end
 
 %% branch
@@ -115,24 +153,34 @@ if isfield(dacf_data, 'lines')
         network_data.branch.ORDER_CODE{branch_i} = ...
             dacf_data.lines.LINE_ORDER_CODE{branch_i};
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
-        base_power = network_data.BASE_MVA * 1000000;                   % change to VA
-        base_impedance=(base_voltage)^2/base_power;
+        base_power = network_data.BASE_MVA * 1000000;                  % change to VA
+        base_impedance = (base_voltage) ^ 2 / base_power;
         branch_r = dacf_data.lines.LINE_RESISTANCE (branch_i) / base_impedance;
         branch_x = dacf_data.lines.LINE_REACTANCE  (branch_i) / base_impedance;
-        branch_b = dacf_data.lines.LINE_SUSCEPTANCE(branch_i) / base_impedance;
+        % avoid a zero reactance (leads to infinity in admittance matrix)
+        if branch_x == 0
+            branch_x = 0.000001;
+        end
+        % susceptance is given in uS
+        branch_b = dacf_data.lines.LINE_SUSCEPTANCE(branch_i) * base_impedance / 1000000;
+        if isnan(branch_b)
+            branch_b = 0;
+        end
         network_data.branch.BR_R(branch_i) = branch_r;
         network_data.branch.BR_X(branch_i) = branch_x;
         network_data.branch.BR_B(branch_i) = branch_b;
-        network_data.branch.RATE_A(branch_i) = ...
-            network_data.bus.BASE_KV(from_bus_index) * dacf_data.lines.LINE_RATING(branch_i) / 1000;
+        % line rating in MVA: Snom = sqrt(3) * U * I
+        LINE_RATING = sqrt(3) * network_data.bus.BASE_KV(from_bus_index) * ...
+            dacf_data.lines.LINE_RATING(branch_i) / 1000;
+        if isnan(LINE_RATING)
+            LINE_RATING = 0; % set infinite rating
+        end
+        network_data.branch.RATE_A(branch_i) = LINE_RATING;
         network_data.branch.BR_STATUS(branch_i) = ...
             line_to_branch_status(dacf_data.lines.LINE_STATUS(branch_i));
         network_data.branch.ANGMIN(branch_i) = -360;
         network_data.branch.ANGMAX(branch_i) = 360;
     end
-    % Some values might not be given for all voltage levels
-    network_data.branch.BR_B(find(isnan(network_data.branch.BR_B) == 1)) = 0;
-    network_data.branch.RATE_A(find(isnan(network_data.branch.RATE_A) == 1)) = 0;
 end
 
 %% transformer
@@ -167,11 +215,15 @@ if isfield(dacf_data, 'transformers')
         network_data.transformer.ORDER_CODE{trafo_i} = ...
             dacf_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
-        base_power = network_data.BASE_MVA * 1000000;                   % change to VA
-        base_impedance=(base_voltage)^2/base_power;
+        base_power = network_data.BASE_MVA * 1000000;                  % change to VA
+        base_impedance = (base_voltage) ^ 2 / base_power;
         branch_r = dacf_data.transformers.TRANSFORMER_RESISTANCE (trafo_i) / base_impedance;
         branch_x = dacf_data.transformers.TRANSFORMER_REACTANCE  (trafo_i) / base_impedance;
-        branch_b = dacf_data.transformers.TRANSFORMER_SUSCEPTANCE(trafo_i) / base_impedance;
+        % susceptance is given in uS
+        branch_b = dacf_data.transformers.TRANSFORMER_SUSCEPTANCE(trafo_i) * base_impedance / 1000000;
+        if isnan(branch_b)
+            branch_b = 0;
+        end
         network_data.transformer.BR_R(trafo_i) = branch_r;
         network_data.transformer.BR_X(trafo_i) = branch_x;
         network_data.transformer.BR_B(trafo_i) = branch_b;
@@ -222,7 +274,7 @@ function [ base_kv ] = node_name_to_base_kv(node_name)
         case 0
             base_kv = 750;
         case 1
-            base_kv = 400;%380;
+            base_kv = 380;
         case 2
             base_kv = 220;
         case 3
