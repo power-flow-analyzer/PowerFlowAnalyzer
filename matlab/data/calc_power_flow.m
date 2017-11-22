@@ -4,11 +4,23 @@ function [  ] = calc_power_flow( jnetwork )
 
 % options for Matpower
 %mpopt = mpoption('VERBOSE', 3,'OUT_SYS_SUM',1,'OUT_BUS',0,'OUT_BRANCH',0,'OUT_GEN',0,'OUT_ALL_LIM',0);
-mpopt = mpoption('VERBOSE', 0, 'OUT_ALL', 0);
+% mpopt = mpoption('VERBOSE', 0, 'OUT_ALL', 0);
+mpopt = mpoption('VERBOSE', 3,'OUT_SYS_SUM',1,'OUT_BUS',0,'OUT_BRANCH',0,'OUT_GEN',0,'OUT_ALL_LIM',1);
 
 % create structure containing case data for Matpower
 mpc = network2matpower(jnetwork);
 %save('matpower_case.mat', 'mpc');
+
+% find islands and isolated buses
+connected_buses = find_islands(mpc);
+if length(connected_buses) > 1
+    error('Error: %i islands were detected in network', length(connected_buses));
+end
+connected_buses = connected_buses{1};% make it a double vector
+isolated_buses = setxor(mpc.bus(:, 1)', connected_buses);
+for bus_i = isolated_buses
+    mpc.bus(bus_i, 2) = 4; % set bus type to isolated
+end
 
 % calculate power flow
 algo = pfa_param_text(jnetwork, 'POWER_FLOW_ALGO');
