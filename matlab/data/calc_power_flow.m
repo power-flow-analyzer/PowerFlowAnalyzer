@@ -17,7 +17,8 @@ if length(connected_buses) > 1
     error('Error: %i islands were detected in network', length(connected_buses));
 end
 connected_buses = connected_buses{1};% make it a double vector
-isolated_buses = setxor(mpc.bus(:, 1)', connected_buses);
+all_buses = 1:size(mpc.bus(:, 1), 1);
+isolated_buses = setxor(all_buses, connected_buses);
 for bus_i = isolated_buses
     mpc.bus(bus_i, 2) = 4; % set bus type to isolated
 end
