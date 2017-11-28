@@ -31,10 +31,14 @@ find_nan = cellfun(@(V) any(isnan(V(:))), parameters);
 parameters(find_nan)={''};
 parameters(strcmp(parameters, '-'))={''};
 
+data.fields = cell(1, length(parameters));
+
 for column_i = 1:length(parameters)
+    param_name = parameters{column_i};
+    data.fields{1, column_i} = param_name;
     % normalize parameter name
     % replace spaces with underscores
-    field_name = strrep(upper(parameters{column_i}), ' ', '_');
+    field_name = strrep(upper(param_name), ' ', '_');
     % use built-in function for all other characters
     field_name = matlab.lang.makeValidName(field_name);
     % skip columns with empty parameter
@@ -43,7 +47,9 @@ for column_i = 1:length(parameters)
     end
 %     fprintf('Parameter %s\n', field_name);
     column_values = all_values(data_values_row:last_row, column_i);
-    if isnumeric(column_values{1,1})
+    if strcmp(field_name, 'TIME')
+        data.time = column_values;
+    elseif isnumeric(column_values{1,1})
         data.(field_name) = cell2mat(column_values);
     elseif ischar(column_values{1,1})
         column_values(strcmp(column_values, '-'))={''};
