@@ -31,11 +31,11 @@ find_nan = cellfun(@(V) any(isnan(V(:))), parameters);
 parameters(find_nan)={''};
 parameters(strcmp(parameters, '-'))={''};
 
-data.fields = cell(1, length(parameters));
+data.fields = cell(2, length(parameters));
+delete_fields = cell(0, 1);
 
 for column_i = 1:length(parameters)
     param_name = parameters{column_i};
-    data.fields{1, column_i} = param_name;
     % normalize parameter name
     % replace spaces with underscores
     field_name = strrep(upper(param_name), ' ', '_');
@@ -45,16 +45,25 @@ for column_i = 1:length(parameters)
     if isempty(field_name) || isempty(strtrim(field_name))
         continue;
     end
+    data.fields{1, column_i} = param_name;
+    data.fields{2, column_i} = field_name;
 %     fprintf('Parameter %s\n', field_name);
     column_values = all_values(data_values_row:last_row, column_i);
     if strcmp(field_name, 'TIME')
         data.time = column_values;
+        delete_fields = {param_name};
     elseif isnumeric(column_values{1,1})
         data.(field_name) = cell2mat(column_values);
     elseif ischar(column_values{1,1})
         column_values(strcmp(column_values, '-'))={''};
         data.(field_name) = column_values;
     end
+end
+
+% delete fields if necessary
+for field_i = 1:length(delete_fields)
+    index_i = find(strcmp(data.fields(1, :), delete_fields(field_i)));
+    data.fields = data.fields(:, [1:index_i-1, index_i+1:end]);
 end
 
 % exlFile.Save
