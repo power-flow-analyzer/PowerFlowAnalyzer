@@ -3,6 +3,8 @@ function [ data ] = read_datasource_excel( input_file, table_name, ...
 %PFA_READ_EXCEL Summary of this function goes here
 %   Detailed explanation goes here
 
+data = struct;
+
 % Source File
 [source_path, source_file_name, source_file_ext] = fileparts(fullfile(input_file));
 input_file_full = fullfile(pwd, source_path, strcat(source_file_name, source_file_ext));
@@ -26,6 +28,13 @@ end
 all_values = exl_table.UsedRange.Value;
 last_row = size(all_values, data_index_column);
 
+% check for empty table -> return empty structure
+if data_index_row > size(all_values, 1)
+    exl_workbook.Close;
+    exl.Quit;
+    fprintf('Empty sheet "%s" in Excel file "%s"\n', table_name, input_file_full);
+    return;
+end
 parameters = all_values(data_index_row, :);
 find_nan = cellfun(@(V) any(isnan(V(:))), parameters);
 parameters(find_nan)={''};
