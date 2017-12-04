@@ -212,8 +212,13 @@ if isfield(dacf_data, 'transformers')
         network_data.transformer.T_BUS_NAME{trafo_i} = to_bus_name;
         network_data.transformer.F_BUS(trafo_i) = from_bus_index;
         network_data.transformer.T_BUS(trafo_i) = to_bus_index;
-        network_data.transformer.ORDER_CODE{trafo_i} = ...
-            dacf_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
+        if isnumeric(dacf_data.transformers.TRANSFORMER_ORDER_CODE)
+            network_data.transformer.ORDER_CODE{trafo_i} = ...
+                dacf_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i);
+        else
+            network_data.transformer.ORDER_CODE{trafo_i} = ...
+                dacf_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
+        end
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
         base_power = network_data.BASE_MVA * 1000000;                  % change to VA
         base_impedance = (base_voltage) ^ 2 / base_power;
@@ -235,19 +240,21 @@ if isfield(dacf_data, 'transformers')
     end
 
     %% transformer regulation
-    trafo_regulation_count = length(dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER);
+    if isfield(dacf_data, 'transformers_regulation')
+        trafo_regulation_count = length(dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER);
 
-    for trafo_reg_i = 1:trafo_regulation_count
-        trafo_id = dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER{trafo_reg_i};
-        trafo_ref = strsplit(trafo_id, ' ');
-        from_bus = find(strcmp(network_data.transformer.F_BUS_NAME, trafo_ref{1}));
-        to_bus = find(strcmp(network_data.transformer.T_BUS_NAME, trafo_ref{2}));
-        code = find(strcmp(network_data.transformer.ORDER_CODE, trafo_ref{3}));
-        trafo_index = intersect(intersect(from_bus, to_bus), code);
-        if length(trafo_index) == 1
-            % TODO
-        else
-            warning('Transformer cannot be found: "%s". Ignoring regulation in row %i.', trafo_id, trafo_reg_i);
+        for trafo_reg_i = 1:trafo_regulation_count
+            trafo_id = dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER{trafo_reg_i};
+            trafo_ref = strsplit(trafo_id, ' ');
+            from_bus = find(strcmp(network_data.transformer.F_BUS_NAME, trafo_ref{1}));
+            to_bus = find(strcmp(network_data.transformer.T_BUS_NAME, trafo_ref{2}));
+            code = find(strcmp(network_data.transformer.ORDER_CODE, trafo_ref{3}));
+            trafo_index = intersect(intersect(from_bus, to_bus), code);
+            if length(trafo_index) == 1
+                % TODO
+            else
+                warning('Transformer cannot be found: "%s". Ignoring regulation in row %i.', trafo_id, trafo_reg_i);
+            end
         end
     end
 
