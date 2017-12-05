@@ -19,6 +19,9 @@ for time_i = 1:size(data.time, 1)
 end
 
 series.fields = data.fields(1, :);
+% TODO remove empty fields
+%find_nan = cellfun(@(V) any(isempty(V(:))), parameters);
+%parameters(find_nan)={''};
 
 series.values = nan(size(data.time, 1), size(data.fields, 2));
 for field_i = 1:size(data.fields, 2)
