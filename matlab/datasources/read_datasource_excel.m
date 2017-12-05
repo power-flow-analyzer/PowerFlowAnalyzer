@@ -40,22 +40,24 @@ find_nan = cellfun(@(V) any(isnan(V(:))), parameters);
 parameters(find_nan)={''};
 parameters(strcmp(parameters, '-'))={''};
 
-data.fields = cell(2, length(parameters));
+fields = parameters(isempty(parameters));
+data.fields = cell(2, length(fields));
 delete_fields = cell(0, 1);
 
+field_i = 1;
 for column_i = 1:length(parameters)
     param_name = parameters{column_i};
     % normalize parameter name
+    % skip columns with empty parameter
+    if isempty(param_name) || isempty(strtrim(param_name))
+        continue;
+    end
     % replace spaces with underscores
     field_name = strrep(upper(param_name), ' ', '_');
     % use built-in function for all other characters
     field_name = matlab.lang.makeValidName(field_name);
-    % skip columns with empty parameter
-    if isempty(field_name) || isempty(strtrim(field_name))
-        continue;
-    end
-    data.fields{1, column_i} = param_name;
-    data.fields{2, column_i} = field_name;
+    data.fields{1, field_i} = param_name;
+    data.fields{2, field_i} = field_name;
 %     fprintf('Parameter %s\n', field_name);
     column_values = all_values(data_values_row:last_row, column_i);
     if strcmp(field_name, 'TIME')
@@ -67,6 +69,7 @@ for column_i = 1:length(parameters)
         column_values(strcmp(column_values, '-'))={''};
         data.(field_name) = column_values;
     end
+    field_i = field_i + 1;
 end
 
 % delete fields if necessary
