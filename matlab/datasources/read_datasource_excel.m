@@ -29,7 +29,7 @@ all_values = exl_table.UsedRange.Value;
 last_row = size(all_values, data_index_column);
 
 % check for empty table -> return empty structure
-if data_index_row > size(all_values, 1)
+if data_index_row >= size(all_values, 1)
     exl_workbook.Close;
     exl.Quit;
     fprintf('Empty sheet "%s" in Excel file "%s"\n', table_name, input_file_full);
