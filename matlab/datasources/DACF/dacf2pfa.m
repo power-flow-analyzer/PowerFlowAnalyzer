@@ -150,12 +150,17 @@ if isfield(dacf_data, 'lines')
         network_data.branch.T_BUS_NAME{branch_i} = to_bus_name;
         network_data.branch.F_BUS(branch_i) = from_bus_index;
         network_data.branch.T_BUS(branch_i) = to_bus_index;
-        network_data.branch.ORDER_CODE{branch_i} = ...
-            dacf_data.lines.LINE_ORDER_CODE{branch_i};
-        network_data.branch.IDENTIFIER{branch_i} = strjoin({...
+        if isnumeric(dacf_data.lines.LINE_ORDER_CODE)
+            network_data.branch.ORDER_CODE{branch_i} = ...
+                dacf_data.lines.LINE_ORDER_CODE(branch_i);
+        else
+            network_data.branch.ORDER_CODE{branch_i} = ...
+                dacf_data.lines.LINE_ORDER_CODE{branch_i};
+        end
+        network_data.branch.IDENTIFIER{branch_i} = get_identifier(...
             dacf_data.lines.LINE_CONNECTIVITY_NODE_1{branch_i}, ...
             dacf_data.lines.LINE_CONNECTIVITY_NODE_2{branch_i}, ...
-            dacf_data.lines.LINE_ORDER_CODE{branch_i}});
+            dacf_data.lines.LINE_ORDER_CODE(branch_i));
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
         base_power = network_data.BASE_MVA * 1000000;                  % change to VA
         base_impedance = (base_voltage) ^ 2 / base_power;
@@ -223,6 +228,10 @@ if isfield(dacf_data, 'transformers')
             network_data.transformer.ORDER_CODE{trafo_i} = ...
                 dacf_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
         end
+        network_data.transformer.IDENTIFIER{trafo_i} = get_identifier(...
+            dacf_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
+            dacf_data.transformers.RW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
+            dacf_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i));
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
         base_power = network_data.BASE_MVA * 1000000;                  % change to VA
         base_impedance = (base_voltage) ^ 2 / base_power;
@@ -324,4 +333,20 @@ function [ branch_status ] = line_to_branch_status(line_status)
         otherwise
             error('Unknown line status code: %i', line_status);
     end
+end
+
+function [ identifier ] = get_identifier(part_1, part_2, part_3)
+    if isnumeric(part_1)
+        part_1 = num2str(part_1);
+    end
+    if isnumeric(part_2)
+        part_2 = num2str(part_2);
+    end
+    if iscell(part_3)
+        part_3 = part_3{1};
+    end
+    if isnumeric(part_3)
+        part_3 = num2str(part_3);
+    end
+    identifier = strjoin({part_1, part_2, part_3});
 end
