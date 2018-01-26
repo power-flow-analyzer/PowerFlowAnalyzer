@@ -14,6 +14,7 @@ if isempty(sourceFileInfo)
 end
 
 exl = actxserver('excel.application');
+exl.DisplayAlerts = false; % do not block UI with invisible prompts from Excel (e.g. saving before closing)
 exl_workbook = exl.Workbooks;
 exl_file = exl_workbook.Open(input_file_full);
     
@@ -79,6 +80,7 @@ for field_i = 1:length(delete_fields)
 end
 
 % exlFile.Save
+
 exl_workbook.Close;
 exl.Quit;
 
