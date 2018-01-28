@@ -9,6 +9,7 @@ addpath([pwd '/matlab/communication']);
 addpath([pwd '/matlab/data']);
 addpath([pwd '/matlab/datasources']);
 addpath([pwd '/matlab/datasources/DACF']);
+addpath([pwd '/matlab/matpower']);
 addpath([pwd '/matlab/parameters']);
 addpath([pwd '/matlab/viewer']);
 
