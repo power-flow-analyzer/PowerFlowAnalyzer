@@ -205,11 +205,13 @@ if isfield(dacf_data, 'transformers')
     network_data.transformer.BR_X = zeros(trafo_count, 1);
     network_data.transformer.BR_B = zeros(trafo_count, 1);
     network_data.transformer.RATE_A = zeros(trafo_count, 1);
-    network_data.transformer.TAP = zeros(trafo_count, 1);
+    network_data.transformer.TAP = ones(trafo_count, 1);
     network_data.transformer.SHIFT = zeros(trafo_count, 1);
     network_data.transformer.BR_STATUS = zeros(trafo_count, 1);
     network_data.transformer.ANGMIN = zeros(trafo_count, 1);
     network_data.transformer.ANGMAX = zeros(trafo_count, 1);
+%     network_data.transformer.TAP_COUNT = zeros(trafo_count, 1);
+%     network_data.transformer.TAP_POSITION = zeros(trafo_count, 1);
 
     for trafo_i = 1:trafo_count
         % find bus nodes
@@ -259,12 +261,37 @@ if isfield(dacf_data, 'transformers')
         for trafo_reg_i = 1:trafo_regulation_count
             trafo_id = dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER{trafo_reg_i};
             trafo_ref = strsplit(trafo_id, ' ');
-            from_bus = find(strcmp(network_data.transformer.F_BUS_NAME, trafo_ref{1}));
-            to_bus = find(strcmp(network_data.transformer.T_BUS_NAME, trafo_ref{2}));
-            code = find(strcmp(network_data.transformer.ORDER_CODE, trafo_ref{3}));
+            from_bus_name = trafo_ref{1};
+            to_bus_name = trafo_ref{2};
+            order_code = trafo_ref{3};
+            from_bus = find(strcmp(network_data.transformer.F_BUS_NAME, from_bus_name));
+            to_bus = find(strcmp(network_data.transformer.T_BUS_NAME, to_bus_name));
+            code = find(strcmp(network_data.transformer.ORDER_CODE, order_code));
             trafo_index = intersect(intersect(from_bus, to_bus), code);
             if length(trafo_index) == 1
                 % TODO
+%                 network_data.transformer.TAP_POSITION(trafo_index) = ...
+%                     dacf_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
+%                 from_bus_index = find(strcmp(network_data.bus.IDENTIFIER, from_bus_name));
+%                 to_bus_index = find(strcmp(network_data.bus.IDENTIFIER, to_bus_name));
+%                 % nominal voltage of busbars
+%                 U1n = network_data.bus.BASE_KV(from_bus_index);
+%                 U2n = network_data.bus.BASE_KV(to_bus_index);
+%                 % rated voltage of transformer
+%                 U1r = dacf_data.transformers.RATED_VOLTAGE_1(trafo_index);
+%                 U2r = dacf_data.transformers.RATED_VOLTAGE_2(trafo_index);
+                
+                du = dacf_data.transformers_regulation.PHASE_REGULATION_VOLTAGE_CHANGE_PER_TAP(trafo_reg_i) / 100;
+                n = dacf_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
+%                 p = 1 / (1 + n * du);
+%                 U2n_new = U2n / p;
+%                 U2r_new = U2r / p;
+%                 ratio = U1r / U2r;
+%                 ratio = (U1n / U2n_new) / (U1r / U2r_new);
+%                 DU_node2 = du * U2r * n;
+%                 p = U1r / U2r;
+%                 DU_node1 = p * DU_node2;
+                network_data.transformer.TAP(trafo_index) = 1 + n * du;
             else
                 warning('Transformer cannot be found: "%s". Ignoring regulation in row %i.', trafo_id, trafo_reg_i);
             end
