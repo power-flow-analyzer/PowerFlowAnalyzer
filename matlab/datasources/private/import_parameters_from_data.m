@@ -21,6 +21,10 @@ end
 %                 char(data.(param_name)(data_entry.index)), param_name);
 %             continue;
 %         end
+        % skip "fields" parameter
+        if strcmp(param_name, 'fields')
+            continue;
+        end
         param_value = data_entry.(param_name);
         
         %% determine parameter value depending on Matlab data type

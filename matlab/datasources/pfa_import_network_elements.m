@@ -3,7 +3,7 @@ function [ jlist_new_elements, jlist_updated_elements ] = ...
 %IMPORT_NETWORK_ELEMENTS Summary of this function goes here
 %   Detailed explanation goes here
 
-parameters = fieldnames(data);
+parameters = pfa_data_field_names(data);
 if ~isstruct(data) || isempty(parameters)
     jlist_new_elements = java.util.ArrayList();
     jlist_updated_elements = java.util.ArrayList();
@@ -12,9 +12,8 @@ end
 
 %% Process all elements from data
 
-% length of second column will be taken as element count
-% note: first columns contains "fields" data
-element_count = length(data.(parameters{2}));
+% length of first column will be taken as element count
+element_count = length(data.(parameters{1}));
 jlist_new_elements = java.util.ArrayList();
 jlist_updated_elements = java.util.ArrayList();
 
@@ -55,5 +54,14 @@ for element_i = 1:element_count
 end % end for
 
 % pfa_network.fireNetworkChanged(true);
+
+end
+
+function [ field_names ] = pfa_data_field_names( data )
+%PFA_DATA_FIELD_NAMES Summary of this function goes here
+%   Detailed explanation goes here
+
+field_names = fieldnames(data);
+field_names = setxor(field_names, {'fields'});
 
 end
