@@ -12,8 +12,9 @@ end
 
 %% Process all elements from data
 
-% length of first column will be taken as element count
-element_count = length(data.(parameters{1}));
+% length of second column will be taken as element count
+% note: first columns contains "fields" data
+element_count = length(data.(parameters{2}));
 jlist_new_elements = java.util.ArrayList();
 jlist_updated_elements = java.util.ArrayList();
 
