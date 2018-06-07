@@ -2,7 +2,7 @@ function [ pfa_element ] = pfa_import_element( pfa_network, data_type, data_entr
 %PFA_IMPORT_ELEMENT Summary of this function goes here
 %   Detailed explanation goes here
 
-switch data_type
+switch upper(data_type)
     case 'BUS'
         pfa_element = pfa_import_bus(pfa_network, data_entry);
     case 'BRANCH'
@@ -19,7 +19,7 @@ switch data_type
             pfa_element = net.ee.pfanalyzer.model.NetworkElement(pfa_network);
 end
 
-if ~isempty(pfa_element)
+if ~isempty(pfa_element) && isempty(pfa_element.getModel())
     %% Write parameters
     import_parameters_from_data(pfa_network, pfa_element, data_type, data_entry);
 end
