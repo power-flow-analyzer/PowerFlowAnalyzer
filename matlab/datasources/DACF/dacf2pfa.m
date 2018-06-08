@@ -199,6 +199,7 @@ if isfield(dacf_data, 'transformers')
     network_data.transformer.F_BUS_NAME = cell(trafo_count, 1);
     network_data.transformer.T_BUS_NAME = cell(trafo_count, 1);
     network_data.transformer.ORDER_CODE = cell(trafo_count, 1);
+    network_data.transformer.IDENTIFIER = cell(trafo_count, 1);
     network_data.transformer.F_BUS = zeros(trafo_count, 1);
     network_data.transformer.T_BUS = zeros(trafo_count, 1);
     network_data.transformer.BR_R = zeros(trafo_count, 1);
