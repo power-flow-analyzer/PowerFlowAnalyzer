@@ -27,6 +27,7 @@ catch
 end
 
 all_values = exl_table.UsedRange.Value;
+all_values = delete_empty_rows(all_values, data_values_row);
 last_row = size(all_values, data_index_column);
 
 % check for empty table -> return empty structure
@@ -86,3 +87,23 @@ exl.Quit;
 
 end
 
+%  Remove empty rows filled with numeric NaNs
+function [ output_data ] = delete_empty_rows(input_data, first_data_row)
+row_count = size(input_data, 1);
+col_count = size(input_data, 2);
+data_rows = zeros(row_count, 1);
+data_rows(1:first_data_row) = true;
+for row_i = first_data_row:row_count
+    for col_i = 1:col_count
+        if (isnumeric(input_data{row_i, col_i}) ...
+                && isnan(input_data{row_i, col_i})) == false
+            data_rows(row_i) = true;
+            break;
+        end
+    end
+%     fprintf('Row %i contains data (not empty): %i\n', row_i, data_rows(row_i));
+end
+output_data = cell(sum(data_rows), col_count);
+data_row_indices = find(data_rows == 1);
+output_data(data_row_indices, :) = input_data(data_row_indices, :);
+end
