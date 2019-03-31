@@ -4,7 +4,7 @@ function [ data_output ] = pfa_read_datasource( input_excel )
 
 %% OBSOLETE !!!
 
-datasources = read_datasource_excel(input_excel, 'Data Sources', 1, 4, 6);
+datasources = pfa_load_dataset_excel(input_excel, 'Data Sources', 1, 4, 6);
 % save('datasources.mat', 'datasources');
 % data_output = struct();
 
@@ -15,7 +15,7 @@ for ds = 1:length(datasources.data_name)
     end
     table_name = char(datasources.data_name(ds));
     fprintf('  Loading %s: %s\n', location, table_name);
-    source_data = read_datasource_excel(location, table_name, 1, ...
+    source_data = pfa_load_dataset_excel(location, table_name, 1, ...
         datasources.data_index_row(ds), ...
         datasources.data_values_row(ds));
 %     source_fields = fieldnames(source_data);
