@@ -1,4 +1,4 @@
-function [ dacf_data ] = read_dacf_csv( input_file_location )
+function [ dacf_data ] = load_ucte_def( input_file_location )
 %READ_DACF Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,6 +7,7 @@ dacf_data.nodes = struct();
 dacf_data.lines = struct();
 dacf_data.transformers = struct();
 dacf_data.transformers_regulation = struct();
+dacf_data.exchange_powers = struct();
 dacf_data.nodes.COUNTRY = cell(0, 1);
 
 % running variables
@@ -40,6 +41,8 @@ while ~feof(fid)
                         mode = 'transformers';
                     case '##R'
                         mode = 'transformer_regulation';
+                    case '##E'
+                        mode = 'exchange_power';
                     otherwise
                         mode = 'unknown';
                         error('Mode not implemented yet: %s', line);
@@ -65,6 +68,10 @@ while ~feof(fid)
                     transformer_regulation_data = read_transformer_regulation(line);
                     dacf_data.transformers_regulation = copy_fields(...
                         dacf_data.transformers_regulation, transformer_regulation_data);
+                case 'exchange_power'
+                    echange_power_data = read_exchange_power(line);
+                    dacf_data.exchange_powers = copy_fields(...
+                        dacf_data.exchange_powers, echange_power_data);
                 otherwise
                     error('Mode not implemented yet: %s', mode);
             end

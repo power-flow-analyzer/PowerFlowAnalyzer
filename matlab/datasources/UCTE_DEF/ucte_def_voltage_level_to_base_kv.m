@@ -1,4 +1,4 @@
-function [ base_kv ] = dacf_voltage_level_to_base_kv(voltage_level_code)
+function [ base_kv ] = ucte_def_voltage_level_to_base_kv(voltage_level_code)
     switch voltage_level_code
         case 0
             base_kv = 750;

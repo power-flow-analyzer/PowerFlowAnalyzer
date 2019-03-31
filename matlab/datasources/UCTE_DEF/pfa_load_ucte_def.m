@@ -1,6 +1,8 @@
-function [ network_data ] = dacf2pfa( dacf_data )
+function [ network_data ] = pfa_load_ucte_def( input_file_location )
 %DACF2MATPOWER Summary of this function goes here
 %   Detailed explanation goes here
+
+uctedef_data = load_ucte_def(input_file_location);
 
 aggregate_fixed_generation = false;
 
@@ -15,11 +17,12 @@ network_data.BASE_MVA = 100;
 
 
 %% bus & generator
-if isfield(dacf_data, 'nodes')
+if isfield(uctedef_data, 'nodes')
     % initialize bus data
-    node_count = length(dacf_data.nodes.NODE);
+    node_count = length(uctedef_data.nodes.NODE);
     network_data.bus.BUS_I = zeros(node_count, 1);
     network_data.bus.NAME = cell(node_count, 1);
+    network_data.bus.IDENTIFIER = cell(node_count, 1);
     network_data.bus.BUS_TYPE = zeros(node_count, 1);
     network_data.bus.PD = zeros(node_count, 1);
     network_data.bus.QD = zeros(node_count, 1);
@@ -33,9 +36,10 @@ if isfield(dacf_data, 'nodes')
     network_data.bus.VMAX = zeros(node_count, 1);
     network_data.bus.VMIN = zeros(node_count, 1);
     % initialize generator data
-    gen_count = length(find(dacf_data.nodes.P_GEN ~= 0));
+    gen_count = length(find(uctedef_data.nodes.P_GEN ~= 0));
     network_data.gen.GEN_BUS = zeros(gen_count, 1);
     network_data.gen.GEN_BUS_NAME = cell(gen_count, 1);
+    network_data.gen.IDENTIFIER = cell(gen_count, 1);
     network_data.gen.PG = zeros(gen_count, 1);
     network_data.gen.QG = zeros(gen_count, 1);
     network_data.gen.QMAX = zeros(gen_count, 1);
@@ -49,25 +53,26 @@ if isfield(dacf_data, 'nodes')
     gen_i = 1;
     for node_i = 1:node_count
         network_data.bus.BUS_I(node_i) = node_i;
-        network_data.bus.NAME{node_i} = dacf_data.nodes.NODE{node_i};
-        network_data.bus.BUS_TYPE(node_i) = node_to_bus_type(dacf_data.nodes.NODE_TYPE(node_i));
-        network_data.bus.PD(node_i) = dacf_data.nodes.P_LOAD(node_i);
-        network_data.bus.QD(node_i) = dacf_data.nodes.Q_LOAD(node_i);
-        network_data.bus.BASE_KV(node_i) = node_name_to_base_kv(dacf_data.nodes.NODE{node_i});
+        network_data.bus.NAME{node_i} = uctedef_data.nodes.NODE{node_i};
+        network_data.bus.IDENTIFIER{node_i} = uctedef_data.nodes.NODE{node_i};
+        network_data.bus.BUS_TYPE(node_i) = node_to_bus_type(uctedef_data.nodes.NODE_TYPE(node_i));
+        network_data.bus.PD(node_i) = uctedef_data.nodes.P_LOAD(node_i);
+        network_data.bus.QD(node_i) = uctedef_data.nodes.Q_LOAD(node_i);
+        network_data.bus.BASE_KV(node_i) = node_name_to_base_kv(uctedef_data.nodes.NODE{node_i});
         network_data.bus.VMAX(node_i) = 1.1;
         network_data.bus.VMIN(node_i) = 0.9;
 
-        if dacf_data.nodes.P_GEN(node_i) ~= 0
+        if uctedef_data.nodes.P_GEN(node_i) ~= 0
 %             % set type of all PQ buses with a generator to PV type
 %             if network_data.bus.BUS_TYPE(node_i) == 1
 %                network_data.bus.BUS_TYPE(node_i) = 2; 
 %             end
-            PG = -dacf_data.nodes.P_GEN(node_i);
-            QG = -dacf_data.nodes.Q_GEN(node_i);
-            P_MAX = -dacf_data.nodes.P_MAX(node_i);
-            P_MIN = -dacf_data.nodes.P_MIN(node_i);
-            Q_MAX = -dacf_data.nodes.Q_MAX(node_i);
-            Q_MIN = -dacf_data.nodes.Q_MIN(node_i);
+            PG = -uctedef_data.nodes.P_GEN(node_i);
+            QG = -uctedef_data.nodes.Q_GEN(node_i);
+            P_MAX = -uctedef_data.nodes.P_MAX(node_i);
+            P_MIN = -uctedef_data.nodes.P_MIN(node_i);
+            Q_MAX = -uctedef_data.nodes.Q_MAX(node_i);
+            Q_MIN = -uctedef_data.nodes.Q_MIN(node_i);
             if isnan(P_MAX)
                 P_MAX = PG;
             end
@@ -87,7 +92,8 @@ if isfield(dacf_data, 'nodes')
                continue; 
             end
             network_data.gen.GEN_BUS(gen_i) = node_i;
-            network_data.gen.GEN_BUS_NAME{gen_i} = dacf_data.nodes.NODE{node_i};
+            network_data.gen.GEN_BUS_NAME{gen_i} = uctedef_data.nodes.NODE{node_i};
+            network_data.gen.IDENTIFIER{gen_i} = ['GEN_' uctedef_data.nodes.NODE{node_i}];
             network_data.gen.PG(gen_i) = PG;
             network_data.gen.PMAX(gen_i) = P_MAX;
             network_data.gen.PMIN(gen_i) = P_MIN;
@@ -95,15 +101,15 @@ if isfield(dacf_data, 'nodes')
             network_data.gen.QMAX(gen_i) = Q_MAX;
             network_data.gen.QMIN(gen_i) = Q_MIN;
             % set voltage set point: only used in OPF if option opf.use_vg = 1
-            if isnan(dacf_data.nodes.VOLTAGE_SET_POINT(node_i))
+            if isnan(uctedef_data.nodes.VOLTAGE_SET_POINT(node_i))
                 network_data.gen.VG(gen_i) = 1;
             else
                 network_data.gen.VG(gen_i) = ...
-                    dacf_data.nodes.VOLTAGE_SET_POINT(node_i) / network_data.bus.BASE_KV(node_i);
+                    uctedef_data.nodes.VOLTAGE_SET_POINT(node_i) / network_data.bus.BASE_KV(node_i);
             end
             % set voltage set point for bus
 %             network_data.bus.VM(node_i) = network_data.gen.VG(gen_i);
-            network_data.gen.MBASE(gen_i) = 100;%dacf_data.nodes.P_NOM(node_i);
+            network_data.gen.MBASE(gen_i) = 100;%uctedef_data.nodes.P_NOM(node_i);
             network_data.gen.GEN_STATUS(gen_i) = abs(PG) > 0 || abs(QG) > 0;
             gen_i = gen_i + 1;
         end
@@ -121,12 +127,17 @@ if isfield(dacf_data, 'nodes')
         network_data.gen.PMAX = network_data.gen.PMAX(1:gen_i - 1);
         network_data.gen.PMIN = network_data.gen.PMIN(1:gen_i - 1);
     end
+    
+    network_data.bus.NAME_INTERNAL = uctedef_data.nodes.NODE; % TODO:remove if not used anymore
+    network_data.bus.SUBSTATION_NAME = uctedef_data.nodes.SUBSTATION_NAME;
 end
 
 %% branch
-if isfield(dacf_data, 'lines')
+if isfield(uctedef_data, 'lines')
     % initialize branch data
-    branch_count = length(dacf_data.lines.LINE_CONNECTIVITY_NODE_1);
+    branch_count = length(uctedef_data.lines.LINE_CONNECTIVITY_NODE_1);
+    network_data.branch.NAME = cell(branch_count, 1);
+    network_data.branch.IDENTIFIER = cell(branch_count, 1);
     network_data.branch.F_BUS_NAME = cell(branch_count, 1);
     network_data.branch.T_BUS_NAME = cell(branch_count, 1);
     network_data.branch.ORDER_CODE = cell(branch_count, 1);
@@ -142,36 +153,37 @@ if isfield(dacf_data, 'lines')
 
     for branch_i = 1:branch_count
         % find bus nodes
-        from_bus_name  = dacf_data.lines.LINE_CONNECTIVITY_NODE_1{branch_i};
-        to_bus_name    = dacf_data.lines.LINE_CONNECTIVITY_NODE_2{branch_i};
+        from_bus_name  = uctedef_data.lines.LINE_CONNECTIVITY_NODE_1{branch_i};
+        to_bus_name    = uctedef_data.lines.LINE_CONNECTIVITY_NODE_2{branch_i};
         from_bus_index = find(strcmp(network_data.bus.NAME, from_bus_name));
         to_bus_index   = find(strcmp(network_data.bus.NAME, to_bus_name));
         network_data.branch.F_BUS_NAME{branch_i} = from_bus_name;
         network_data.branch.T_BUS_NAME{branch_i} = to_bus_name;
         network_data.branch.F_BUS(branch_i) = from_bus_index;
         network_data.branch.T_BUS(branch_i) = to_bus_index;
-        if isnumeric(dacf_data.lines.LINE_ORDER_CODE)
+        if isnumeric(uctedef_data.lines.LINE_ORDER_CODE)
             network_data.branch.ORDER_CODE{branch_i} = ...
-                dacf_data.lines.LINE_ORDER_CODE(branch_i);
+                uctedef_data.lines.LINE_ORDER_CODE(branch_i);
         else
             network_data.branch.ORDER_CODE{branch_i} = ...
-                dacf_data.lines.LINE_ORDER_CODE{branch_i};
+                uctedef_data.lines.LINE_ORDER_CODE{branch_i};
         end
         network_data.branch.IDENTIFIER{branch_i} = get_identifier(...
-            dacf_data.lines.LINE_CONNECTIVITY_NODE_1{branch_i}, ...
-            dacf_data.lines.LINE_CONNECTIVITY_NODE_2{branch_i}, ...
-            dacf_data.lines.LINE_ORDER_CODE(branch_i));
+            uctedef_data.lines.LINE_CONNECTIVITY_NODE_1{branch_i}, ...
+            uctedef_data.lines.LINE_CONNECTIVITY_NODE_2{branch_i}, ...
+            uctedef_data.lines.LINE_ORDER_CODE(branch_i));
+        network_data.branch.NAME{branch_i} = uctedef_data.lines.LINE_IDENTIFIER{branch_i};
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
         base_power = network_data.BASE_MVA * 1000000;                  % change to VA
         base_impedance = (base_voltage) ^ 2 / base_power;
-        branch_r = dacf_data.lines.LINE_RESISTANCE (branch_i) / base_impedance;
-        branch_x = dacf_data.lines.LINE_REACTANCE  (branch_i) / base_impedance;
+        branch_r = uctedef_data.lines.LINE_RESISTANCE (branch_i) / base_impedance;
+        branch_x = uctedef_data.lines.LINE_REACTANCE  (branch_i) / base_impedance;
         % avoid a zero reactance (leads to infinity in admittance matrix)
         if branch_x == 0
             branch_x = 0.000001;
         end
         % susceptance is given in uS
-        branch_b = dacf_data.lines.LINE_SUSCEPTANCE(branch_i) * base_impedance / 1000000;
+        branch_b = uctedef_data.lines.LINE_SUSCEPTANCE(branch_i) * base_impedance / 1000000;
         if isnan(branch_b)
             branch_b = 0;
         end
@@ -180,26 +192,29 @@ if isfield(dacf_data, 'lines')
         network_data.branch.BR_B(branch_i) = branch_b;
         % line rating in MVA: Snom = sqrt(3) * U * I
         LINE_RATING = sqrt(3) * network_data.bus.BASE_KV(from_bus_index) * ...
-            dacf_data.lines.LINE_RATING(branch_i) / 1000;
+            uctedef_data.lines.LINE_RATING(branch_i) / 1000;
         if isnan(LINE_RATING)
             LINE_RATING = 0; % set infinite rating
         end
         network_data.branch.RATE_A(branch_i) = LINE_RATING;
         network_data.branch.BR_STATUS(branch_i) = ...
-            line_to_branch_status(dacf_data.lines.LINE_STATUS(branch_i));
+            line_to_branch_status(uctedef_data.lines.LINE_STATUS(branch_i));
         network_data.branch.ANGMIN(branch_i) = -360;
         network_data.branch.ANGMAX(branch_i) = 360;
     end
+    
+    network_data.branch.NAME_INTERNAL = uctedef_data.lines.LINE_IDENTIFIER;
 end
 
 %% transformer
-if isfield(dacf_data, 'transformers')
+if isfield(uctedef_data, 'transformers')
     % initialize transformer data
-    trafo_count = length(dacf_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE);
+    trafo_count = length(uctedef_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE);
+    network_data.transformer.NAME = cell(trafo_count, 1);
+    network_data.transformer.IDENTIFIER = cell(trafo_count, 1);
     network_data.transformer.F_BUS_NAME = cell(trafo_count, 1);
     network_data.transformer.T_BUS_NAME = cell(trafo_count, 1);
     network_data.transformer.ORDER_CODE = cell(trafo_count, 1);
-    network_data.transformer.IDENTIFIER = cell(trafo_count, 1);
     network_data.transformer.F_BUS = zeros(trafo_count, 1);
     network_data.transformer.T_BUS = zeros(trafo_count, 1);
     network_data.transformer.BR_R = zeros(trafo_count, 1);
@@ -216,60 +231,64 @@ if isfield(dacf_data, 'transformers')
 
     for trafo_i = 1:trafo_count
         % find bus nodes
-        from_bus_name  = dacf_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i};
-        to_bus_name    = dacf_data.transformers.RW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i};
+        from_bus_name  = uctedef_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i};
+        to_bus_name    = uctedef_data.transformers.RW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i};
         from_bus_index = find(strcmp(network_data.bus.NAME, from_bus_name));
         to_bus_index   = find(strcmp(network_data.bus.NAME, to_bus_name));
         network_data.transformer.F_BUS_NAME{trafo_i} = from_bus_name;
         network_data.transformer.T_BUS_NAME{trafo_i} = to_bus_name;
         network_data.transformer.F_BUS(trafo_i) = from_bus_index;
         network_data.transformer.T_BUS(trafo_i) = to_bus_index;
-        if isnumeric(dacf_data.transformers.TRANSFORMER_ORDER_CODE)
+        if isnumeric(uctedef_data.transformers.TRANSFORMER_ORDER_CODE)
             network_data.transformer.ORDER_CODE{trafo_i} = ...
-                dacf_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i);
+                uctedef_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i);
         else
             network_data.transformer.ORDER_CODE{trafo_i} = ...
-                dacf_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
+                uctedef_data.transformers.TRANSFORMER_ORDER_CODE{trafo_i};
         end
         network_data.transformer.IDENTIFIER{trafo_i} = get_identifier(...
-            dacf_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
-            dacf_data.transformers.RW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
-            dacf_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i));
+            uctedef_data.transformers.NRW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
+            uctedef_data.transformers.RW_TRANSFORMER_CONNECTIVITY_NODE{trafo_i}, ...
+            uctedef_data.transformers.TRANSFORMER_ORDER_CODE(trafo_i));
+        network_data.transformer.NAME{trafo_i} = ...
+            uctedef_data.transformers.TRANSFORMER_IDENTIFIER{trafo_i};
         base_voltage = network_data.bus.BASE_KV(from_bus_index) * 1000;% change to V
         base_power = network_data.BASE_MVA * 1000000;                  % change to VA
         base_impedance = (base_voltage) ^ 2 / base_power;
-        branch_r = dacf_data.transformers.TRANSFORMER_RESISTANCE (trafo_i) / base_impedance;
-        branch_x = dacf_data.transformers.TRANSFORMER_REACTANCE  (trafo_i) / base_impedance;
+        branch_r = uctedef_data.transformers.TRANSFORMER_RESISTANCE (trafo_i) / base_impedance;
+        branch_x = uctedef_data.transformers.TRANSFORMER_REACTANCE  (trafo_i) / base_impedance;
         % susceptance is given in uS
-        branch_b = dacf_data.transformers.TRANSFORMER_SUSCEPTANCE(trafo_i) * base_impedance / 1000000;
+        branch_b = uctedef_data.transformers.TRANSFORMER_SUSCEPTANCE(trafo_i) * base_impedance / 1000000;
         if isnan(branch_b)
             branch_b = 0;
         end
         network_data.transformer.BR_R(trafo_i) = branch_r;
         network_data.transformer.BR_X(trafo_i) = branch_x;
         network_data.transformer.BR_B(trafo_i) = branch_b;
-        network_data.transformer.RATE_A(trafo_i) = dacf_data.transformers.TRANSFORMER_SNOM(trafo_i);
+        network_data.transformer.RATE_A(trafo_i) = uctedef_data.transformers.TRANSFORMER_SNOM(trafo_i);
         % nominal voltage of busbars
         Un1 = network_data.bus.BASE_KV(from_bus_index);
         Un2 = network_data.bus.BASE_KV(to_bus_index);
         % rated voltage of transformer
-        Ur1 = dacf_data.transformers.RATED_VOLTAGE_1(trafo_i);
-        Ur2 = dacf_data.transformers.RATED_VOLTAGE_2(trafo_i);
+        Ur1 = uctedef_data.transformers.RATED_VOLTAGE_1(trafo_i);
+        Ur2 = uctedef_data.transformers.RATED_VOLTAGE_2(trafo_i);
         % tap ratio based on rated and nominal voltage
         tap_ratio = (Ur1 / Ur2) / (Un1 / Un2);
         network_data.transformer.TAP(trafo_i) = tap_ratio;
         network_data.transformer.BR_STATUS(trafo_i) = ...
-            line_to_branch_status(dacf_data.transformers.TRANSFORMER_STATUS(trafo_i));
+            line_to_branch_status(uctedef_data.transformers.TRANSFORMER_STATUS(trafo_i));
         network_data.transformer.ANGMIN(trafo_i) = -360;
         network_data.transformer.ANGMAX(trafo_i) = 360;
     end
+    
+    network_data.transformer.NAME_INTERNAL = uctedef_data.transformers.TRANSFORMER_IDENTIFIER;
 
     %% transformer regulation
-    if isfield(dacf_data, 'transformers_regulation')
-        trafo_regulation_count = length(dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER);
+    if isfield(uctedef_data, 'transformers_regulation')
+        trafo_regulation_count = length(uctedef_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER);
 
         for trafo_reg_i = 1:trafo_regulation_count
-            trafo_id = dacf_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER{trafo_reg_i};
+            trafo_id = uctedef_data.transformers_regulation.LTC_TRANSFORMER_IDENTIFIER{trafo_reg_i};
             trafo_ref = strsplit(trafo_id, ' ');
             from_bus_name = trafo_ref{1};
             to_bus_name = trafo_ref{2};
@@ -281,20 +300,20 @@ if isfield(dacf_data, 'transformers')
             if length(trafo_index) == 1
                 % TODO
 %                 network_data.transformer.TAP_POSITION(trafo_index) = ...
-%                     dacf_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
+%                     uctedef_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
                 from_bus_index = find(strcmp(network_data.bus.NAME, from_bus_name));
                 to_bus_index = find(strcmp(network_data.bus.NAME, to_bus_name));
                 % nominal voltage of busbars
                 Un1 = network_data.bus.BASE_KV(from_bus_index);
                 Un2 = network_data.bus.BASE_KV(to_bus_index);
                 % rated voltage of transformer
-                Ur1 = dacf_data.transformers.RATED_VOLTAGE_1(trafo_index);
-                Ur2 = dacf_data.transformers.RATED_VOLTAGE_2(trafo_index);
+                Ur1 = uctedef_data.transformers.RATED_VOLTAGE_1(trafo_index);
+                Ur2 = uctedef_data.transformers.RATED_VOLTAGE_2(trafo_index);
                 
                 % voltage change per tap [%]
-                du = dacf_data.transformers_regulation.PHASE_REGULATION_VOLTAGE_CHANGE_PER_TAP(trafo_reg_i) / 100;
+                du = uctedef_data.transformers_regulation.PHASE_REGULATION_VOLTAGE_CHANGE_PER_TAP(trafo_reg_i) / 100;
                 % current tap position
-                n = dacf_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
+                n = uctedef_data.transformers_regulation.PHASE_REGULATION_CURRENT_TAP_POSITION(trafo_reg_i);
                 % total voltage change [%]
                 DU = 1 + n * du;
                 % regulated winding is on secondary side
@@ -327,7 +346,7 @@ end
 
 function [ base_kv ] = node_name_to_base_kv(node_name)
     voltage_level_code = str2double(node_name(length(node_name)-1));
-    base_kv = dacf_voltage_level_to_base_kv(voltage_level_code);
+    base_kv = ucte_def_voltage_level_to_base_kv(voltage_level_code);
 end
 
 function [ branch_status ] = line_to_branch_status(line_status)
