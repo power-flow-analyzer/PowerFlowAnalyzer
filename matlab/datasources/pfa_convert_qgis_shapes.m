@@ -4,7 +4,7 @@ function pfa_convert_qgis_shapes(qgis_config_file)
 
 tic
 
-qgis_config = read_datasource_excel(qgis_config_file, 'AREAS', 1, 1, 2);
+qgis_config = pfa_load_dataset_excel(qgis_config_file, 'AREAS', 1, 1, 2);
 
 file_pattern = '*.csv';
     
@@ -44,9 +44,9 @@ for conf_index = 1 : length(qgis_config.NAME)
         data_sources.DATA_INDEX_COLUMN = {1};
         data_sources.DATA_INDEX_ROW = {1};
         data_sources.DATA_VALUES_ROW = {2};
-        write_datasource_excel(data_sources, output_file, 'Data Sources', 1, 4, 6);
+        pfa_write_datasource_excel(data_sources, output_file, 'Data Sources', 1, 4, 6);
         % write table data
-        write_datasource_excel(area_config, output_file, 'Areas', 1, 1, 2);
+        pfa_write_datasource_excel(area_config, output_file, 'Areas', 1, 1, 2);
     end
 end
 
