@@ -11,7 +11,7 @@ mpopt = mpoption('VERBOSE', 3,'OUT_SYS_SUM',1,'OUT_BUS',0,'OUT_BRANCH',0,'OUT_GE
 mpc = network2matpower(jnetwork);
 %save('matpower_case.mat', 'mpc');
 
-mpc = mp_handle_isolated_buses(mpc);
+mpc = mp_handle_isolated_buses(mpc, true);
 
 % calculate power flow
 algo = pfa_param_text(jnetwork, 'POWER_FLOW_ALGO');
