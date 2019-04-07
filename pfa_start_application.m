@@ -17,7 +17,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % clear java; %#ok<CLSCR> % hide annoying warning
 
-javaaddpath([pwd '/java/PowerFlowAnalyzer_2.2.2.jar']);
+javaaddpath([pwd '/java/PowerFlowAnalyzer.jar']);
 javaaddpath([pwd '/java/miglayout-3.7-swing.jar']);
 javaaddpath([pwd '/java/fatcow-hosting-icons-2000.zip']);
 
