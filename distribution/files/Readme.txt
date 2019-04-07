@@ -7,7 +7,7 @@ PFA is free software: you can use it, modify it and redistribute it under the te
 
 Installation
 ------------
-No installation is needed
+Download the zip file, unzip it. A new folder `PowerFlowAnalyzer-${project.version}` will be created.
 
 Start
 -----
