@@ -1,0 +1,192 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>PowerFlowAnalyzer</name>
+
+	<artifactId>PowerFlowAnalyzer</artifactId>
+	<groupId>PowerFlowAnalyzer</groupId>
+	<version>2.3.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<project.main.class>net.ee.pfanalyzer.PowerFlowAnalyzer</project.main.class>
+
+		<java.version>1.6</java.version>
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+<!-- only required when using downloadable dependency of miglayout -->
+<!-- 	<repositories> -->
+<!-- 		<repository> -->
+<!-- 			<id>mvn-repo1</id> -->
+<!-- 			<name>mvnrepository.com</name> -->
+<!-- 			<url>http://www.miglayout.com/mavensite/</url> -->
+<!-- 		</repository> -->
+<!-- 	</repositories> -->
+
+	<dependencies>
+		<dependency>
+			<groupId>com.miglayout</groupId>
+			<artifactId>miglayout-swing</artifactId>
+			<version>3.7</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/java/miglayout-3.7-swing.jar</systemPath>
+		</dependency>
+		<!-- SWING-only version is not available in this repository ?! -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.miglayout</groupId> -->
+		<!-- <artifactId>miglayout</artifactId> -->
+		<!-- <version>3.7</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.mathworks</groupId>
+			<artifactId>matlab-jmi</artifactId>
+			<version>2015a</version>
+			<scope>system</scope>
+			<systemPath>C:/Program Files/MATLAB/R2015a/java/jar/jmi.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.fatcow</groupId>
+			<artifactId>fatcow-hosting-icons</artifactId>
+			<version>2000</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/java/fatcow-hosting-icons-2000.zip</systemPath>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<!-- Activate plugin configurations -->
+			<!-- disabled since dependencies are copied from project folder -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- </plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>copy-dependencies</id>
+							<phase>prepare-package</phase>
+							<goals>
+								<goal>copy-dependencies</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${project.build.directory}/distribution/java</outputDirectory>
+								<overWriteReleases>false</overWriteReleases>
+								<overWriteSnapshots>false</overWriteSnapshots>
+								<overWriteIfNewer>true</overWriteIfNewer>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.1</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix>java/</classpathPrefix>
+								<useUniqueVersions>false</useUniqueVersions>
+								<mainClass>${project.main.class}</mainClass>
+							</manifest>
+							<manifestEntries>
+								<!-- this is required since system scope dependencies are not added 
+									here -->
+								<Class-Path>java/miglayout-3.7-swing.jar
+									java/fatcow-hosting-icons-2000.zip</Class-Path>
+								<Group-Id>${project.groupId}</Group-Id>
+								<Artifact-Id>${project.artifactId}</Artifact-Id>
+								<App-Name>${project.name}</App-Name>
+								<App-Version>${project.version}</App-Version>
+							</manifestEntries>
+						</archive>
+
+						<finalName>distribution/java/${project.name}</finalName>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.1.0</version>
+					<executions>
+						<execution>
+							<id>copy-resources</id>
+							<!-- here the phase you need -->
+							<phase>deploy</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${project.build.directory}/distribution</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${project.basedir}</directory>
+										<includes>
+											<include>LICENSE</include>
+											<include>NOTICE</include>
+											<include>pfa_start_application.m</include>
+											<include>matlab/**</include>
+											<include>java/miglayout-3.7-swing.jar</include>
+											<include>java/fatcow-hosting-icons-2000.zip</include>
+										</includes>
+									</resource>
+									<resource>
+										<!-- Copy files and and substitute variables in their content ("filter") -->
+										<directory>${project.basedir}/distribution/files</directory>
+										<filtering>true</filtering>
+										<includes>
+											<include>**/*</include>
+										</includes>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<descriptors>
+							<descriptor>distribution/conf/assembly.xml</descriptor>
+						</descriptors>
+<!-- 						<finalName>${pom.artifactId}-${pom.version}</finalName> -->
+						<appendAssemblyId>false</appendAssemblyId>
+					</configuration>
+					<executions>
+						<execution>
+							<id>make-assembly</id>
+							<phase>package</phase>
+							<goals>
+								<goal>single</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
+
