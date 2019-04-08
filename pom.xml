@@ -42,13 +42,6 @@
 		<!-- <version>3.7</version> -->
 		<!-- </dependency> -->
 		<dependency>
-			<groupId>com.mathworks</groupId>
-			<artifactId>matlab-jmi</artifactId>
-			<version>2015a</version>
-			<scope>system</scope>
-			<systemPath>C:/Program Files/MATLAB/R2015a/java/jar/jmi.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>com.fatcow</groupId>
 			<artifactId>fatcow-hosting-icons</artifactId>
 			<version>2000</version>
@@ -134,7 +127,7 @@
 						<execution>
 							<id>copy-resources</id>
 							<!-- here the phase you need -->
-							<phase>deploy</phase>
+							<phase>prepare-package</phase>
 							<goals>
 								<goal>copy-resources</goal>
 							</goals>
