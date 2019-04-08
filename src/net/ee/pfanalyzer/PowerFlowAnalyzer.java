@@ -49,6 +49,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
+import net.ee.pfanalyzer.io.MatlabInterface;
 import net.ee.pfanalyzer.io.MatpowerGUIServer;
 import net.ee.pfanalyzer.model.AbstractNetworkElement;
 import net.ee.pfanalyzer.model.CaseSerializer;
@@ -80,10 +81,6 @@ import net.ee.pfanalyzer.ui.dialog.SelectScriptDialog;
 import net.ee.pfanalyzer.ui.util.ClosableTabbedPane;
 import net.ee.pfanalyzer.ui.util.IActionUpdater;
 import net.ee.pfanalyzer.ui.util.TabListener;
-
-import com.mathworks.jmi.Matlab;
-import com.mathworks.jmi.MatlabException;
-
 
 public class PowerFlowAnalyzer extends JFrame implements ActionListener, IActionUpdater, IPreferenceConstants {
 
@@ -842,33 +839,8 @@ public class PowerFlowAnalyzer extends JFrame implements ActionListener, IAction
 			callMatlabCommand("stoppfviewer", new Object[0], -1, 0, false);
 	}
 	
-	private void callMatlabCommand(final String command, final Object[] parameters, final long caseID, final int returnValueCount, final boolean printOutput) {
-		try {
-			Matlab.whenMatlabIdle(new Runnable() {
-				public void run() {
-					try {
-						if(cancelScriptExecution)
-							return;
-						if(printOutput)
-							Matlab.mtFevalConsoleOutput(command, parameters, returnValueCount);
-						else
-							Matlab.mtFeval(command, parameters, returnValueCount);
-					} catch(MatlabException e) {
-						JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "Error: " + e.getMessage()
-								+ "\n\nSee the Matlab console for more information.");
-						cancelPowerFlow();
-					} catch (Exception e) {
-						JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "An error occurred while executing a matlab command: " + e
-								+ "\n\nSee the Matlab console for more information.");
-						cancelPowerFlow();
-					}
-				}
-			});
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(PowerFlowAnalyzer.this, "An error occurred while calling matlab: " + e
-					+ "\n\nSee the Matlab console for more information.");
-			e.printStackTrace();
-		}
+	private void callMatlabCommand(final String functionName, final Object[] parameters, final long caseID, final int returnValueCount, final boolean printOutput) {
+		MatlabInterface.callMatlabFunction(functionName, parameters, returnValueCount, PowerFlowAnalyzer.this, cancelScriptExecution, printOutput);
 	}
 	
 	private void addProgress(long caseID, long networkID) {
