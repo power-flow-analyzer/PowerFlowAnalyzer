@@ -30,4 +30,9 @@ addpath([pwd '/matlab/matpower']);
 addpath([pwd '/matlab/parameters']);
 addpath([pwd '/matlab/viewer']);
 
+% points dynamically to subfolder of current user directory, thus 
+% overwriting library functions above. Directory must not exist in
+% user directory after all.
+addpath('scripts');
+
 PowerFlowAnalyzer_MAIN
