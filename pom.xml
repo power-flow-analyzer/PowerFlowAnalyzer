@@ -141,6 +141,7 @@
 											<include>NOTICE</include>
 											<include>pfa_start_application.m</include>
 											<include>matlab/**</include>
+											<include>scripts/**</include>
 											<include>java/miglayout-3.7-swing.jar</include>
 											<include>java/fatcow-hosting-icons-2000.zip</include>
 										</includes>

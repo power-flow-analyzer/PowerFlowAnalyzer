@@ -1,0 +1,1 @@
+This file is required for the containing folder to be created by Git and Maven.
