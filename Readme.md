@@ -29,7 +29,10 @@ The distribution will be assembled in `target/distribution` before zipping.
 Clone this git repository and build a release from source (see above). 
 
 ### Start
-You can start PFA from from the (dynamic) output folder of your maven toolchain (e.g. command line Maven and embedded Maven runtime in Eclipse). Assuming the compiled classes are located in the _target/classes_ folder of this directory (as this is the case for the Maven build), run `pfa_start_application_dev.m` in Matlab.
+Run `pfa_start_application_dev.m` in Matlab.
+You can start PFA from from the (dynamic) output folder of your maven toolchain (e.g. command line 
+Maven or embedded Maven runtime in Eclipse). The script assumes the compiled classes to be located 
+in the _target/classes_ folder of this directory (as this is the case for the provided Maven build).
 
 For the Java classes to be reloaded in Matlab after changes in those classes, stop PFA and run the start script again.
 
@@ -39,5 +42,11 @@ PFA can also be started outside Matlab without any Matlab interface (for special
 
 License
 -------
-PowerFlowAnalyzer is released under the Apache License, Version 2.0 (see `License` file).
+PowerFlowAnalyzer is released under the Apache License, Version 2.0 (see `LICENSE` file).
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+
+This product includes [MATPOWER](http://www.pserc.cornell.edu/matpower) 
+[(Github)](https://github.com/MATPOWER/matpower "MATPOWER on Github"), 
+[MigLayout](http://miglayout.com) [(Github)](https://github.com/mikaelgrev/miglayout "MigLayout on Github") and [Fatcow Hosting Icons](http://www.fatcow.com) 
+[(Github)](https://github.com/ioBroker/ioBroker.icons-fatcow-hosting "Fatcow Hosting Icons on Github").
+See `NOTICE` file for more information. 
