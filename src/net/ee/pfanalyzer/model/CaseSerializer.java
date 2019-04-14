@@ -46,9 +46,9 @@ public class CaseSerializer {
 
 	public final static String NAMESPACE = "http://www.mehg.net/schema/PowerFlowAnalyzer";
 	
-	public final static String INTERNAL_MODEL_DB_INPUT_FILE = "/net/ee/pfanalyzer/default_model_db.xml";
+	public final static String INTERNAL_MODEL_DB_INPUT_FILE = "/default_model_db.xml";
 	
-	public final static String INTERNAL_CONFIGURATION_DB_INPUT_FILE = "/net/ee/pfanalyzer/configuration_db.xml";
+	public final static String INTERNAL_CONFIGURATION_DB_INPUT_FILE = "/configuration_db.xml";
 	
 	private JAXBContext context;
 	
