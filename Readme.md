@@ -25,6 +25,11 @@ For MATPOWER support in your builds, download a MATPOWER release or clone a git 
 The MATPOWER files must reside in a `matpower` folder inside this folder. In general, a `matpower`
 folder (if existing) will be copied to the distribution folder and added to Matlab's search path.
 
+The data model classes can be rebuild from the XSL schema files using:
+```
+xjc -d src -p net.ee.pfanalyzer.model.data schema
+```
+
 A zip file containing a full distribution will be created at `target/PowerFlowAnalyzer-<VERSION>.zip`
 
 The distribution will be assembled in `target/distribution` before zipping.

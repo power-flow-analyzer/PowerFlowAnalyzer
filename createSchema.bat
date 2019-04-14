@@ -1,1 +1,0 @@
-xjc -d src -p net.ee.pfanalyzer.model.data schema
