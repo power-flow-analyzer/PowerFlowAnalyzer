@@ -20,6 +20,10 @@ PFA can be build using the provided Maven POM-file.
 Simply execute the following two steps:
  - Clone this git repository
  - Create a build using `mvn package` (you need to have Maven installed)
+ 
+For MATPOWER support in your builds, download a MATPOWER release or clone a git repository.
+The MATPOWER files must reside in a `matpower` folder inside this folder. In general, a `matpower`
+folder (if existing) will be copied to the distribution folder and added to Matlab's search path.
 
 A zip file containing a full distribution will be created at `target/PowerFlowAnalyzer-<VERSION>.zip`
 
