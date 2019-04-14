@@ -15,12 +15,13 @@
 % See the License for the specific language governing permissions and
 % limitations under the License.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% clear java; %#ok<CLSCR> % hide annoying warning
 
+% add PFA's Java binaries to class path of Matlab
 javaaddpath([pwd '/java/PowerFlowAnalyzer.jar']);
 javaaddpath([pwd '/java/miglayout-3.7-swing.jar']);
 javaaddpath([pwd '/java/fatcow-hosting-icons-2000.zip']);
 
+% add PFA's Matlab files to search path of Matlab
 addpath([pwd '/matlab']);
 addpath([pwd '/matlab/communication']);
 addpath([pwd '/matlab/data']);
@@ -29,10 +30,13 @@ addpath([pwd '/matlab/datasources/UCTE_DEF']);
 addpath([pwd '/matlab/matpower']);
 addpath([pwd '/matlab/parameters']);
 addpath([pwd '/matlab/viewer']);
+addpath([pwd '/matpower']);
 
-% points dynamically to subfolder of current user directory, thus 
+% add "scripts" folder to search path of Matlab;
+% points dynamically to subfolder of current directory in Matlab, thus 
 % overwriting library functions above. Directory must not exist in
 % user directory after all.
 addpath('scripts');
 
+% start GUI of PFA application
 PowerFlowAnalyzer_MAIN
