@@ -1,6 +1,8 @@
 # Eclipse files
 /bin/
 /.settings/
+/.project
+/.classpath
 
 # Maven output files
 /target/
