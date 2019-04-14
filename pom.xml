@@ -137,7 +137,6 @@
 										<includes>
 											<include>LICENSE</include>
 											<include>NOTICE</include>
-											<include>pfa_start_application.m</include>
 											<include>matlab/**</include>
 											<include>scripts/**</include>
 											<include>matpower/**</include>
