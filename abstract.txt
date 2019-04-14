@@ -1,8 +1,0 @@
-
-Power Flow Analyzer
--------------------
-Power Flow Analyzer is a software tool for visualising and analysing different network topologies along with their data. It was developed at the Technical University Berlin with the main purpose to support actual and future research on small and large scale electrical networks (e.g. transmission and distribution networks in Germany). 
-Power Flow Analyzer allows to create powerful network diagrams with true geographic coordinates containing error flags, line flows, additional markers and border outlines. Further contour diagrams can be created to visualise trends and patterns in large scale power systems. Its user interface allows to aggregate network elements at multiple levels, such as the system operator, location or voltage level.
-Networks and the elements they contain are defined by abstract parameters which are specified in an hierarchical database, allowing to use different sets of parameters for each network. A built-in database for standard Matpower networks is included. 
-It interfaces to Matlab and allows to define and execute custom scripts with individual script parameters for e.g. the import of networks from Excel files and the calculation of power flows. 
- 
