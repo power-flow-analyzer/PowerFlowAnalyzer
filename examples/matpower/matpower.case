@@ -1,0 +1,1267 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<power_flow_case xmlns="http://www.mehg.net/schema/PowerFlowAnalyzer">
+    <model-db>
+        <modelClass label="Network Elements" ID="network">
+            <parameter inherit="false" empty="true" label="Base MVA" type="integer" ID="BASE_MVA">
+                <display/>
+            </parameter>
+            <parameter purpose="result" inherit="false" restriction="list" label="Calculation converged" type="integer" ID="SUCCESS">
+                <option ID="1" label="Yes" value="1"/>
+                <option ID="0" label="No" value="0"/>
+                <display/>
+            </parameter>
+            <modelClass label="Branch" ID="branch">
+                <parameter empty="true" description="Name of this bus node" label="Name" type="text" ID="NAME">
+                    <display/>
+                </parameter>
+                <parameter empty="true" restriction="existing parameter value" description="From Bus" label="From Bus" type="integer" ID="F_BUS">
+                    <display parameterID="BUS_I" elementRestriction="bus"/>
+                </parameter>
+                <parameter empty="true" restriction="existing parameter value" description="To Bus" label="To Bus" type="integer" ID="T_BUS">
+                    <display parameterID="BUS_I" elementRestriction="bus"/>
+                </parameter>
+                <parameter empty="true" label="Resistance" type="double" ID="BR_R">
+                    <display increment="1.0E-4" unit="p.u."/>
+                </parameter>
+                <parameter empty="true" label="Reactance" type="double" ID="BR_X">
+                    <display unit="p.u."/>
+                </parameter>
+                <parameter empty="true" label="Total line charging susceptance" type="double" ID="BR_B">
+                    <display unit="p.u."/>
+                </parameter>
+                <parameter empty="true" description="long term rating" label="Rating A" type="double" ID="RATE_A">
+                    <display unit="MVA" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" description="short term rating" label="Rating B" type="double" ID="RATE_B">
+                    <display unit="MVA" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" description="emergency rating" label="Rating C" type="double" ID="RATE_C">
+                    <display unit="MVA" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" description="taps at &quot;from&quot; bus, &lt;br&gt;impedance at &quot;to&quot; bus, i.e. if &lt;i&gt;r = x = 0&lt;/i&gt;, &lt;i&gt;tap&lt;/i&gt; = |V&lt;sub&gt;f&lt;/sub&gt;| / |V&lt;sub&gt;t&lt;/sub&gt;|" label="Transformer off nominal turns ratio" type="double" ID="TAP">
+                    <display decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" description="angle in degrees, positive =&gt; delay" label="Transformer phase shift angle" type="double" ID="SHIFT">
+                    <display unit="&#176;" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="false" value="1" restriction="list" label="Initial branch status" type="integer" ID="BR_STATUS">
+                    <option ID="1" label="in-service" value="1"/>
+                    <option ID="0" label="out-of-service" value="0"/>
+                    <display/>
+                </parameter>
+                <parameter empty="true" description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" label="Minimum angle difference" type="double" ID="ANGMIN">
+                    <display unit="&#176;" decimalFormatPattern="#.#"/>
+                </parameter>
+                <parameter description="&#920;&lt;sub&gt;f&lt;/sub&gt; - &#920;&lt;sub&gt;t&lt;/sub&gt; (degrees)" label="Maximum angle difference" type="double" ID="ANGMAX">
+                    <display unit="&#176;" decimalFormatPattern="#.#"/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Real power injected at &quot;from&quot; bus end" type="double" ID="PF">
+                    <display unit="MW" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Reactive power injected at &quot;from&quot; bus end" type="double" ID="QF">
+                    <display unit="MVAr" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Real power injected at &quot;to&quot; bus end" type="double" ID="PT">
+                    <display unit="MW" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Reactive power injected at &quot;to&quot; bus end" type="double" ID="QT">
+                    <display unit="MVAr" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;from&quot; bus&lt;/html&gt;" type="double" ID="MU_SF">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MVA"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on MVA limit at &quot;to&quot; bus&lt;/html&gt;" type="double" ID="MU_ST">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MVA"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier lower angle difference limit&lt;/html&gt;" type="double" ID="MU_ANGMIN">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/degree"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier upper angle difference limit&lt;/html&gt;" type="double" ID="MU_ANGMAX">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/degree"/>
+                </parameter>
+                <parameter value="shape.branch.default" restriction="list" label="Shape" type="text" ID="SHAPE">
+                    <option ID="DEFAULT" label="Default" value="shape.branch.default"/>
+                    <option ID="TRANSFORMER" label="Transformer" value="shape.branch.transformer"/>
+                    <display/>
+                </parameter>
+                <modelClass description="" label="Transformer" ID="transformer">
+                    <parameter value="shape.branch.transformer" ID="SHAPE"/>
+                    <model label="Default Matpower Transformer" ID="default"/>
+                </modelClass>
+                <model label="Default Matpower Branch" ID="unknown"/>
+            </modelClass>
+            <modelClass label="Bus" ID="bus">
+                <parameter empty="true" description="Name of this bus node" label="Name" type="text" ID="NAME">
+                    <display/>
+                </parameter>
+                <parameter empty="true" restriction="bus-number" description="Bus number" label="Bus" type="integer" ID="BUS_I">
+                    <display/>
+                </parameter>
+                <parameter empty="true" restriction="list" description="Bus type (1 = PQ, 2 = PV, 3 = ref, 4 = isolated)" label="Type" type="integer" ID="BUS_TYPE">
+                    <option ID="PQ" label="PQ" value="1"/>
+                    <option ID="PV" label="PV" value="2"/>
+                    <option ID="REF" label="Reference" value="3"/>
+                    <option ID="ISOLATED" label="Isolated" value="4"/>
+                    <display/>
+                </parameter>
+                <parameter empty="true" description="" label="Latitude" type="double" ID="LATITUDE">
+                    <display/>
+                </parameter>
+                <parameter empty="true" description="" label="Longitude" type="double" ID="LONGITUDE">
+                    <display/>
+                </parameter>
+                <parameter empty="true" label="Real Power Demand" type="double" ID="PD">
+                    <display unit="MW" decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" label="Reactive Power Demand" type="double" ID="QD">
+                    <display unit="MVAr" decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" description="MV demanded at V = 1.0 p.u." label="Shunt Conductance" type="double" ID="GS">
+                    <display unit="MW" decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" description="MVAr injected at V = 1.0 p.u." label="Shunt Susceptance" type="double" ID="BS">
+                    <display unit="MVAr" decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" description="Bus Area" label="Area" type="integer" ID="BUS_AREA">
+                    <display/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Voltage Magnitude" type="double" ID="VM">
+                    <display unit="p.u." decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter purpose="result" empty="true" label="Voltage Angle" type="double" ID="VA">
+                    <display unit="&#176;" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" description="Base voltage (kV)" label="Base-kV" type="double" ID="BASE_KV">
+                    <display unit="kV" decimalFormatPattern="#.#"/>
+                </parameter>
+                <parameter empty="true" description="Maximum voltage magnitude" label="Max. voltage" type="double" ID="VMAX">
+                    <display unit="p.u." decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" description="Minimum voltage magnitude" label="Min. voltage" type="double" ID="VMIN">
+                    <display unit="p.u." decimalFormatPattern="#.###"/>
+                </parameter>
+                <parameter empty="true" description="Lagrange multiplier on real power mismatch" label="LaM P" type="double" ID="LAM_P">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MW"/>
+                </parameter>
+                <parameter empty="true" description="Lagrange multiplier on reactive power mismatch" label="LaM Q" type="double" ID="LAM_Q">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MVAr"/>
+                </parameter>
+                <parameter empty="true" description="Kuhn-Tucker multiplier on upper voltage limit (u/p.u.)" label="Mult Vmax" type="double" ID="MU_VMAX">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/p.u."/>
+                </parameter>
+                <parameter empty="true" description="Kuhn-Tucker multiplier on lower voltage limit (u/p.u.)" label="Mult Vmin" type="double" ID="MU_VMIN">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/p.u."/>
+                </parameter>
+                <parameter empty="true" label="Zone" type="integer" ID="ZONE">
+                    <display/>
+                </parameter>
+                <parameter value="shape.bus.default" restriction="list" label="Shape" type="text" ID="SHAPE">
+                    <option ID="DEFAULT" label="Default" value="shape.bus.default"/>
+                    <option ID="NETWORK" label="Network" value="shape.network"/>
+                    <display/>
+                </parameter>
+                <model label="Default Matpower Bus" ID="unknown"/>
+                <model label="Network Bus" ID="network">
+                    <parameter value="shape.network" ID="SHAPE"/>
+                </model>
+            </modelClass>
+            <modelClass label="Generator" ID="generator">
+                <parameter empty="true" description="Name of this bus node" label="Name" type="text" ID="NAME">
+                    <display/>
+                </parameter>
+                <parameter empty="true" restriction="existing parameter value" label="Bus Number" type="integer" ID="GEN_BUS">
+                    <display parameterID="BUS_I" elementRestriction="bus"/>
+                </parameter>
+                <parameter purpose="parameter" empty="true" label="Real Power Output" type="double" ID="PG">
+                    <display unit="MW" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter purpose="parameter" empty="true" label="Reactive Power Output" type="double" ID="QG">
+                    <display unit="MVAr" decimalFormatPattern="#.##"/>
+                </parameter>
+                <parameter empty="true" label="Maximum Reactive Power Output" type="double" ID="QMAX">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Minimum Reactive Power Output" type="double" ID="QMIN">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Voltage Magnitude Setpoint" type="double" ID="VG">
+                    <display unit="p.u."/>
+                </parameter>
+                <parameter empty="true" description="Total MVA Base of machine, defaults to baseMVA" label="Total MVA Base" type="double" ID="MBASE">
+                    <display unit="MVA"/>
+                </parameter>
+                <parameter value="1" restriction="list" label="Machine Status" type="integer" ID="GEN_STATUS">
+                    <option ID="1" label="in-service" value="1"/>
+                    <option ID="0" label="out-of-service" value="0"/>
+                    <display/>
+                </parameter>
+                <parameter empty="true" label="Maximum real power output" type="double" ID="PMAX">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" label="Minimum real power output" type="double" ID="PMIN">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" label="Lower real power output of PQ capability curve" type="double" ID="PC1">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" label="Upper real power output of PQ capability curve" type="double" ID="PC2">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" label="Minimum reactive power output at PC1" type="double" ID="QC1MIN">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Maximum reactive power output at PC1" type="double" ID="QC1MAX">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Minimum reactive power output at PC2" type="double" ID="QC2MIN">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Maximum reactive power output at PC2" type="double" ID="QC2MAX">
+                    <display unit="MVAr"/>
+                </parameter>
+                <parameter empty="true" label="Ramp rate for loading following/AGC" type="double" ID="RAMP_AGC">
+                    <display unit="MW/min"/>
+                </parameter>
+                <parameter empty="true" label="Ramp rate for 10 minute reserves" type="double" ID="RAMP_10">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" label="Ramp rate for 30 minute reserves" type="double" ID="RAMP_30">
+                    <display unit="MW"/>
+                </parameter>
+                <parameter empty="true" description="2 sec timescale" label="Ramp rate for reactive power" type="double" ID="RAMP_Q">
+                    <display unit="MVAr/min"/>
+                </parameter>
+                <parameter empty="true" label="Area participation factor" type="double" ID="APF">
+                    <display/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit&lt;/html&gt;" type="double" ID="MU_PMAX">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MW"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;P&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit&lt;/html&gt;" type="double" ID="MU_PMIN">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MW"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on upper &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit&lt;/html&gt;" type="double" ID="MU_QMAX">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MVAr"/>
+                </parameter>
+                <parameter empty="true" label="&lt;html&gt;Kuhn-Tucker multiplier on lower &lt;i&gt;Q&lt;sub&gt;g&lt;/sub&gt;&lt;/i&gt; limit&lt;/html&gt;" type="double" ID="MU_QMIN">
+                    <display unit="&lt;i&gt;u&lt;/i&gt;/MVAr"/>
+                </parameter>
+                <parameter empty="true" restriction="list" label="Cost model" type="integer" ID="MODEL">
+                    <option ID="1" label="Piecewise linear" value="1"/>
+                    <option ID="2" label="polynomial" value="2"/>
+                    <display/>
+                </parameter>
+                <parameter empty="true" description="Not currently used by any MATPOWER functions" label="Startup cost in US dollars" type="double" ID="STARTUP">
+                    <display unit="$"/>
+                </parameter>
+                <parameter empty="true" description="Not currently used by any MATPOWER functions" label="Shutdown cost in US dollars" type="double" ID="SHUTDOWN">
+                    <display unit="$"/>
+                </parameter>
+                <parameter empty="true" description="Number of cost coefficients for polynomial cost function, or number of data points for piecewise linear" label="Number cost" type="integer" ID="NCOST">
+                    <display/>
+                </parameter>
+                <parameter empty="true" description="Parameters definining total cost function f(p) begin in this column, units of f and p are $/hr and MW (or MVAr), respectively" label="Parameters definining total cost function" type="double" ID="COST">
+                    <display/>
+                </parameter>
+                <model label="Default Matpower Generator" ID="unknown"/>
+            </modelClass>
+            <modelClass label="Markers" ID="marker">
+                <parameter empty="true" description="Name of this marker" label="Name" type="text" ID="NAME">
+                    <display/>
+                </parameter>
+                <parameter empty="true" restriction="existing parameter value" label="Bus Number" type="integer" ID="PARENT_BUS">
+                    <display parameterID="BUS_I" elementRestriction="bus"/>
+                </parameter>
+                <parameter empty="true" description="" label="Latitude" type="double" ID="LATITUDE"/>
+                <parameter empty="true" description="" label="Longitude" type="double" ID="LONGITUDE"/>
+                <parameter empty="true" restriction="list" label="Shape" type="text" ID="SHAPE">
+                    <option ID="NETWORK" label="Network" value="shape.network"/>
+                    <option ID="BUS" label="Bus" value="shape.bus.default"/>
+                    <option ID="BRANCH" label="Branch" value="shape.branch.default"/>
+                    <option ID="TRANSFORMER" label="Transformer" value="shape.branch.transformer"/>
+                    <display/>
+                </parameter>
+                <modelClass label="Connection" ID="connection">
+                    <model label="Network" ID="network">
+                        <parameter value="shape.network" ID="SHAPE"/>
+                    </model>
+                    <model label="Tie line" ID="tie_line">
+                        <parameter value="shape.network" ID="SHAPE"/>
+                    </model>
+                </modelClass>
+            </modelClass>
+            <model label="Unknown Element" ID="unknown">
+                <parameter empty="true" label="Name" type="text" ID="NAME">
+                    <display/>
+                </parameter>
+            </model>
+        </modelClass>
+        <modelClass label="Scripts" ID="script">
+            <parameter empty="true" description="File name of Matlab script to be executed" label="Matlab Script" type="text" ID="SCRIPT">
+                <display/>
+            </parameter>
+            <parameter value="false" description="&lt;html&gt;Controls whether a new network will be created before executing this script.&lt;br&gt;Disabling this option will execute this script on a selected network" label="Create a new network" type="boolean" ID="CREATE_NETWORK">
+                <display/>
+            </parameter>
+            <parameter value="true" description="&lt;html&gt;Change Matlab's path to the directory of the&lt;br&gt;current case file before executing this script." label="Change Matlab's path" type="boolean" ID="CHANGE_PATH">
+                <display/>
+            </parameter>
+            <model label="1. Import Matpower Case" ID="import_matpower_case">
+                <parameter value="ui_import_matpower_case.m" ID="SCRIPT"/>
+                <parameter empty="true" restriction="list" label="Input Matpower Case" type="text" ID="INPUT_MATPOWER_CASE">
+                    <option ID="case14" label="IEEE 14 Bus Test Case" value="case14"/>
+                    <option ID="case30" label="IEEE 30 Bus Test Case" value="case30"/>
+                    <display/>
+                </parameter>
+            </model>
+            <model label="2. Calculate Power Flow" ID="calc_power_flow">
+                <parameter purpose="scenario" empty="true" restriction="list" label="Power flow algorithm" type="text" ID="POWER_FLOW_ALGO">
+                    <option ID="PF" label="AC Standard" value="PF"/>
+                    <option ID="OPF" label="AC Optimal" value="OPF"/>
+                    <option ID="UOPF" label="AC Optimal with unit-decommitment heuristic" value="UOPF"/>
+                    <option ID="DCPF" label="DC Standard" value="DCPF"/>
+                    <option ID="DCOPF" label="DC Optimal" value="DCOPF"/>
+                    <option ID="DUOPF" label="DC Optimal with unit-decommitment heuristic" value="DUOPF"/>
+                    <display/>
+                </parameter>
+                <parameter value="calc_power_flow" ID="SCRIPT"/>
+                <parameter value="false" ID="CHANGE_PATH"/>
+            </model>
+        </modelClass>
+        <modelClass label="Flags" ID="flag">
+            <parameter empty="true" description="A scientific unit for the value" label="Unit" type="text" ID="UNIT">
+                <display/>
+            </parameter>
+            <parameter value="#.##" description="A number pattern for controlling the display of the value (e.g. precision)" label="Pattern" type="text" ID="DISPLAY_PATTERN">
+                <display/>
+            </parameter>
+            <parameter value="95" description="The level at which a percentage value will produce a warning (in %)" label="Warning level" type="double" ID="WARNING_LEVEL">
+                <display min="0.0" increment="5.0" decimalFormatPattern="#%"/>
+            </parameter>
+            <parameter value="101" description="The level at which a percentage value will produce an error (in %)" label="Error level" type="double" ID="ERROR_LEVEL">
+                <display min="0.0" increment="5.0" decimalFormatPattern="#%"/>
+            </parameter>
+            <parameter value="true" description="Sets if this flag should be visible in the user interface." label="Visible" type="boolean" ID="VISIBLE">
+                <display/>
+            </parameter>
+            <parameter value="false" description="Only the warning and error levels will be taken into account,&lt;br&gt;regardless of any explicit setting on script side." label="Only use maximum values" type="boolean" ID="ONLY_USE_MAXIMUM_VALUES">
+                <display/>
+            </parameter>
+            <modelClass label="Branch" ID="branch">
+                <model label="Emergency term rating" ID="emergency_term_rating">
+                    <parameter value="MVA" ID="UNIT"/>
+                </model>
+                <model label="Long term rating" ID="long_term_rating">
+                    <parameter value="MVA" ID="UNIT"/>
+                </model>
+                <model label="Short term rating" ID="short_term_rating">
+                    <parameter value="MVA" ID="UNIT"/>
+                </model>
+            </modelClass>
+            <modelClass label="Bus" ID="bus">
+                <model label="Voltage magnitude" ID="voltage_magnitude">
+                    <parameter value="p.u." ID="UNIT"/>
+                    <parameter value="#.###" ID="DISPLAY_PATTERN"/>
+                </model>
+            </modelClass>
+            <modelClass label="Generator" ID="generator">
+                <model label="Reactive power Output" ID="reactive_power_output">
+                    <parameter value="MVAr" ID="UNIT"/>
+                </model>
+                <model label="Real power Output" ID="real_power_output">
+                    <parameter value="MW" ID="UNIT"/>
+                </model>
+            </modelClass>
+        </modelClass>
+        <modelClass label="Outlines" ID="outline">
+            <parameter empty="true" label="CSV Data file" type="text" ID="CSV_DATA_FILE">
+                <display/>
+            </parameter>
+            <parameter value="true" label="Enabled" type="boolean" ID="ENABLED">
+                <display/>
+            </parameter>
+            <parameter empty="false" value="192,192,192" restriction="color (RGB)" label="Border color" type="text" ID="BORDER_COLOR">
+                <display/>
+            </parameter>
+            <parameter empty="true" restriction="color (RGB)" label="Background color" type="text" ID="BACKGROUND_COLOR">
+                <display/>
+            </parameter>
+        </modelClass>
+    </model-db>
+    <network caseID="0" internalID="7" name="IEEE 14 Bus Test Case">
+        <parameter value="calc_power_flow" ID="SCRIPT"/>
+        <parameter value="case14" ID="INPUT_MATPOWER_CASE"/>
+        <parameter value="100.0" ID="BASE_MVA"/>
+        <parameter value="PF" ID="POWER_FLOW_ALGO"/>
+        <parameter value="false" ID="CHANGE_PATH"/>
+        <element modelID="bus.unknown">
+            <parameter value="1.0" ID="index"/>
+            <parameter value="bus_1_ref" ID="IDENTIFIER"/>
+            <parameter value="1.0" ID="BUS_I"/>
+            <parameter value="3.0" ID="BUS_TYPE"/>
+            <parameter value="0.0" ID="PD"/>
+            <parameter value="0.0" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.06" ID="VM"/>
+            <parameter value="0.0" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.0" ID="LATITUDE"/>
+            <parameter value="0.0" ID="LONGITUDE"/>
+            <parameter value="1" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="2.0" ID="index"/>
+            <parameter value="bus_2_ref" ID="IDENTIFIER"/>
+            <parameter value="2.0" ID="BUS_I"/>
+            <parameter value="2.0" ID="BUS_TYPE"/>
+            <parameter value="21.7" ID="PD"/>
+            <parameter value="12.7" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.045" ID="VM"/>
+            <parameter value="-4.98" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="-0.3" ID="LATITUDE"/>
+            <parameter value="0.2" ID="LONGITUDE"/>
+            <parameter value="2" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="3.0" ID="index"/>
+            <parameter value="bus_3_ref" ID="IDENTIFIER"/>
+            <parameter value="3.0" ID="BUS_I"/>
+            <parameter value="2.0" ID="BUS_TYPE"/>
+            <parameter value="94.2" ID="PD"/>
+            <parameter value="19.0" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.01" ID="VM"/>
+            <parameter value="-12.72" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="-0.4" ID="LATITUDE"/>
+            <parameter value="0.8" ID="LONGITUDE"/>
+            <parameter value="3" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="4.0" ID="index"/>
+            <parameter value="bus_4_ref" ID="IDENTIFIER"/>
+            <parameter value="4.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="47.8" ID="PD"/>
+            <parameter value="-3.9" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.019" ID="VM"/>
+            <parameter value="-10.33" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="-0.15" ID="LATITUDE"/>
+            <parameter value="0.8" ID="LONGITUDE"/>
+            <parameter value="4" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="5.0" ID="index"/>
+            <parameter value="bus_5_ref" ID="IDENTIFIER"/>
+            <parameter value="5.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="7.6" ID="PD"/>
+            <parameter value="1.6" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.02" ID="VM"/>
+            <parameter value="-8.78" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="-0.1" ID="LATITUDE"/>
+            <parameter value="0.4" ID="LONGITUDE"/>
+            <parameter value="5" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="6.0" ID="index"/>
+            <parameter value="bus_6_ref" ID="IDENTIFIER"/>
+            <parameter value="6.0" ID="BUS_I"/>
+            <parameter value="2.0" ID="BUS_TYPE"/>
+            <parameter value="11.2" ID="PD"/>
+            <parameter value="7.5" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.07" ID="VM"/>
+            <parameter value="-14.22" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.05" ID="LATITUDE"/>
+            <parameter value="0.4" ID="LONGITUDE"/>
+            <parameter value="6" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="7.0" ID="index"/>
+            <parameter value="bus_7_ref" ID="IDENTIFIER"/>
+            <parameter value="7.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="0.0" ID="PD"/>
+            <parameter value="0.0" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.062" ID="VM"/>
+            <parameter value="-13.37" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="-0.025" ID="LATITUDE"/>
+            <parameter value="0.8" ID="LONGITUDE"/>
+            <parameter value="7" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="8.0" ID="index"/>
+            <parameter value="bus_8_ref" ID="IDENTIFIER"/>
+            <parameter value="8.0" ID="BUS_I"/>
+            <parameter value="2.0" ID="BUS_TYPE"/>
+            <parameter value="0.0" ID="PD"/>
+            <parameter value="0.0" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.09" ID="VM"/>
+            <parameter value="-13.36" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.0" ID="LATITUDE"/>
+            <parameter value="1.0" ID="LONGITUDE"/>
+            <parameter value="8" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="9.0" ID="index"/>
+            <parameter value="bus_9_ref" ID="IDENTIFIER"/>
+            <parameter value="9.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="29.5" ID="PD"/>
+            <parameter value="16.6" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="19.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.056" ID="VM"/>
+            <parameter value="-14.94" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.1" ID="LATITUDE"/>
+            <parameter value="0.8" ID="LONGITUDE"/>
+            <parameter value="9" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="10.0" ID="index"/>
+            <parameter value="bus_10_ref" ID="IDENTIFIER"/>
+            <parameter value="10.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="9.0" ID="PD"/>
+            <parameter value="5.8" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.051" ID="VM"/>
+            <parameter value="-15.1" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.15" ID="LATITUDE"/>
+            <parameter value="0.7" ID="LONGITUDE"/>
+            <parameter value="10" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="11.0" ID="index"/>
+            <parameter value="bus_11_ref" ID="IDENTIFIER"/>
+            <parameter value="11.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="3.5" ID="PD"/>
+            <parameter value="1.8" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.057" ID="VM"/>
+            <parameter value="-14.79" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.15" ID="LATITUDE"/>
+            <parameter value="0.55" ID="LONGITUDE"/>
+            <parameter value="11" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="12.0" ID="index"/>
+            <parameter value="bus_12_ref" ID="IDENTIFIER"/>
+            <parameter value="12.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="6.1" ID="PD"/>
+            <parameter value="1.6" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.055" ID="VM"/>
+            <parameter value="-15.07" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.3" ID="LATITUDE"/>
+            <parameter value="0.2" ID="LONGITUDE"/>
+            <parameter value="12" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="13.0" ID="index"/>
+            <parameter value="bus_13_ref" ID="IDENTIFIER"/>
+            <parameter value="13.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="13.5" ID="PD"/>
+            <parameter value="5.8" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.05" ID="VM"/>
+            <parameter value="-15.16" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.4" ID="LATITUDE"/>
+            <parameter value="0.4" ID="LONGITUDE"/>
+            <parameter value="13" ID="NAME"/>
+        </element>
+        <element modelID="bus.unknown">
+            <parameter value="14.0" ID="index"/>
+            <parameter value="bus_14_ref" ID="IDENTIFIER"/>
+            <parameter value="14.0" ID="BUS_I"/>
+            <parameter value="1.0" ID="BUS_TYPE"/>
+            <parameter value="14.9" ID="PD"/>
+            <parameter value="5.0" ID="QD"/>
+            <parameter value="0.0" ID="GS"/>
+            <parameter value="0.0" ID="BS"/>
+            <parameter value="1.0" ID="BUS_AREA"/>
+            <parameter value="1.036" ID="VM"/>
+            <parameter value="-16.04" ID="VA"/>
+            <parameter value="135.0" ID="BASE_KV"/>
+            <parameter value="1.0" ID="ZONE"/>
+            <parameter value="1.06" ID="VMAX"/>
+            <parameter value="0.94" ID="VMIN"/>
+            <parameter value="0.3" ID="LATITUDE"/>
+            <parameter value="0.7" ID="LONGITUDE"/>
+            <parameter value="14" ID="NAME"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="1 - 2" ID="NAME"/>
+            <parameter value="1.0" ID="index"/>
+            <parameter value="1.0" ID="F_BUS"/>
+            <parameter value="2.0" ID="T_BUS"/>
+            <parameter value="0.01938" ID="BR_R"/>
+            <parameter value="0.05917" ID="BR_X"/>
+            <parameter value="0.0528" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="1 - 5" ID="NAME"/>
+            <parameter value="2.0" ID="index"/>
+            <parameter value="1.0" ID="F_BUS"/>
+            <parameter value="5.0" ID="T_BUS"/>
+            <parameter value="0.05403" ID="BR_R"/>
+            <parameter value="0.22304" ID="BR_X"/>
+            <parameter value="0.0492" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="2 - 3" ID="NAME"/>
+            <parameter value="3.0" ID="index"/>
+            <parameter value="2.0" ID="F_BUS"/>
+            <parameter value="3.0" ID="T_BUS"/>
+            <parameter value="0.04699" ID="BR_R"/>
+            <parameter value="0.19797" ID="BR_X"/>
+            <parameter value="0.0438" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="2 - 4" ID="NAME"/>
+            <parameter value="4.0" ID="index"/>
+            <parameter value="2.0" ID="F_BUS"/>
+            <parameter value="4.0" ID="T_BUS"/>
+            <parameter value="0.05811" ID="BR_R"/>
+            <parameter value="0.17632" ID="BR_X"/>
+            <parameter value="0.034" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="2 - 5" ID="NAME"/>
+            <parameter value="5.0" ID="index"/>
+            <parameter value="2.0" ID="F_BUS"/>
+            <parameter value="5.0" ID="T_BUS"/>
+            <parameter value="0.05695" ID="BR_R"/>
+            <parameter value="0.17388" ID="BR_X"/>
+            <parameter value="0.0346" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="3 - 4" ID="NAME"/>
+            <parameter value="6.0" ID="index"/>
+            <parameter value="3.0" ID="F_BUS"/>
+            <parameter value="4.0" ID="T_BUS"/>
+            <parameter value="0.06701" ID="BR_R"/>
+            <parameter value="0.17103" ID="BR_X"/>
+            <parameter value="0.0128" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="4 - 5" ID="NAME"/>
+            <parameter value="7.0" ID="index"/>
+            <parameter value="4.0" ID="F_BUS"/>
+            <parameter value="5.0" ID="T_BUS"/>
+            <parameter value="0.01335" ID="BR_R"/>
+            <parameter value="0.04211" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="4 - 7" ID="NAME"/>
+            <parameter value="8.0" ID="index"/>
+            <parameter value="4.0" ID="F_BUS"/>
+            <parameter value="7.0" ID="T_BUS"/>
+            <parameter value="0.0" ID="BR_R"/>
+            <parameter value="0.20912" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.978" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="4 - 9" ID="NAME"/>
+            <parameter value="9.0" ID="index"/>
+            <parameter value="4.0" ID="F_BUS"/>
+            <parameter value="9.0" ID="T_BUS"/>
+            <parameter value="0.0" ID="BR_R"/>
+            <parameter value="0.55618" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.969" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="5 - 6" ID="NAME"/>
+            <parameter value="10.0" ID="index"/>
+            <parameter value="5.0" ID="F_BUS"/>
+            <parameter value="6.0" ID="T_BUS"/>
+            <parameter value="0.0" ID="BR_R"/>
+            <parameter value="0.25202" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.932" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="6 - 11" ID="NAME"/>
+            <parameter value="11.0" ID="index"/>
+            <parameter value="6.0" ID="F_BUS"/>
+            <parameter value="11.0" ID="T_BUS"/>
+            <parameter value="0.09498" ID="BR_R"/>
+            <parameter value="0.1989" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="6 - 12" ID="NAME"/>
+            <parameter value="12.0" ID="index"/>
+            <parameter value="6.0" ID="F_BUS"/>
+            <parameter value="12.0" ID="T_BUS"/>
+            <parameter value="0.12291" ID="BR_R"/>
+            <parameter value="0.25581" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="6 - 13" ID="NAME"/>
+            <parameter value="13.0" ID="index"/>
+            <parameter value="6.0" ID="F_BUS"/>
+            <parameter value="13.0" ID="T_BUS"/>
+            <parameter value="0.06615" ID="BR_R"/>
+            <parameter value="0.13027" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="7 - 8" ID="NAME"/>
+            <parameter value="14.0" ID="index"/>
+            <parameter value="7.0" ID="F_BUS"/>
+            <parameter value="8.0" ID="T_BUS"/>
+            <parameter value="0.0" ID="BR_R"/>
+            <parameter value="0.17615" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="7 - 9" ID="NAME"/>
+            <parameter value="15.0" ID="index"/>
+            <parameter value="7.0" ID="F_BUS"/>
+            <parameter value="9.0" ID="T_BUS"/>
+            <parameter value="0.0" ID="BR_R"/>
+            <parameter value="0.11001" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="9 - 10" ID="NAME"/>
+            <parameter value="16.0" ID="index"/>
+            <parameter value="9.0" ID="F_BUS"/>
+            <parameter value="10.0" ID="T_BUS"/>
+            <parameter value="0.03181" ID="BR_R"/>
+            <parameter value="0.0845" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="9 - 14" ID="NAME"/>
+            <parameter value="17.0" ID="index"/>
+            <parameter value="9.0" ID="F_BUS"/>
+            <parameter value="14.0" ID="T_BUS"/>
+            <parameter value="0.12711" ID="BR_R"/>
+            <parameter value="0.27038" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="10 - 11" ID="NAME"/>
+            <parameter value="18.0" ID="index"/>
+            <parameter value="10.0" ID="F_BUS"/>
+            <parameter value="11.0" ID="T_BUS"/>
+            <parameter value="0.08205" ID="BR_R"/>
+            <parameter value="0.19207" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="12 - 13" ID="NAME"/>
+            <parameter value="19.0" ID="index"/>
+            <parameter value="12.0" ID="F_BUS"/>
+            <parameter value="13.0" ID="T_BUS"/>
+            <parameter value="0.22092" ID="BR_R"/>
+            <parameter value="0.19988" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="branch.unknown">
+            <parameter value="13 - 14" ID="NAME"/>
+            <parameter value="20.0" ID="index"/>
+            <parameter value="13.0" ID="F_BUS"/>
+            <parameter value="14.0" ID="T_BUS"/>
+            <parameter value="0.17093" ID="BR_R"/>
+            <parameter value="0.34802" ID="BR_X"/>
+            <parameter value="0.0" ID="BR_B"/>
+            <parameter value="0.0" ID="RATE_A"/>
+            <parameter value="0.0" ID="RATE_B"/>
+            <parameter value="0.0" ID="RATE_C"/>
+            <parameter value="0.0" ID="TAP"/>
+            <parameter value="0.0" ID="SHIFT"/>
+            <parameter value="1.0" ID="BR_STATUS"/>
+            <parameter value="-360.0" ID="ANGMIN"/>
+            <parameter value="360.0" ID="ANGMAX"/>
+        </element>
+        <element modelID="generator.unknown">
+            <parameter value="1.0" ID="index"/>
+            <parameter value="1.0" ID="GEN_BUS"/>
+            <parameter value="232.4" ID="PG"/>
+            <parameter value="-16.9" ID="QG"/>
+            <parameter value="10.0" ID="QMAX"/>
+            <parameter value="0.0" ID="QMIN"/>
+            <parameter value="1.06" ID="VG"/>
+            <parameter value="100.0" ID="MBASE"/>
+            <parameter value="1.0" ID="GEN_STATUS"/>
+            <parameter value="332.4" ID="PMAX"/>
+            <parameter value="0.0" ID="PMIN"/>
+        </element>
+        <element modelID="generator.unknown">
+            <parameter value="2.0" ID="index"/>
+            <parameter value="2.0" ID="GEN_BUS"/>
+            <parameter value="40.0" ID="PG"/>
+            <parameter value="42.4" ID="QG"/>
+            <parameter value="50.0" ID="QMAX"/>
+            <parameter value="-40.0" ID="QMIN"/>
+            <parameter value="1.045" ID="VG"/>
+            <parameter value="100.0" ID="MBASE"/>
+            <parameter value="1.0" ID="GEN_STATUS"/>
+            <parameter value="140.0" ID="PMAX"/>
+            <parameter value="0.0" ID="PMIN"/>
+        </element>
+        <element modelID="generator.unknown">
+            <parameter value="3.0" ID="index"/>
+            <parameter value="3.0" ID="GEN_BUS"/>
+            <parameter value="0.0" ID="PG"/>
+            <parameter value="23.4" ID="QG"/>
+            <parameter value="40.0" ID="QMAX"/>
+            <parameter value="0.0" ID="QMIN"/>
+            <parameter value="1.01" ID="VG"/>
+            <parameter value="100.0" ID="MBASE"/>
+            <parameter value="1.0" ID="GEN_STATUS"/>
+            <parameter value="100.0" ID="PMAX"/>
+            <parameter value="0.0" ID="PMIN"/>
+        </element>
+        <element modelID="generator.unknown">
+            <parameter value="4.0" ID="index"/>
+            <parameter value="6.0" ID="GEN_BUS"/>
+            <parameter value="0.0" ID="PG"/>
+            <parameter value="12.2" ID="QG"/>
+            <parameter value="24.0" ID="QMAX"/>
+            <parameter value="-6.0" ID="QMIN"/>
+            <parameter value="1.07" ID="VG"/>
+            <parameter value="100.0" ID="MBASE"/>
+            <parameter value="1.0" ID="GEN_STATUS"/>
+            <parameter value="100.0" ID="PMAX"/>
+            <parameter value="0.0" ID="PMIN"/>
+        </element>
+        <element modelID="generator.unknown">
+            <parameter value="5.0" ID="index"/>
+            <parameter value="8.0" ID="GEN_BUS"/>
+            <parameter value="0.0" ID="PG"/>
+            <parameter value="17.4" ID="QG"/>
+            <parameter value="24.0" ID="QMAX"/>
+            <parameter value="-6.0" ID="QMIN"/>
+            <parameter value="1.09" ID="VG"/>
+            <parameter value="100.0" ID="MBASE"/>
+            <parameter value="1.0" ID="GEN_STATUS"/>
+            <parameter value="100.0" ID="PMAX"/>
+            <parameter value="0.0" ID="PMIN"/>
+        </element>
+    </network>
+    <dataViewer modelID="viewer.network.map">
+        <parameter value="Network" ID="TITLE"/>
+        <parameter value="left" ID="POSITION"/>
+        <parameter value="0" ID="ZOOM"/>
+        <parameter value="true" ID="SHOW_LEGEND"/>
+        <parameter value="true" ID="KEEP_ASPECT_RATIO"/>
+        <parameter value="true" ID="DRAW_BUSSES"/>
+        <parameter value="true" ID="DRAW_BRANCHES"/>
+        <parameter value="true" ID="DRAW_POWER_FLOW_DIRECTION"/>
+        <parameter value="true" ID="DRAW_GENERATORS"/>
+        <parameter value="true" ID="DRAW_OUTLINE"/>
+        <parameter value="true" ID="ALLOW_ZOOMING"/>
+        <parameter value="true" ID="ALLOW_DRAGGING"/>
+        <parameter value="true" ID="SHOW_TOOLTIPS"/>
+        <parameter value="true" ID="DRAW_BUS_NAMES"/>
+        <parameter value="true" ID="FADE_OUT_UNSELECTED"/>
+        <parameter value="true" ID="DRAW_AREAS"/>
+        <parameter value="FIXED_VALUE" ID="AREA_DISPLAY_VALUE"/>
+        <parameter ID="AREA_ELEMENT_FILTER"/>
+        <parameter ID="AREA_PARAMETER_NAME"/>
+        <parameter ID="AREA_MIN_VALUE"/>
+        <parameter ID="AREA_MAX_VALUE"/>
+        <parameter value="255,255,255" ID="AREA_MIN_COLOR"/>
+        <parameter value="255,0,0" ID="AREA_MAX_COLOR"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.element.viewer">
+        <parameter value="Network Navigator" ID="TITLE"/>
+        <parameter value="right" ID="POSITION"/>
+        <parameter value="Area" ID="VIEWER_AREA_NAME"/>
+        <parameter value="BUS_AREA" ID="VIEWER_AREA_PARAMETER"/>
+        <parameter value="true" ID="GROUP_BUS_BY_AREA"/>
+        <parameter value="true" ID="GROUP_BUS_BY_LOCATION"/>
+        <parameter value="true" ID="GROUP_BRANCH_BY_AREA"/>
+        <parameter value="true" ID="GROUP_BRANCH_BY_LOCATION"/>
+        <parameter value="true" ID="GROUP_BRANCH_BY_VOLTAGE"/>
+        <parameter value="true" ID="GROUP_ELEMENTS_BY_AREA"/>
+        <parameter value="true" ID="GROUP_ELEMENTS_BY_LOCATION"/>
+        <parameter value="true" ID="SHOW_NETWORK_PARAMETERS"/>
+        <parameter value="true" ID="SHOW_SUMS_OF_VALUES"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.table.type_filter">
+        <parameter value="Bus Data" ID="TITLE"/>
+        <parameter value="bus" ID="ELEMENT_FILTER"/>
+        <parameter value="bottom" ID="POSITION"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.table.type_filter">
+        <parameter value="Branch Data" ID="TITLE"/>
+        <parameter value="branch" ID="ELEMENT_FILTER"/>
+        <parameter value="bottom" ID="POSITION"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.table.type_filter">
+        <parameter value="Generator Data" ID="TITLE"/>
+        <parameter value="generator" ID="ELEMENT_FILTER"/>
+        <parameter value="bottom" ID="POSITION"/>
+        <parameter value="false" ID="EXPORT_ROUND_VALUES"/>
+        <parameter value="true" ID="EXPORT_REMOVE_PERCENTAGE_SYMBOL"/>
+        <parameter value="true" ID="EXPORT_CONVERT_BOOLEAN_VALUES"/>
+        <parameter ID="EXPORT_DECIMAL_SEPARATOR"/>
+        <parameter value="value" ID="EXPORT_LIST_VALUES"/>
+        <parameter ID="IMPORT_DECIMAL_SEPARATOR"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.network.contour">
+        <parameter value="Voltage Magnitude [p.u.]" ID="TITLE"/>
+        <parameter value="left" ID="POSITION"/>
+        <parameter value="0" ID="ZOOM"/>
+        <parameter value="true" ID="SHOW_LEGEND"/>
+        <parameter value="true" ID="KEEP_ASPECT_RATIO"/>
+        <parameter value="true" ID="DRAW_BUSSES"/>
+        <parameter value="true" ID="DRAW_BRANCHES"/>
+        <parameter value="true" ID="DRAW_POWER_FLOW_DIRECTION"/>
+        <parameter value="true" ID="DRAW_GENERATORS"/>
+        <parameter value="true" ID="DRAW_OUTLINE"/>
+        <parameter value="true" ID="ALLOW_ZOOMING"/>
+        <parameter value="true" ID="ALLOW_DRAGGING"/>
+        <parameter value="true" ID="SHOW_TOOLTIPS"/>
+        <parameter value="true" ID="DRAW_BUS_NAMES"/>
+        <parameter value="true" ID="FADE_OUT_UNSELECTED"/>
+        <parameter value="true" ID="DRAW_AREAS"/>
+        <parameter value="FIXED_VALUE" ID="AREA_DISPLAY_VALUE"/>
+        <parameter ID="AREA_ELEMENT_FILTER"/>
+        <parameter ID="AREA_PARAMETER_NAME"/>
+        <parameter ID="AREA_MIN_VALUE"/>
+        <parameter ID="AREA_MAX_VALUE"/>
+        <parameter value="255,255,255" ID="AREA_MIN_COLOR"/>
+        <parameter value="255,0,0" ID="AREA_MAX_COLOR"/>
+        <parameter value="bus" ID="CONTOUR_ELEMENT_ID_PREFIX"/>
+        <parameter value="VM" ID="CONTOUR_PARAMETER_NAME"/>
+        <parameter value="1.1" ID="CONTOUR_MAX_VALUE"/>
+        <parameter value="1" ID="CONTOUR_MIDDLE_VALUE"/>
+        <parameter value="0.9" ID="CONTOUR_MIN_VALUE"/>
+        <parameter value="70.0" ID="CONTOUR_MAX_DISTANCE"/>
+        <parameter value="0.93" ID="CONTOUR_MAX_REL_DISTANCE"/>
+        <parameter value="5.0" ID="CONTOUR_COLOR_STEPS"/>
+        <parameter value="3" ID="COLOR_PROVIDER"/>
+        <parameter value="255,0,0" ID="CONTOUR_MAX_COLOR"/>
+        <parameter value="255,255,0" ID="CONTOUR_UPPER_HALF_COLOR"/>
+        <parameter value="255,255,255" ID="CONTOUR_MIDDLE_COLOR"/>
+        <parameter value="0,255,255" ID="CONTOUR_LOWER_HALF_COLOR"/>
+        <parameter value="0,0,255" ID="CONTOUR_MIN_COLOR"/>
+        <parameter value="0" ID="ACTION_OUT_OF_BOUNDS"/>
+        <parameter value="185.0" ID="TRANSPARENCY"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.network.contour">
+        <parameter value="Load [MW]" ID="TITLE"/>
+        <parameter value="left" ID="POSITION"/>
+        <parameter value="0" ID="ZOOM"/>
+        <parameter value="true" ID="SHOW_LEGEND"/>
+        <parameter value="true" ID="KEEP_ASPECT_RATIO"/>
+        <parameter value="true" ID="DRAW_BUSSES"/>
+        <parameter value="true" ID="DRAW_BRANCHES"/>
+        <parameter value="true" ID="DRAW_POWER_FLOW_DIRECTION"/>
+        <parameter value="true" ID="DRAW_GENERATORS"/>
+        <parameter value="true" ID="DRAW_OUTLINE"/>
+        <parameter value="true" ID="ALLOW_ZOOMING"/>
+        <parameter value="true" ID="ALLOW_DRAGGING"/>
+        <parameter value="true" ID="SHOW_TOOLTIPS"/>
+        <parameter value="true" ID="DRAW_BUS_NAMES"/>
+        <parameter value="true" ID="FADE_OUT_UNSELECTED"/>
+        <parameter value="true" ID="DRAW_AREAS"/>
+        <parameter value="FIXED_VALUE" ID="AREA_DISPLAY_VALUE"/>
+        <parameter ID="AREA_ELEMENT_FILTER"/>
+        <parameter ID="AREA_PARAMETER_NAME"/>
+        <parameter ID="AREA_MIN_VALUE"/>
+        <parameter ID="AREA_MAX_VALUE"/>
+        <parameter value="255,255,255" ID="AREA_MIN_COLOR"/>
+        <parameter value="255,0,0" ID="AREA_MAX_COLOR"/>
+        <parameter value="bus" ID="CONTOUR_ELEMENT_ID_PREFIX"/>
+        <parameter value="PD" ID="CONTOUR_PARAMETER_NAME"/>
+        <parameter value="100" ID="CONTOUR_MAX_VALUE"/>
+        <parameter value="0" ID="CONTOUR_MIDDLE_VALUE"/>
+        <parameter value="-100" ID="CONTOUR_MIN_VALUE"/>
+        <parameter value="70.0" ID="CONTOUR_MAX_DISTANCE"/>
+        <parameter value="0.93" ID="CONTOUR_MAX_REL_DISTANCE"/>
+        <parameter value="5.0" ID="CONTOUR_COLOR_STEPS"/>
+        <parameter value="3" ID="COLOR_PROVIDER"/>
+        <parameter value="255,0,0" ID="CONTOUR_MAX_COLOR"/>
+        <parameter value="255,255,0" ID="CONTOUR_UPPER_HALF_COLOR"/>
+        <parameter value="255,255,255" ID="CONTOUR_MIDDLE_COLOR"/>
+        <parameter value="0,255,255" ID="CONTOUR_LOWER_HALF_COLOR"/>
+        <parameter value="0,0,255" ID="CONTOUR_MIN_COLOR"/>
+        <parameter value="0" ID="ACTION_OUT_OF_BOUNDS"/>
+        <parameter value="185.0" ID="TRANSPARENCY"/>
+    </dataViewer>
+    <dataViewer modelID="viewer.network.contour">
+        <parameter value="Generation [MW]" ID="TITLE"/>
+        <parameter value="left" ID="POSITION"/>
+        <parameter value="0" ID="ZOOM"/>
+        <parameter value="true" ID="SHOW_LEGEND"/>
+        <parameter value="true" ID="KEEP_ASPECT_RATIO"/>
+        <parameter value="true" ID="DRAW_BUSSES"/>
+        <parameter value="true" ID="DRAW_BRANCHES"/>
+        <parameter value="true" ID="DRAW_POWER_FLOW_DIRECTION"/>
+        <parameter value="true" ID="DRAW_GENERATORS"/>
+        <parameter value="true" ID="DRAW_OUTLINE"/>
+        <parameter value="true" ID="ALLOW_ZOOMING"/>
+        <parameter value="true" ID="ALLOW_DRAGGING"/>
+        <parameter value="true" ID="SHOW_TOOLTIPS"/>
+        <parameter value="true" ID="DRAW_BUS_NAMES"/>
+        <parameter value="true" ID="FADE_OUT_UNSELECTED"/>
+        <parameter value="true" ID="DRAW_AREAS"/>
+        <parameter value="FIXED_VALUE" ID="AREA_DISPLAY_VALUE"/>
+        <parameter ID="AREA_ELEMENT_FILTER"/>
+        <parameter ID="AREA_PARAMETER_NAME"/>
+        <parameter ID="AREA_MIN_VALUE"/>
+        <parameter ID="AREA_MAX_VALUE"/>
+        <parameter value="255,255,255" ID="AREA_MIN_COLOR"/>
+        <parameter value="255,0,0" ID="AREA_MAX_COLOR"/>
+        <parameter value="generator" ID="CONTOUR_ELEMENT_ID_PREFIX"/>
+        <parameter value="PG" ID="CONTOUR_PARAMETER_NAME"/>
+        <parameter value="100" ID="CONTOUR_MAX_VALUE"/>
+        <parameter value="0" ID="CONTOUR_MIDDLE_VALUE"/>
+        <parameter value="-100" ID="CONTOUR_MIN_VALUE"/>
+        <parameter value="70.0" ID="CONTOUR_MAX_DISTANCE"/>
+        <parameter value="0.93" ID="CONTOUR_MAX_REL_DISTANCE"/>
+        <parameter value="5.0" ID="CONTOUR_COLOR_STEPS"/>
+        <parameter value="3" ID="COLOR_PROVIDER"/>
+        <parameter value="255,0,0" ID="CONTOUR_MAX_COLOR"/>
+        <parameter value="255,255,0" ID="CONTOUR_UPPER_HALF_COLOR"/>
+        <parameter value="255,255,255" ID="CONTOUR_MIDDLE_COLOR"/>
+        <parameter value="0,255,255" ID="CONTOUR_LOWER_HALF_COLOR"/>
+        <parameter value="0,0,255" ID="CONTOUR_MIN_COLOR"/>
+        <parameter value="0" ID="ACTION_OUT_OF_BOUNDS"/>
+        <parameter value="185.0" ID="TRANSPARENCY"/>
+    </dataViewer>
+</power_flow_case>
