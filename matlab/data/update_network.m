@@ -34,7 +34,7 @@ end
 define_constants;
     
 % collect data for visualisation
-if exist('mpc.success', 'var')
+if isfield(mpc, 'success')
     jnetwork.setParameter('SUCCESS', mpc.success);
 end
 

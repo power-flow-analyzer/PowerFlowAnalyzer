@@ -40,7 +40,7 @@ else
     jnetwork = create_network(jparentNetwork);
 end
 jnetwork.setParameter('BASE_MVA', mpc.baseMVA);
-if exist('mpc.success', 'var')
+if isfield(mpc, 'success')
     jnetwork.setParameter('SUCCESS', mpc.success);
 end
 
@@ -48,7 +48,7 @@ end
 for i=1:length(mpc.bus(:,1))
     % erstelle neuen Bus
     jbus = create_bus(jnetwork, mpc.bus(i,:));
-    % füge neuen Bus dem Netzwerk hinzu
+    % fï¿½ge neuen Bus dem Netzwerk hinzu
     jnetwork.addElement(jbus);
 end
 % create branches
@@ -57,7 +57,7 @@ for i=1:length(mpc.branch(:,1))
 end
 % create generators
 for i=1:length(mpc.gen(:,1))
-    if exist('mpc.gencost', 'var')
+    if isfield(mpc, 'gencost')
         jgenerator = create_generator(jnetwork, mpc.gen(i,:), mpc.gencost(i,:));
     else
         jgenerator = create_generator(jnetwork, mpc.gen(i,:));
