@@ -75,8 +75,8 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 	
 	private ModelDBDialog modelDBDialog;
 	private NetworkOverviewPane overviewPane;
-	private NetworkSwitcher networkSwitcher;
-	private DisplayTimerControls timerControls;
+//	private NetworkSwitcher networkSwitcher;
+//	private DisplayTimerControls timerControls;
 	
 	private Map<String, Outline> outlinesMap = new HashMap<String, Outline>();
 	private Collection<Outline> cachedOutlines;
@@ -110,17 +110,17 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 				fireActionUpdate();
 			}
 		});
-		networkSwitcher = new NetworkSwitcher();
-		timerControls = new DisplayTimerControls();
-		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		topPanel.add(networkSwitcher);
-		topPanel.add(timerControls);
-		add(topPanel, BorderLayout.NORTH);
+//		networkSwitcher = new NetworkSwitcher();
+//		timerControls = new DisplayTimerControls();
+//		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//		topPanel.add(networkSwitcher);
+//		topPanel.add(timerControls);
+//		add(topPanel, BorderLayout.NORTH);
 		add(networkTabs.getComponent(), BorderLayout.CENTER);
 		overviewPane.networkSelectionChanged();
 		getPowerFlowCase().getModelDB().addDatabaseChangeListener(this);
 		getPowerFlowCase().addPowerFlowCaseListener(this);
-		addActionUpdateListener(networkSwitcher);
+//		addActionUpdateListener(networkSwitcher);
 		updateOutlines(null, false);
 	}
 	
@@ -369,7 +369,7 @@ public class CaseViewer extends JPanel implements IActionUpdater, IDatabaseChang
 		modelDBDialog.setVisible(false);
 		getPowerFlowCase().getModelDB().removeDatabaseChangeListener(this);
 		getPowerFlowCase().removePowerFlowCaseListener(this);
-		removeActionUpdateListener(networkSwitcher);
+//		removeActionUpdateListener(networkSwitcher);
 		for (int i = 0; i < getViewerCount(); i++) {
 			getViewer(i + 1).removeActionUpdateListener(CaseViewer.this);
 			getViewer(i + 1).removeNetworkElementSelectionListener(modelDBDialog);
