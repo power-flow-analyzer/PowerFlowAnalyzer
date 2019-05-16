@@ -27,9 +27,9 @@ function pfaui_import_datasource( jnetwork )
 %     jnetwork.removeElements(jnetwork.getElements('branch'));
 %     jnetwork.removeElements(jnetwork.getElements('generator'));
 %     jnetwork.removeElements(jnetwork.getElements('unknown'));
-    jnetwork.removeAllElements();
+%     jnetwork.removeAllElements();
     % remove all outline definitions for areas from PFA-DB
-    jnetwork.getModelDB().getOutlineClass().getModel().clear();
+%     jnetwork.getModelDB().getOutlineClass().getModel().clear();
 
 %     
 % end
