@@ -25,6 +25,9 @@ if isstruct(input_data)
 
     for param_i = 1:length(parameters)
         param = parameters{param_i};
+        if strcmp(param, 'fields')
+            continue;
+        end
         value = input_data.(param)(index);
         if iscell(value)
             value = value{1};
